@@ -5,9 +5,6 @@
  *      Author: Pimenta
  */
 
-#include <SDL.h>
-#include <SDL_error.h>
-#include <SDL_main.h>
 #include <SDL_net.h>
 #include <cstdio>
 #include <cstdlib>
@@ -58,13 +55,16 @@ int main(int argc, char* argv[]) {
   char* msg = "<html><body>hello world</body></html>";
   
   while (true) {
+    SDL_Delay(50);
     TCPsocket client = SDLNet_TCP_Accept(tcpsock);
     if (client == nullptr)
       continue;
-    else
-      printf("olha q maravilha\n");
-    SDLNet_TCP_Send(client, "HTTP/1.0 200 OK\n\n", 17);
-    SDLNet_TCP_Send(client, msg, strlen(msg));
+    
+    char buf[9999];
+    SDLNet_TCP_Recv(client, buf, 9999);
+    printf("===============\nsize: %d\n===============\n%s\n\n", strlen(buf), buf);
+    //SDLNet_TCP_Send(client, headers, strlen(headers) + 1);
+    SDLNet_TCP_Send(client, msg, strlen(msg) + 1);
     SDLNet_TCP_Close(client);
   }
   
