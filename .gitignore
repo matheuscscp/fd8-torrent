@@ -3,3 +3,4 @@
 .settings
 Debug
 *.dll
+!3rd/bin/*
