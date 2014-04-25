@@ -5,10 +5,15 @@
  *      Author: Pimenta
  */
 
+#include <SDL.h>
+#include <SDL_error.h>
+#include <SDL_main.h>
 #include <SDL_net.h>
+#include <SDL_timer.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 
 using namespace std;
 
@@ -47,13 +52,6 @@ int main(int argc, char* argv[]) {
       exit(2);
   }
   
-  char * headers =
-      "HTTP 1.1 200 OK\n"
-      "Content-Type: text/html;\n"
-      "Server: rosettaNaBoletta 0.1;\n"
-      "\n";
-  char* msg = "<html><body>hello world</body></html>";
-  
   while (true) {
     SDL_Delay(50);
     TCPsocket client = SDLNet_TCP_Accept(tcpsock);
@@ -63,8 +61,23 @@ int main(int argc, char* argv[]) {
     char buf[9999];
     SDLNet_TCP_Recv(client, buf, 9999);
     printf("===============\nsize: %d\n===============\n%s\n\n", strlen(buf), buf);
-    //SDLNet_TCP_Send(client, headers, strlen(headers) + 1);
-    SDLNet_TCP_Send(client, msg, strlen(msg) + 1);
+    
+    char fn[100], buftmp[100];
+    sscanf(buf, "%s %s", buftmp, fn);
+    if (string(fn) == "/")
+      strcpy(fn, "/index.html");
+    FILE* fp = fopen((string(".") + fn).c_str(), "rb");
+    if (fp) {
+      size_t total;
+      while (total = fread(buf, sizeof(char), 10, fp))
+        SDLNet_TCP_Send(client, buf, total);
+      fclose(fp);
+    }
+    else {
+      const char* msg = "<html><body>Pagina nao encontrada.</body></html>";
+      SDLNet_TCP_Send(client, msg, strlen(msg) + 1);
+    }
+    
     SDLNet_TCP_Close(client);
   }
   
