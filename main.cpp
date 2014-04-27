@@ -17,7 +17,7 @@
 
 using namespace std;
 
-void init() {
+static void init() {
   if (SDL_Init(0)) {
     fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
     exit(0);
@@ -29,12 +29,12 @@ void init() {
   }
 }
 
-void close() {
+static void close() {
   SDLNet_Quit();
   SDL_Quit();
 }
 
-int main(int argc, char* argv[]) {
+int http(int argc, char* argv[]) {
   init();
   
   // create a listening TCP socket on port 8080 (server)
