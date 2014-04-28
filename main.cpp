@@ -77,11 +77,19 @@ void input() {
 }
 
 int peerListen(void*) {
+  map<Uint32, Uint32> peers;
+  
   UDPsocket listenSocket = SDLNet_UDP_Open(6969);
   UDPpacket* packet = SDLNet_AllocPacket(1);
   while (peerOn) {
     if (SDLNet_UDP_Recv(listenSocket, packet)) {
+      peers[packet->address.host] = SDL_GetTicks();
       printAddr(packet->address.host, packet->address.port);
+    }
+    
+    for (auto& kv : peers) {
+      if (SDL_GetTicks() - kv.second  >= 10000)
+        printf("%x caiu\n", kv.first);
     }
   }
   SDLNet_FreePacket(packet);
