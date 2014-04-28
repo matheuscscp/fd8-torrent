@@ -86,10 +86,13 @@ int peerListen(void*) {
       peers[packet->address.host] = SDL_GetTicks();
       printAddr(packet->address.host, packet->address.port);
     }
-    
-    for (auto& kv : peers) {
-      if (SDL_GetTicks() - kv.second  >= 10000)
-        printf("%x caiu\n", kv.first);
+    for (auto it = peers.begin(); it != peers.end();) {
+      if (SDL_GetTicks() - it->second  >= 10000) {
+        printf("\t%x caiu\n", it->first);
+        peers.erase(it++);
+      }
+      else
+        ++it;
     }
   }
   SDLNet_FreePacket(packet);
