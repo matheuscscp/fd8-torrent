@@ -9,10 +9,13 @@
 #include <SDL_error.h>
 #include <SDL_main.h>
 #include <SDL_net.h>
+#include <SDL_stdinc.h>
+#include <SDL_timer.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <map>
 
 using namespace std;
 
@@ -33,14 +36,16 @@ static void close() {
   SDL_Quit();
 }
 
-void printAddr(Uint32 host, Uint16 port) {
+static void printAddr(Uint32 host, Uint16 port) {
   printf("\tAddress: %d", ((Uint8*)&host)[0]);
   for (int i = 1; i < 4; i++)
     printf(".%d", ((Uint8*)&host)[i]);
   printf(" %d\n", SDLNet_Read16(&port));
 }
 
-int main(int argc, char* argv[]) {
+
+
+int multicast(int argc, char* argv[]) {
   init();
   
   int port;
