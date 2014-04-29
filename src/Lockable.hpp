@@ -17,9 +17,8 @@ class LockableBase {
 
 template <class T>
 class Lockable : public LockableBase {
-  public:
-    T* val;
   private:
+    T* val;
     Mutex mutex;
   public:
     Lockable(T* val) : val(val) {
