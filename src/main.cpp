@@ -5,20 +5,13 @@
  *      Author: Pimenta
  */
 
-#include <SDL.h>
-#include <SDL_error.h>
 #include <SDL_net.h>
-#include <SDL_stdinc.h>
-#include <SDL_timer.h>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
-#include <string>
-#include <map>
 
 #include "Globals.hpp"
-#include "Thread.hpp"
 #include "System.hpp"
+#include "Thread.hpp"
 
 using namespace std;
 
@@ -29,7 +22,7 @@ enum KeyState {
   JUST_RELEASED
 };
 
-KeyState keys[300];
+static KeyState keys[300];
 
 static void init() {
   if (SDL_Init(0)) {
@@ -46,7 +39,6 @@ static void close() {
   SDLNet_Quit();
   SDL_Quit();
 }
-
 
 static void input() {
   for (auto& i : keys) {
