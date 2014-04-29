@@ -24,7 +24,7 @@ void Globals::init() {
   
   // peerOn
   bool* peerOn = new bool;
-  *peerOn = false;
+  *peerOn = true;
   globals["peerOn"] = new Lockable<bool>(peerOn);
   
   // peers

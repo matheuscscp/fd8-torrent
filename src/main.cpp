@@ -17,6 +17,7 @@
 #include <map>
 
 #include "Globals.hpp"
+#include "Thread.hpp"
 
 using namespace std;
 
@@ -28,7 +29,6 @@ enum KeyState {
 };
 
 KeyState keys[300];
-SDL_Thread* peerThread = nullptr;
 
 static void init() {
   if (SDL_Init(0)) {
@@ -39,11 +39,9 @@ static void init() {
     fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
     exit(0);
   }
-  Globals::init();
 }
 
 static void close() {
-  Globals::close();
   SDLNet_Quit();
   SDL_Quit();
 }
@@ -79,7 +77,7 @@ static void input() {
   }
 }
 
-static int peerDetectFailure(void*) {
+static void peerDetectFailure() {
   bool& peerOn = Globals::get<bool>("peerOn").value();
   Lockable<map<Uint32, Uint32>>& peers = Globals::get<map<Uint32, Uint32>>("peers");
   while (peerOn) {
@@ -93,12 +91,11 @@ static int peerDetectFailure(void*) {
         ++it;
     }
     peers.unlock();
-    SDL_Delay(50);
+    Thread_sleep(50);
   }
-  return 0;
 }
 
-static int peerListen(void*) {
+static void peerListen() {
   UDPsocket listenSocket = SDLNet_UDP_Open(6969);
   UDPpacket* packet = SDLNet_AllocPacket(1);
   bool& peerOn = Globals::get<bool>("peerOn").value();
@@ -110,14 +107,13 @@ static int peerListen(void*) {
       peers.unlock();
       printAddr(packet->address.host, packet->address.port);
     }
-    SDL_Delay(50);
+    Thread_sleep(50);
   }
   SDLNet_FreePacket(packet);
   SDLNet_UDP_Close(listenSocket);
-  return 0;
 }
 
-static int peerSpeak(void*) {
+static void peerSpeak() {
   UDPsocket speakSocket = SDLNet_UDP_Open(0);
   IPaddress discoverAddr;
   SDLNet_ResolveHost(&discoverAddr, "255.255.255.255", 6969);
@@ -129,54 +125,57 @@ static int peerSpeak(void*) {
   bool& peerOn = Globals::get<bool>("peerOn").value();
   while (peerOn) {
     SDLNet_UDP_Send(speakSocket, -1, packet);
-    SDL_Delay(5000);
+    Thread_sleep(5000, &peerOn);
   }
   SDLNet_FreePacket(packet);
   SDLNet_UDP_Close(speakSocket);
-  return 0;
 }
 
-static int peer(void*) {
-  SDL_Thread* speak = SDL_CreateThread(peerSpeak, "peerSpeak", nullptr);
-  SDL_Thread* listen = SDL_CreateThread(peerListen, "peerListen", nullptr);
-  SDL_Thread* detectFailure = SDL_CreateThread(peerDetectFailure, "peerDetectFailure", nullptr);
-  SDL_WaitThread(speak, nullptr);
-  SDL_WaitThread(listen, nullptr);
-  SDL_WaitThread(detectFailure, nullptr);
-  return 0;
-}
-
-static void startPeer() {
-  SDL_WaitThread(peerThread, nullptr);
-  peerThread = SDL_CreateThread(peer, "peer", nullptr);
-}
-
-static void stopPeer() {
-  SDL_WaitThread(peerThread, nullptr);
+static void peer() {
+  // init
+  Globals::init();
+  
+  // all system threads
+  Thread<peerSpeak> speak;
+  Thread<peerListen> listen;
+  Thread<peerDetectFailure> detectFailure;
+  
+  // start all threads
+  speak.start();
+  listen.start();
+  detectFailure.start();
+  
+  // join all threads
+  speak.join();
+  listen.join();
+  detectFailure.join();
+  
+  // close
+  Globals::close();
 }
 
 int main(int argc, char* argv[]) {
   init();
   
-  SDL_Window* window = SDL_CreateWindow("final-torrent", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 480, 0);
+  SDL_Window* window = SDL_CreateWindow("fd8-torrent", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 480, 0);
   
-  bool& peerOn = Globals::get<bool>("peerOn").value();
+  bool peerOn = false;
+  Thread<peer> peerThread;
   while (!SDL_QuitRequested()) {
     input();
     
     if (keys[SDLK_a] == JUST_PRESSED) {
       peerOn = !peerOn;
-      if (peerOn)
-        startPeer();
+      if (!peerOn) {
+        Globals::get<bool>("peerOn").value() = false;
+        peerThread.join();
+      }
       else
-        stopPeer();
+        peerThread.start();
       printf("peer status: %d\n", (int)peerOn);
     }
     
-    
-    //fflush(stdout);
-    
-    SDL_Delay(50);
+    Thread_sleep(50);
   }
   
   SDL_DestroyWindow(window);
