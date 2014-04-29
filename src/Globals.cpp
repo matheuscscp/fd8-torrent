@@ -22,10 +22,10 @@ void Globals::init() {
     return;
   isInit = true;
   
-  // peerOn
-  bool* peerOn = new bool;
-  *peerOn = true;
-  globals["peerOn"] = new Lockable<bool>(peerOn);
+  // systemOn
+  bool* systemOn = new bool;
+  *systemOn = true;
+  globals["systemOn"] = new Lockable<bool>(systemOn);
   
   // peers
   globals["peers"] = new Lockable<map<Uint32, Uint32>>(new map<Uint32, Uint32>);
