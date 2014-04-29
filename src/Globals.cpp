@@ -5,11 +5,11 @@
  *      Author: Pimenta
  */
 
+// this
+#include "Globals.hpp"
+
 // lib
 #include <SDL_stdinc.h>
-
-// local
-#include "Globals.hpp"
 
 using namespace std;
 

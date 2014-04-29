@@ -5,11 +5,11 @@
  *      Author: Pimenta
  */
 
+// this
+#include "Thread.hpp"
+
 // lib
 #include <SDL.h>
-
-// local
-#include "Thread.hpp"
 
 void Thread_sleep(Uint32 ms, const bool* keepCondition) {
   // for naps, or if there is no wakeup condition

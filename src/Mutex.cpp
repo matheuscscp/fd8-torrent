@@ -5,11 +5,11 @@
  *      Author: Pimenta
  */
 
+// this
+#include "Mutex.hpp"
+
 // lib
 #include <SDL.h>
-
-// local
-#include "Mutex.hpp"
 
 Mutex::Mutex() {
   mutex = SDL_CreateMutex();
