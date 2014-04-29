@@ -38,7 +38,7 @@ class Thread {
       SDL_WaitThread(thread, nullptr);
     }
     
-    bool isRunning() {
+    bool isRunning() const {
       return running;
     }
   private:
