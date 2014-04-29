@@ -15,7 +15,32 @@
 #include "SystemDetectFailure.hpp"
 #include "Thread.hpp"
 
-void System() {
+Thread<System::run>* System::thread = nullptr;
+bool System::running = false;
+
+bool System::start() {
+  if (running)
+    return false;
+  running = true;
+  thread = new Thread<run>;
+  thread->start();
+  return true;
+}
+
+bool System::stop() {
+  if (!running)
+    return false;
+  running = false;
+  Globals::get<bool>("systemOn").value() = false;
+  thread->join();
+  return true;
+}
+
+bool System::isRunning() {
+  return running;
+}
+
+void System::run() {
   // init
   Globals::init();
   

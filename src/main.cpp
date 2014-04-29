@@ -5,13 +5,12 @@
  *      Author: Pimenta
  */
 
+#include <SDL_image.h>
 #include <SDL_net.h>
 #include <cstdio>
 #include <cstdlib>
 
-#include "Globals.hpp"
 #include "System.hpp"
-#include "Thread.hpp"
 
 using namespace std;
 
@@ -25,8 +24,12 @@ enum KeyState {
 static KeyState keys[300];
 
 static void init() {
-  if (SDL_Init(0)) {
-    fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER)) {
+    fprintf(stderr, "SDL_Init failure: %s\n", SDL_GetError());
+    exit(0);
+  }
+  if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF) != (IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF)) {
+    fprintf(stderr, "IMG_Init failure\n");
     exit(0);
   }
   if (SDLNet_Init()) {
@@ -37,6 +40,7 @@ static void init() {
 
 static void close() {
   SDLNet_Quit();
+  IMG_Quit();
   SDL_Quit();
 }
 
@@ -68,25 +72,19 @@ int main(int argc, char* argv[]) {
   
   SDL_Window* window = SDL_CreateWindow("fd8-torrent", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 480, 0);
   
-  bool systemOn = false;
-  Thread<System> systemThread;
   while (!SDL_QuitRequested()) {
     input();
     
     if (keys[SDLK_a] == JUST_PRESSED) {
-      systemOn = !systemOn;
-      if (!systemOn) {
-        Globals::get<bool>("systemOn").value() = false;
-        systemThread.join();
-      }
-      else
-        systemThread.start();
-      printf("system status: %d\n", (int)systemOn);
+      if (!System::start())
+        System::stop();
+      printf("system status: %d\n", (int)System::isRunning());
     }
     
     Thread_sleep(50);
   }
   
+  System::stop();
   SDL_DestroyWindow(window);
   
   close();
