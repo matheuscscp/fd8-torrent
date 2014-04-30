@@ -15,11 +15,12 @@
 // local
 #include "Globals.hpp"
 #include "Thread.hpp"
+#include "Define.hpp"
 
 void SystemSpeak() {
   UDPsocket speakSocket = SDLNet_UDP_Open(0);
   IPaddress discoverAddr;
-  SDLNet_ResolveHost(&discoverAddr, "255.255.255.255", 6969);
+  SDLNet_ResolveHost(&discoverAddr, "255.255.255.255", FD8_UDP_PORT_LISTEN);
   UDPpacket* packet = SDLNet_AllocPacket(1);
   packet->address.host = discoverAddr.host;
   packet->address.port = discoverAddr.port;

@@ -19,6 +19,7 @@
 // local
 #include "Globals.hpp"
 #include "Thread.hpp"
+#include "Define.hpp"
 
 using namespace std;
 
@@ -30,7 +31,7 @@ static void printAddr(Uint32 host, Uint16 port) {
 }
 
 void SystemListen() {
-  UDPsocket listenSocket = SDLNet_UDP_Open(6969);
+  UDPsocket listenSocket = SDLNet_UDP_Open(FD8_UDP_PORT_LISTEN);
   UDPpacket* packet = SDLNet_AllocPacket(1);
   bool& systemOn = Globals::get<bool>("systemOn").value();
   Lockable<map<Uint32, Uint32>>& peers = Globals::get<map<Uint32, Uint32>>("peers");
