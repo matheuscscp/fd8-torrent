@@ -8,6 +8,7 @@
 #include "Context.hpp"
 #include "Platform.hpp"
 #include "System.hpp"
+#include <cstdio>
 
 using namespace std;
 

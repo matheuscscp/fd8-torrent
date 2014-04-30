@@ -5,17 +5,19 @@
  *      Author: Pimenta
  */
 
+#include <cstdio>
+
 #include "Thread.hpp"
 
 static void foo() {
   printf("foo entrou\n");
   fflush(stdout);
-  Thread_sleep(2500, nullptr);
+  Thread::sleep(2500);
   printf("foo saiu\n");
 }
 
 int test() {
-  Thread<foo> t;
+  Thread t(foo);
   t.start();
   t.join();
   t.join();

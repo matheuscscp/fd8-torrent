@@ -9,48 +9,25 @@
 #define THREAD_HPP_
 
 // standard
-#include <cstdio>
+#include <functional>
 
 // lib
-#include <SDL_thread.h>
+#include <SDL.h>
 
-typedef void (*Callback)();
-
-template <Callback cb>
 class Thread {
   private:
-    bool running;
+    std::function<void()> f;
+    bool started;
     SDL_Thread* thread;
   public:
-    Thread() : running(false), thread(nullptr) {
-      
-    }
+    Thread(std::function<void()> f);
     
-    void start() {
-      if (running)
-        return;
-      char name[20];
-      sprintf(name, "%p", (void*)cb);
-      thread = SDL_CreateThread(threadCallback, name, &running);
-    }
+    void start();
+    void join();
     
-    void join() {
-      SDL_WaitThread(thread, nullptr);
-    }
-    
-    bool isRunning() const {
-      return running;
-    }
+    static void sleep(Uint32 ms, const bool* keepCondition = nullptr);
   private:
-    static int threadCallback(void* running) {
-      *((bool*)running) = true;
-      cb();
-      *((bool*)running) = false;
-      return 0;
-    }
+    static int exec(void* func);
 };
-
-void Thread_sleep(Uint32 ms, const bool* keepCondition);
-void Thread_sleep(Uint32 ms);
 
 #endif /* THREAD_HPP_ */

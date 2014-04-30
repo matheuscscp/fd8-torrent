@@ -8,10 +8,33 @@
 // this
 #include "Thread.hpp"
 
-// lib
-#include <SDL.h>
+using namespace std;
 
-void Thread_sleep(Uint32 ms, const bool* keepCondition) {
+Thread::Thread(function<void()> f) : f(f), started(false), thread(nullptr) {
+  
+}
+
+void Thread::start() {
+  // check if already started
+  if (started)
+    return;
+  
+  // start
+  started = true;
+  thread = SDL_CreateThread(exec, nullptr, &f);
+}
+
+void Thread::join() {
+  // check if thread exists
+  if (!thread)
+    return;
+  
+  // join
+  SDL_WaitThread(thread, nullptr);
+  thread = nullptr;
+}
+
+void Thread::sleep(Uint32 ms, const bool* keepCondition) {
   // for naps, or if there is no wakeup condition
   if (ms <= 50 || keepCondition == nullptr) {
     SDL_Delay(ms);
@@ -29,6 +52,8 @@ void Thread_sleep(Uint32 ms, const bool* keepCondition) {
   } while (true == *keepCondition && now < time);
 }
 
-void Thread_sleep(Uint32 ms) {
-  Thread_sleep(ms, nullptr);
+int Thread::exec(void* func) {
+  auto f = *((std::function<void()>*)func);
+  f();
+  return 0;
 }

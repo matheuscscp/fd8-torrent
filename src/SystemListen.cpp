@@ -10,6 +10,7 @@
 
 // standard
 #include <map>
+#include <cstdio>
 
 // lib
 #include <SDL2/SDL_net.h>
@@ -28,6 +29,7 @@ static void printAddr(Uint32 host, Uint16 port) {
   for (int i = 1; i < 4; i++)
     printf(".%d", ((Uint8*)&host)[i]);
   printf(" %d\n", SDLNet_Read16(&port));
+  fflush(stdout);
 }
 
 void SystemListen() {
@@ -42,7 +44,7 @@ void SystemListen() {
       peers.unlock();
       printAddr(packet->address.host, packet->address.port);
     }
-    Thread_sleep(50);
+    Thread::sleep(50);
   }
   SDLNet_FreePacket(packet);
   SDLNet_UDP_Close(listenSocket);

@@ -29,7 +29,7 @@ void SystemSpeak() {
   bool& systemOn = Globals::get<bool>("systemOn").value();
   while (systemOn) {
     SDLNet_UDP_Send(speakSocket, -1, packet);
-    Thread_sleep(5000, &systemOn);
+    Thread::sleep(5000, &systemOn);
   }
   SDLNet_FreePacket(packet);
   SDLNet_UDP_Close(speakSocket);

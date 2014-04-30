@@ -13,7 +13,7 @@
 class System {
   private:
     static void run();
-    static Thread<run>* thread;
+    static Thread* thread;
     static bool running;
   public:
     static bool start();

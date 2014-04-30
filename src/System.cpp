@@ -23,14 +23,15 @@
 #include "SystemSpeak.hpp"
 #include "Define.hpp"
 
-Thread<System::run>* System::thread = nullptr;
+Thread* System::thread = nullptr;
 bool System::running = false;
 
 bool System::start() {
   if (running)
     return false;
+  
   running = true;
-  thread = new Thread<run>;
+  thread = new Thread(System::run);
   thread->start();
   return true;
 }
@@ -38,6 +39,7 @@ bool System::start() {
 bool System::stop() {
   if (!running)
     return false;
+  
   running = false;
   Globals::get<bool>("systemOn").value() = false;
   thread->join();
@@ -80,15 +82,16 @@ void System::run() {
     while (SDLNet_UDP_Recv(socklist, pack) != 1);
     printf("local address: ");
     printAddr(pack->address.host);
+    fflush(stdout);
     SDLNet_FreePacket(pack);
     SDLNet_UDP_Close(sock);
     SDLNet_UDP_Close(socklist);
   }
   
   // all system threads
-  Thread<SystemSpeak> speak;
-  Thread<SystemListen> listen;
-  Thread<SystemDetectFailure> detectFailure;
+  Thread speak(SystemSpeak);
+  Thread listen(SystemListen);
+  Thread detectFailure(SystemDetectFailure);
   
   // start all threads
   speak.start();
