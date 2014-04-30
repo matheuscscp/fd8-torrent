@@ -16,10 +16,12 @@ class Context {
     class Image {
       private:
         SDL_Texture* texture;
+        SDL_Rect dstrect;
       public:
         Image(const std::string& fn);
         ~Image();
         void render(int x, int y);
+        bool isMouseInside();
     };
     
     enum InputState {
@@ -28,8 +30,15 @@ class Context {
       RELEASED,
       JUST_RELEASED
     };
+    
+    enum MouseButton {
+      LEFT_MOUSE_BUTTON = SDL_BUTTON_LEFT,
+      RIGHT_MOUSE_BUTTON = SDL_BUTTON_RIGHT
+    };
   private:
     static std::map<SDL_Keycode, InputState> keys;
+    static InputState buttons[6];
+    static int mousex, mousey;
     static SDL_Window* window;
     static SDL_Renderer* renderer;
     static bool quit;
@@ -40,6 +49,7 @@ class Context {
     static void input();
     static void render();
     static InputState key(SDL_Keycode keycode);
+    static InputState button(int butt);
 };
 
 #endif /* CONTEXT_HPP_ */

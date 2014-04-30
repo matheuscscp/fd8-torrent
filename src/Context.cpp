@@ -23,6 +23,9 @@ using namespace std;
 // =============================================================================
 
 map<SDL_Keycode, Context::InputState> Context::keys;
+Context::InputState Context::buttons[6];
+int Context::mousex;
+int Context::mousey;
 SDL_Window* Context::window = nullptr;
 SDL_Renderer* Context::renderer = nullptr;
 bool Context::quit = false;
@@ -42,8 +45,13 @@ void Context::init(const char* title, int w, int h, const char* icon) {
   }
   window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-  if (icon)
-    SDL_SetWindowIcon(window, IMG_Load(icon));
+  if (icon) {
+    SDL_Surface* surface = IMG_Load(icon);
+    SDL_SetWindowIcon(window, surface);
+    SDL_FreeSurface(surface);
+  }
+  for (auto& butt : buttons)
+    butt = RELEASED;
 }
 
 void Context::close() {
@@ -66,6 +74,14 @@ void Context::input() {
       kv.second = RELEASED;
   }
   
+  SDL_GetMouseState(&mousex, &mousey);
+  for (auto& i : buttons) {
+    if (i == JUST_PRESSED)
+      i = PRESSED;
+    else if (i == JUST_RELEASED)
+      i = RELEASED;
+  }
+  
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
@@ -75,6 +91,14 @@ void Context::input() {
         
       case SDL_KEYUP:
         keys[event.key.keysym.sym] = JUST_RELEASED;
+        break;
+        
+      case SDL_MOUSEBUTTONDOWN:
+        buttons[event.button.button] = JUST_PRESSED;
+        break;
+        
+      case SDL_MOUSEBUTTONUP:
+        buttons[event.button.button] = JUST_RELEASED;
         break;
         
       case SDL_QUIT:
@@ -99,12 +123,17 @@ Context::InputState Context::key(SDL_Keycode keycode) {
   return keys[keycode];
 }
 
+Context::InputState Context::button(int butt) {
+  return buttons[butt];
+}
+
 // =============================================================================
 // Context::Image
 // =============================================================================
 
 Context::Image::Image(const string& fn) {
   texture = IMG_LoadTexture(Context::renderer, fn.c_str());
+  SDL_QueryTexture(texture, nullptr, nullptr, &dstrect.w, &dstrect.h);
 }
 
 Context::Image::~Image() {
@@ -112,5 +141,14 @@ Context::Image::~Image() {
 }
 
 void Context::Image::render(int x, int y) {
-  SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+  dstrect.x = x;
+  dstrect.y = y;
+  SDL_RenderCopy(renderer, texture, nullptr, &dstrect);
+}
+
+bool Context::Image::isMouseInside() {
+  return
+    mousex >= dstrect.x && mousex < dstrect.x + dstrect.w &&
+    mousey >= dstrect.y && mousey < dstrect.y + dstrect.h
+  ;
 }
