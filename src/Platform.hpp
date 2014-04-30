@@ -16,7 +16,7 @@
 
 #else
 
-#define browser() system("gnome-open http://localhost:8080")
+#define browser() system("sensible-browser http://localhost:8080")
 
 #endif
 
