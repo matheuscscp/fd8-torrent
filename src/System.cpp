@@ -71,9 +71,18 @@ void System::run() {
     pack->len = 1;
     *((Uint8*)pack->data) = (Uint8)0xFF;
     SDLNet_UDP_Send(sock, -1, pack);
-    SDLNet_UDP_Recv(socklist, pack);
+    /*while (true) {
+      SDLNet_UDP_Recv(socklist, pack);
+      char port[6];
+      sprintf(port, "%d", pack->address.port);
+      
+    }*/
+    while (SDLNet_UDP_Recv(socklist, pack) != 1);
+    printf("local address: ");
     printAddr(pack->address.host);
     SDLNet_FreePacket(pack);
+    SDLNet_UDP_Close(sock);
+    SDLNet_UDP_Close(socklist);
   }
   
   // all system threads
