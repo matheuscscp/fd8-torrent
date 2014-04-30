@@ -22,10 +22,14 @@ using namespace std;
 // Context
 // =============================================================================
 
-map<SDL_Keycode, Context::InputState> Context::keys;
+map<SDL_Keycode, pair<bool, Context::InputState>> Context::keys;
 Context::InputState Context::buttons[6];
 int Context::mousex;
 int Context::mousey;
+int Context::mousedownx = -1;
+int Context::mousedowny = -1;
+int Context::mouseupx = -1;
+int Context::mouseupy = -1;
 SDL_Window* Context::window = nullptr;
 SDL_Renderer* Context::renderer = nullptr;
 bool Context::quit = false;
@@ -68,10 +72,10 @@ bool Context::shouldQuit() {
 
 void Context::input() {
   for (auto& kv : keys) {
-    if (kv.second == JUST_PRESSED)
-      kv.second = PRESSED;
-    else if (kv.second == JUST_RELEASED)
-      kv.second = RELEASED;
+    if (kv.second.second == JUST_PRESSED)
+      kv.second.second = PRESSED;
+    else if (kv.second.second == JUST_RELEASED)
+      kv.second.second = RELEASED;
   }
   
   SDL_GetMouseState(&mousex, &mousey);
@@ -86,19 +90,27 @@ void Context::input() {
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
       case SDL_KEYDOWN:
-        keys[event.key.keysym.sym] = JUST_PRESSED;
+        if (!keys[event.key.keysym.sym].first) {
+          keys[event.key.keysym.sym].first = true;
+          keys[event.key.keysym.sym].second = JUST_PRESSED;
+        }
         break;
         
       case SDL_KEYUP:
-        keys[event.key.keysym.sym] = JUST_RELEASED;
+        keys[event.key.keysym.sym].first = false;
+        keys[event.key.keysym.sym].second = JUST_RELEASED;
         break;
         
       case SDL_MOUSEBUTTONDOWN:
         buttons[event.button.button] = JUST_PRESSED;
+        mousedownx = mousex;
+        mousedowny = mousey;
         break;
         
       case SDL_MOUSEBUTTONUP:
         buttons[event.button.button] = JUST_RELEASED;
+        mouseupx = mousex;
+        mouseupy = mousey;
         break;
         
       case SDL_QUIT:
@@ -117,10 +129,11 @@ void Context::render() {
 
 Context::InputState Context::key(SDL_Keycode keycode) {
   if (keys.find(keycode) == keys.end()) {
-    keys[keycode] = RELEASED;
+    keys[keycode].first = false;
+    keys[keycode].second = RELEASED;
     return RELEASED;
   }
-  return keys[keycode];
+  return keys[keycode].second;
 }
 
 Context::InputState Context::button(int butt) {
@@ -146,9 +159,12 @@ void Context::Image::render(int x, int y) {
   SDL_RenderCopy(renderer, texture, nullptr, &dstrect);
 }
 
-bool Context::Image::isMouseInside() {
+bool Context::Image::leftClicked() {
   return
-    mousex >= dstrect.x && mousex < dstrect.x + dstrect.w &&
-    mousey >= dstrect.y && mousey < dstrect.y + dstrect.h
+    button(LEFT_MOUSE_BUTTON) == JUST_RELEASED &&
+    mousedownx >= dstrect.x && mousedownx < dstrect.x + dstrect.w &&
+    mousedowny >= dstrect.y && mousedowny < dstrect.y + dstrect.h &&
+    mouseupx >= dstrect.x && mouseupx < dstrect.x + dstrect.w &&
+    mouseupy >= dstrect.y && mouseupy < dstrect.y + dstrect.h
   ;
 }

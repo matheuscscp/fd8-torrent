@@ -23,14 +23,11 @@ int main(int argc, char* argv[]) {
     Context::input();
     
     // update
-    if (Context::button(Context::LEFT_MOUSE_BUTTON) == Context::JUST_PRESSED &&
-        start.isMouseInside()) {
+    if (start.leftClicked()) {
       if (!System::start())
         System::stop();
     }
-    if (System::isRunning() &&
-        Context::button(Context::LEFT_MOUSE_BUTTON) == Context::JUST_PRESSED &&
-        browse.isMouseInside())
+    if (System::isRunning() && browse.leftClicked())
       browser();
     
     // render

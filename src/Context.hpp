@@ -21,7 +21,7 @@ class Context {
         Image(const std::string& fn);
         ~Image();
         void render(int x, int y);
-        bool isMouseInside();
+        bool leftClicked();
     };
     
     enum InputState {
@@ -36,9 +36,9 @@ class Context {
       RIGHT_MOUSE_BUTTON = SDL_BUTTON_RIGHT
     };
   private:
-    static std::map<SDL_Keycode, InputState> keys;
+    static std::map<SDL_Keycode, std::pair<bool, InputState>> keys;
     static InputState buttons[6];
-    static int mousex, mousey;
+    static int mousex, mousey, mousedownx, mousedowny, mouseupx, mouseupy;
     static SDL_Window* window;
     static SDL_Renderer* renderer;
     static bool quit;
