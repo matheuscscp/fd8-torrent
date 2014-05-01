@@ -22,9 +22,9 @@ bool System::start() {
   if (running)
     return false;
   
-  running = true;
   thread = new Thread(System::run);
   thread->start();
+  running = true;
   return true;
 }
 
@@ -32,9 +32,9 @@ bool System::stop() {
   if (!running)
     return false;
   
-  running = false;
   Globals::get<bool>("systemOn").value() = false;
   thread->join();
+  running = false;
   return true;
 }
 

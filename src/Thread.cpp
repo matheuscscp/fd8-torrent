@@ -8,6 +8,9 @@
 // this
 #include "Thread.hpp"
 
+// lib
+#include <SDL.h>
+
 using namespace std;
 
 Thread::Thread(function<void()> f) : f(f), started(false), thread(nullptr) {
@@ -30,19 +33,19 @@ void Thread::join() {
     return;
   
   // join
-  SDL_WaitThread(thread, nullptr);
+  SDL_WaitThread((SDL_Thread*)thread, nullptr);
   thread = nullptr;
 }
 
-void Thread::sleep(Uint32 ms, const bool* keepCondition) {
+void Thread::sleep(uint32_t ms, const bool* keepCondition) {
   // for naps, or if there is no wakeup condition
   if (ms <= 50 || keepCondition == nullptr) {
     SDL_Delay(ms);
     return;
   }
   
-  Uint32 now = SDL_GetTicks();
-  Uint32 time = now + ms;
+  uint32_t now = SDL_GetTicks();
+  uint32_t time = now + ms;
   int cont = 0;
   do {
     ms = time - now;

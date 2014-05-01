@@ -14,13 +14,12 @@
 
 // lib
 #include <SDL2/SDL_net.h>
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_timer.h>
 
 // local
 #include "Globals.hpp"
 #include "Thread.hpp"
 #include "Define.hpp"
+#include "MulticastSocket.hpp"
 
 using namespace std;
 
@@ -29,28 +28,27 @@ static void printAddr(Uint32 host, Uint16 port) {
   for (int i = 1; i < 4; i++)
     printf(".%d", ((Uint8*)&host)[i]);
   printf(" %d\n", SDLNet_Read16(&port));
-  fflush(stdout);
 }
 
 void SystemListen() {
-  UDPsocket listenSocket = SDLNet_UDP_Open(FD8_UDP_PORT_LISTEN);
-  UDPpacket* packet = SDLNet_AllocPacket(1);
+  MulticastSocket sock(Globals::get<Uint32>("localIP").value(), UDP_LISTEN_HOST, IP_MULTICAST_NET);
   bool& systemOn = Globals::get<bool>("systemOn").value();
   Lockable<map<Uint32, Uint32>>& peers = Globals::get<map<Uint32, Uint32>>("peers");
-  Uint32& localIP = Globals::get<Uint32>("localIP").value();
+  IPaddress addr;
+  vector<char> pack;
   while (systemOn) {
-    if (SDLNet_UDP_Recv(listenSocket, packet)) {
-      if (packet->address.host == localIP)
-        printf("self message");
-      else {
-        peers.lock();
-        peers.value()[packet->address.host] = SDL_GetTicks();
-        peers.unlock();
-      }
-      printAddr(packet->address.host, packet->address.port);
+    pack = sock.read(addr.host, addr.port);
+    if (pack.size()) {
+      peers.lock();
+      peers.value()[addr.host] = SDL_GetTicks();
+      peers.unlock();
+      printf("Total bytes: %d", pack.size());
+      printAddr(addr.host, addr.port);
+      for (auto byte : pack)
+        printf("%x ", ((int)byte) & 0xFF);
+      printf("\n");
+      fflush(stdout);
     }
     Thread::sleep(50);
   }
-  SDLNet_FreePacket(packet);
-  SDLNet_UDP_Close(listenSocket);
 }

@@ -20,7 +20,7 @@
 void SystemSpeak() {
   UDPsocket speakSocket = SDLNet_UDP_Open(0);
   IPaddress discoverAddr;
-  SDLNet_ResolveHost(&discoverAddr, "255.255.255.255", FD8_UDP_PORT_LISTEN);
+  SDLNet_ResolveHost(&discoverAddr, IP_MULTICAST_STR, UDP_LISTEN_HOST);
   UDPpacket* packet = SDLNet_AllocPacket(1);
   packet->address.host = discoverAddr.host;
   packet->address.port = discoverAddr.port;

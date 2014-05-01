@@ -11,21 +11,18 @@
 // standard
 #include <functional>
 
-// lib
-#include <SDL.h>
-
 class Thread {
   private:
     std::function<void()> f;
     bool started;
-    SDL_Thread* thread;
+    void* thread;
   public:
     Thread(std::function<void()> f);
     
     void start();
     void join();
     
-    static void sleep(Uint32 ms, const bool* keepCondition = nullptr);
+    static void sleep(uint32_t ms, const bool* keepCondition = nullptr);
   private:
     static int exec(void* func);
 };
