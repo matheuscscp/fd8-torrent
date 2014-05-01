@@ -8,20 +8,12 @@
 // this
 #include "System.hpp"
 
-// standard
-#include <cstdio>
-
-// lib
-#include <SDL_net.h>
-#include <SDL_stdinc.h>
-
 // local
 #include "Globals.hpp"
 #include "Lockable.hpp"
 #include "SystemDetectFailure.hpp"
 #include "SystemListen.hpp"
 #include "SystemSpeak.hpp"
-#include "Define.hpp"
 
 Thread* System::thread = nullptr;
 bool System::running = false;
@@ -50,43 +42,9 @@ bool System::isRunning() {
   return running;
 }
 
-static void printAddr(Uint32 host) {
-  printf("%d", ((Uint8*)&host)[0]);
-  for (int i = 1; i < 4; i++)
-    printf(".%d", ((Uint8*)&host)[i]);
-  printf("\n");
-}
-
 void System::run() {
   // init
   Globals::init();
-  
-  // resolve ip
-  {
-    UDPsocket sock = SDLNet_UDP_Open(0);
-    UDPsocket socklist = SDLNet_UDP_Open(FD8_UDP_PORT_RESOLVE_IP);
-    UDPpacket* pack = SDLNet_AllocPacket(1);
-    IPaddress ip;
-    SDLNet_ResolveHost(&ip, "255.255.255.255", FD8_UDP_PORT_RESOLVE_IP);
-    pack->address.host = ip.host;
-    pack->address.port = ip.port;
-    pack->len = 1;
-    *((Uint8*)pack->data) = (Uint8)0xFF;
-    SDLNet_UDP_Send(sock, -1, pack);
-    /*while (true) {
-      SDLNet_UDP_Recv(socklist, pack);
-      char port[6];
-      sprintf(port, "%d", pack->address.port);
-      
-    }*/
-    while (SDLNet_UDP_Recv(socklist, pack) != 1);
-    printf("local address: ");
-    printAddr(pack->address.host);
-    fflush(stdout);
-    SDLNet_FreePacket(pack);
-    SDLNet_UDP_Close(sock);
-    SDLNet_UDP_Close(socklist);
-  }
   
   // all system threads
   Thread speak(SystemSpeak);

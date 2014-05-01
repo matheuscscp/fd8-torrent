@@ -37,11 +37,16 @@ void SystemListen() {
   UDPpacket* packet = SDLNet_AllocPacket(1);
   bool& systemOn = Globals::get<bool>("systemOn").value();
   Lockable<map<Uint32, Uint32>>& peers = Globals::get<map<Uint32, Uint32>>("peers");
+  Uint32& localIP = Globals::get<Uint32>("localIP").value();
   while (systemOn) {
     if (SDLNet_UDP_Recv(listenSocket, packet)) {
-      peers.lock();
-      peers.value()[packet->address.host] = SDL_GetTicks();
-      peers.unlock();
+      if (packet->address.host == localIP)
+        printf("self message");
+      else {
+        peers.lock();
+        peers.value()[packet->address.host] = SDL_GetTicks();
+        peers.unlock();
+      }
       printAddr(packet->address.host, packet->address.port);
     }
     Thread::sleep(50);
