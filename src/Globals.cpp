@@ -16,6 +16,13 @@ using namespace std;
 map<string, LockableBase*> Globals::globals;
 bool Globals::isInit = false;
 
+static void printAddr(Uint32 host) {
+  printf("\tAddress: %d", ((Uint8*)&host)[0]);
+  for (int i = 1; i < 4; i++)
+    printf(".%d", ((Uint8*)&host)[i]);
+  printf("\n");
+}
+
 void Globals::init() {
   // check if is already initialized
   if (isInit)
@@ -37,9 +44,11 @@ void Globals::init() {
   // localIP
   {
     Uint32* localIP = new Uint32;
-    IPaddress addr;
-    SDLNet_ResolveHost(&addr, nullptr, 0);
-    SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addr), 0);
+    IPaddress addr, addrs[100];
+    int total = SDLNet_GetLocalAddresses(addrs, 100);
+    int i;
+    for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
+    SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addrs[i]), 0);
     *localIP = addr.host;
     globals["localIP"] = new Lockable<Uint32>(localIP);
   }
