@@ -14,6 +14,7 @@
 #include "SystemDetectFailure.hpp"
 #include "SystemListen.hpp"
 #include "SystemSpeak.hpp"
+#include "SystemWeb.hpp"
 
 Thread* System::thread = nullptr;
 bool System::running = false;
@@ -50,16 +51,19 @@ void System::run() {
   Thread speak(SystemSpeak);
   Thread listen(SystemListen);
   Thread detectFailure(SystemDetectFailure);
+  Thread web(SystemWeb);
   
   // start all threads
   speak.start();
   listen.start();
   detectFailure.start();
+  web.start();
   
   // join all threads
   speak.join();
   listen.join();
   detectFailure.join();
+  web.join();
   
   // close
   Globals::close();

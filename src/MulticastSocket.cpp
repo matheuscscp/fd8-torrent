@@ -61,12 +61,11 @@ vector<char> MulticastSocket::read(uint32_t& host, uint16_t& port) {
     SOCKADDR_IN addr;
     int addrsize = sizeof(SOCKADDR_IN);
     int total = recvfrom(sd, buf, 0x1000, 0, (sockaddr*)&addr, &addrsize);
-    if (addr.sin_addr.S_un.S_addr == ip) {
-      return vector<char>();
+    if (addr.sin_addr.S_un.S_addr != ip) {
+      data.assign(buf, buf + total);
+      host = addr.sin_addr.S_un.S_addr;
+      port = addr.sin_port;
     }
-    data.assign(buf, buf + total);
-    host = addr.sin_addr.S_un.S_addr;
-    port = addr.sin_port;
   }
 #else
   
