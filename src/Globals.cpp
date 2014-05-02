@@ -16,13 +16,6 @@ using namespace std;
 map<string, LockableBase*> Globals::globals;
 bool Globals::isInit = false;
 
-static void printAddr(Uint32 host) {
-  printf("\tAddress: %d", ((Uint8*)&host)[0]);
-  for (int i = 1; i < 4; i++)
-    printf(".%d", ((Uint8*)&host)[i]);
-  printf("\n");
-}
-
 void Globals::init() {
   // check if is already initialized
   if (isInit)
