@@ -56,4 +56,5 @@ void SystemWebServer() {
     }
     Thread::sleep(50);
   }
+  SDLNet_TCP_Close(server);
 }
