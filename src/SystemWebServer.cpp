@@ -6,7 +6,7 @@
  */
 
 // this
-#include "SystemWeb.hpp"
+#include "SystemWebServer.hpp"
 
 // standard
 #include <cstring>
@@ -23,7 +23,7 @@
 
 using namespace std;
 
-void SystemWeb() {
+void SystemWebServer() {
   IPaddress addr;
   SDLNet_ResolveHost(&addr, nullptr, TCP_WEB_HOST);
   TCPsocket server = SDLNet_TCP_Open(&addr), client;
