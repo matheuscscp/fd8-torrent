@@ -13,7 +13,7 @@
 
 using namespace std;
 
-Thread::Thread(function<void()> f) : f(f), started(false), thread(nullptr) {
+Thread::Thread(const function<void()>& f) : f(f), started(false), thread(nullptr) {
   
 }
 

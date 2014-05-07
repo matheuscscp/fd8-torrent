@@ -17,7 +17,7 @@ class Thread {
     bool started;
     void* thread;
   public:
-    Thread(std::function<void()> f);
+    Thread(const std::function<void()>& f);
     
     void start();
     void join();

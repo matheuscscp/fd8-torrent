@@ -8,7 +8,6 @@
 #include "Context.hpp"
 #include "Platform.hpp"
 #include "System.hpp"
-#include <cstdio>
 
 using namespace std;
 
@@ -29,7 +28,7 @@ int main(int argc, char* argv[]) {
         System::stop();
     }
     if (System::isRunning() && browse.leftClicked())
-      browser();
+      Platform::browser();
     
     // render
     bg.render(0, 0);
