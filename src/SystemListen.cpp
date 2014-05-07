@@ -19,9 +19,10 @@
 #include "Globals.hpp"
 #include "Thread.hpp"
 #include "Define.hpp"
-#include "MulticastSocket.hpp"
+#include "Platform.hpp"
 
 using namespace std;
+using namespace platform;
 
 static void printAddr(Uint32 host, Uint16 port) {
   printf("\tAddress: %d", ((Uint8*)&host)[0]);

@@ -8,9 +8,24 @@
 #ifndef PLATFORM_HPP_
 #define PLATFORM_HPP_
 
-class Platform {
+// standard
+#include <cstdint>
+#include <vector>
+
+namespace platform {
+
+class MulticastSocket {
+  private:
+    int sd;
+    uint32_t ip;
   public:
-    static void browser();
+    MulticastSocket(uint32_t ip, uint16_t port, uint32_t group);
+    ~MulticastSocket();
+    std::vector<char> read(uint32_t& host, uint16_t& port);
 };
+
+void browser();
+
+}
 
 #endif /* PLATFORM_HPP_ */

@@ -10,6 +10,7 @@
 #include "System.hpp"
 
 using namespace std;
+using namespace platform;
 
 int main(int argc, char* argv[]) {
   Context::init("..::fd8-torrent::..", 512, 512, "img/icon.jpg");
@@ -28,7 +29,7 @@ int main(int argc, char* argv[]) {
         System::stop();
     }
     if (System::isRunning() && browse.leftClicked())
-      Platform::browser();
+      browser();
     
     // render
     bg.render(0, 0);
