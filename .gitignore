@@ -4,3 +4,4 @@
 Debug
 *.dll
 !3rd/bin/*
+src/test.cpp
