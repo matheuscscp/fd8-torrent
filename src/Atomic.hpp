@@ -1,31 +1,31 @@
 /*
- * Lockable.hpp
+ * Atomic.hpp
  *
- *  Created on: Apr 28, 2014
+ *  Created on: May 7, 2014
  *      Author: Pimenta
  */
 
-#ifndef LOCKABLE_HPP_
-#define LOCKABLE_HPP_
+#ifndef ATOMIC_HPP_
+#define ATOMIC_HPP_
 
 // local
 #include "Mutex.hpp"
 
-class LockableBase {
+class AtomicBase {
     
 };
 
 template <class T>
-class Lockable : public LockableBase {
+class Atomic : public AtomicBase {
   private:
     T* val;
     Mutex mutex;
   public:
-    Lockable(T* val) : val(val) {
+    Atomic(T* val) : val(val) {
       
     }
     
-    ~Lockable() {
+    ~Atomic() {
       delete val;
     }
     
@@ -42,4 +42,4 @@ class Lockable : public LockableBase {
     }
 };
 
-#endif /* LOCKABLE_HPP_ */
+#endif /* ATOMIC_HPP_ */

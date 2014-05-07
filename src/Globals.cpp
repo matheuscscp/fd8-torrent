@@ -13,7 +13,7 @@
 
 using namespace std;
 
-map<string, LockableBase*> Globals::globals;
+map<string, AtomicBase*> Globals::globals;
 bool Globals::isInit = false;
 
 void Globals::init() {
@@ -26,12 +26,12 @@ void Globals::init() {
   {
     bool* systemOn = new bool;
     *systemOn = true;
-    globals["systemOn"] = new Lockable<bool>(systemOn);
+    globals["systemOn"] = new Atomic<bool>(systemOn);
   }
   
   // peers
   {
-    globals["peers"] = new Lockable<map<Uint32, Uint32>>(new map<Uint32, Uint32>);
+    globals["peers"] = new Atomic<map<Uint32, Uint32>>(new map<Uint32, Uint32>);
   }
   
   // localIP
@@ -43,7 +43,7 @@ void Globals::init() {
     for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
     SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addrs[i]), 0);
     *localIP = addr.host;
-    globals["localIP"] = new Lockable<Uint32>(localIP);
+    globals["localIP"] = new Atomic<Uint32>(localIP);
   }
 }
 

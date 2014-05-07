@@ -10,7 +10,6 @@
 
 // local
 #include "Globals.hpp"
-#include "Lockable.hpp"
 #include "SystemDetectFailure.hpp"
 #include "SystemListen.hpp"
 #include "SystemSpeak.hpp"

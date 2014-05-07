@@ -24,7 +24,7 @@ using namespace std;
 
 void SystemDetectFailure() {
   bool& systemOn = Globals::get<bool>("systemOn").value();
-  Lockable<map<Uint32, Uint32>>& peers = Globals::get<map<Uint32, Uint32>>("peers");
+  Atomic<map<Uint32, Uint32>>& peers = Globals::get<map<Uint32, Uint32>>("peers");
   while (systemOn) {
     peers.lock();
     for (auto it = peers.value().begin(); it != peers.value().end();) {
