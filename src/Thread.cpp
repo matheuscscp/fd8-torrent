@@ -56,7 +56,7 @@ void Thread::sleep(uint32_t ms, const bool* keepCondition) {
 }
 
 int Thread::exec(void* func) {
-  auto f = *((std::function<void()>*)func);
+  auto& f = *((function<void()>*)func);
   f();
   return 0;
 }
