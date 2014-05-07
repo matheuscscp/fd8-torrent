@@ -1,8 +1,13 @@
-<h1>Carregou Arquivos</h1>
-
 <div id="new-file" class="add-form">
 	<h2>Novo Arquivo</h2>
-	<input type="file" id="input-user">
-	<button id="adding-button" onclick="addingUser()">Enviar</button>
+	<div id="file-inputs"><input type="file" name="files[]"></div>
+
+	<button onclick="addFileInput()">+</button>
+	<button onclick="submitFilesButtonClicked()">Enviar</button>
+</div>
+<div class="search-bar" id="file-search">
+	<img src="lupa.png" />
+	<input type="text" class="finder">
 </div>
 
+<table class="file-explorer table-find">

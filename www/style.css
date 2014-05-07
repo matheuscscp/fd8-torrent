@@ -1,7 +1,9 @@
 *{ margin: 0; padding: 0; font-family: "Segoe UI";}
+ul, ul li{ list-style: none; }
 
 #header{
 	width: 100%;	
+	background: url("brickwall.png") repeat;
 }
 
 #header-content{
@@ -12,48 +14,49 @@
 #logo{
 	float: left;
 	text-align: center;
-	width: 23%;
+	width: 600px;
+	margin-left: 60px;
 }
 
-#logo img{width: 150px;}
-
-#titulo{
-	float: left;
-	text-align: center;
-	width: 50%;
-	padding-top: 50px;
-}
+#logo img{width: 600px;}
 
 #group-info{
-	float: left;
+	float: right;
 	text-align: left;
+	margin-right: 60px;
 }
 
 .group-member{ padding: 5px; overflow: auto;}
 .member-info{ float: left; padding: 10px 10px 10px 10px}
 .member-photo{ float: left;}
-.member-photo img{ border-radius: 100%; width: 65px;}
+.member-photo img{ border-radius: 100%; width: 100px;}
 
 #menu-principal{
-	width: 100%;
+	width: 81.9%;
 	background-color: #000;
-	margin-left: auto;
-	margin-right: auto;
 	color: #fff;
-	overflow: auto;
-	text-align: center;
+	overflow: hidden;
+	padding-left: 18.1%;
 }
 
 #menu-principal ul{
 	list-style: none;
-	padding: 10px 0px 10px 0px;
+	padding: 2px 0px 10px 0px;
 }
 
 #menu-principal ul li{
 	display: inline;
 	font-weight: bold;
-	padding: 10px 40px 10px 40px;
+	padding: 15px 40px 15px 40px;
 	cursor: pointer;
+	height: auto;
+}
+
+#menu-principal ul li img{ 
+	width: 30px; 
+	padding: 0px 8px 0px 0px;
+	position: relative;
+	top: 8px;
 }
 
 #menu-principal ul li:last-child{
@@ -63,7 +66,7 @@
 #menuop-user{ background: #f00; }
 #menuop-file{ background: #00f; }
 #menuop-host{ background: #00a118; }
-#menuop-presentation{ background: #bfb600; }
+#menuop-presentation{ background: #F5E900; }
 
 #middle{
 	overflow: auto;
@@ -73,11 +76,10 @@
 	width: 15%;
 	height: 100%;
 	float: left;
-	background: #000;
 	overflow: auto;
 	padding: 25px;
 	color: white;
-	
+	background: url(tweed.png) repeat;
 }
 
 #submenu ul{
@@ -99,7 +101,7 @@
 	float: left;
 	overflow: auto;
 	display: table;
-	width: 81.86%;
+	width: 81.88%;
 	height: 60%;
 }
 
@@ -108,6 +110,8 @@
 	font-size: 20px;
 	color: #fff;
 }
+
+#content-header-offset{ margin: 5px 0px 5px 0px }
 
 #add-button{
 	cursor: pointer;
@@ -118,8 +122,7 @@
 }
 
 #content{
-	padding: 10px;
-	border-bottom: 1px solid #ccc;	
+	overflow-y: scroll;
 }
 
 #footer {
@@ -132,6 +135,7 @@
 	color: #fff;
 	text-align: center;
 }
+#footer-msg { padding-top: 25px; font-size: 25px; }
 
 /* ---------------------------------------------- */
 /** Forms                                        **/
@@ -147,22 +151,43 @@
 .add-form input{ margin-right: 20px; }
 
 button{
-	color: #fff;
-	background: #0AEFFF;
-	font-size: 16px;
-	padding: 6px 25px 6px 25px;
-	border: none;
-	border-bottom: 4px outset #00BECC;
-	border-right: 4px outset #00BECC;
+	border: 0;
+	outline: none;
+	background: #33E7FF;
+	color: white;
+	padding: 3px 15px;
+	margin: 10px 10px 4px 0px;
+	font-weight: bold;
+	font-size: 18px;
+	text-decoration: none;
+	display: inline-block; /* needed for anchors */
 	position: relative;
-	bottom: 4px;
-	right: 4px;
-	outline: 0;
+	transition: ease all 0.1s;
+	cursor: pointer;
+	box-shadow: 1px 0px #007E8F, 0px 1px #00B4CC,
+				2px 1px #007E8F, 1px 2px #00B4CC,
+				3px 2px #007E8F, 2px 3px #00B4CC,
+				4px 3px #007E8F, 3px 4px #00B4CC,
+				5px 4px #007E8F, 4px 5px #00B4CC,
+				6px 5px #007E8F, 5px 6px #00B4CC;
+}
+
+button:hover{
+	transform: translate(2px, 2px);
+	-webkit-transform: translate(2px, 2px);
+	-moz-transform: translate(2px, 2px);
+	-o-transform: translate(2px, 2px);
+	box-shadow: 1px 0px #007E8F, 0px 1px #00B4CC,
+				2px 1px #007E8F, 1px 2px #00B4CC,
+				3px 2px #007E8F, 2px 3px #00B4CC,
+				4px 3px #007E8F, 3px 4px #00B4CC;
 }
 
 button:active{
-	bottom: 0px;
-	right: 0px;
-	border-right: none;
-	border-bottom: none;
+	transform: translate(4px, 4px);
+	-webkit-transform: translate(4px, 4px);
+	-moz-transform: translate(4px, 4px);
+	-o-transform: translate(4px, 4px);
+	box-shadow: 1px 0px #007E8F, 0px 1px #00B4CC,
+				2px 1px #007E8F, 1px 2px #00B4CC;
 }

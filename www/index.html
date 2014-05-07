@@ -12,39 +12,43 @@
 <body>
 <div id="header">
 	<div id="header-content">
-		<div id="logo"><img src="logo.jpg"/></div>
-		
-		<div id="titulo">
-			<h1>Sistema de Arquivos Distribuído</h1>
-		</div>
+		<div id="logo"><img src="logo.png"/></div>
 		
 		<div id="group-info">
-			<h2>Grupo</h2>
-			<div class="group-member" id="upper-member">
-				<div class="member-photo"><img src="rodo.jpg"/></div>
-				<div class="member-info" >
-					Felipe Rodopoulos de Oliveira<br>
-					<small>10/0100601</small>
-				</div>
-			</div>
-			
-			<div class="group-member">
-				<div class="member-photo"><img src="pimenta.jpg"/></div>
-				<div class="member-info" >
-					Matheus Pimenta<br>
-					<small>09/0125798</small>
-				</div>
-			</div>
+			<table>
+				<tr><td><h2>Grupo</h2></td></tr>
+				<tr>
+					<td>
+						<div class="group-member" id="upper-member">
+							<div class="member-photo"><img src="rodo.jpg"/></div>
+							<div class="member-info" >
+								Felipe Rodopoulos de Oliveira<br>
+								<small>10/0100601</small>
+							</div>
+						</div>
+					</td>
+					
+					<td>
+						<div class="group-member">
+							<div class="member-photo"><img src="pimenta.jpg"/></div>
+							<div class="member-info" >
+								Matheus Pimenta<br>
+								<small>09/0125798</small>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
 		</div>
 	</div>
 	
 	<div id="menu-principal">
 	<ul>
-		<li onclick="menuOpClicked(this)" id="menuop-home">Home</li>
-		<li onclick="menuOpClicked(this)" id="menuop-user">Usuários</li>
-		<li onclick="menuOpClicked(this)" id="menuop-file">Arquivos</li>
-		<li onclick="menuOpClicked(this)" id="menuop-host">Hosts</li>
-		<li onclick="menuOpClicked(this)" id="menuop-presentation">Apresentação</li>
+		<li onclick="menuOpClicked(this)" id="menuop-home"><img src="home.png"/>Home</li>
+		<li onclick="menuOpClicked(this)" id="menuop-user"><img src="user.png"/>Usuários</li>
+		<li onclick="menuOpClicked(this)" id="menuop-file"><img src="file.png"/>Arquivos</li>
+		<li onclick="menuOpClicked(this)" id="menuop-host"><img src="host.png"/>Hosts</li>
+		<li onclick="menuOpClicked(this)" id="menuop-presentation"><img src="presentation.png"/>Apresentação</li>
 	</ul>
 </div>
 	
@@ -66,6 +70,7 @@
 		<div id="content-header">
 			<h1 id="content-title"></h1>
 			<a  id="add-button" onclick="addButtonClicked()">+ Novo</a>
+			<div id="content-header-offset"></div>
 		</div>
 		
 		<div id="content"></div>
