@@ -20,7 +20,7 @@
 void SystemSpeak() {
   UDPsocket speakSocket = SDLNet_UDP_Open(0);
   IPaddress discoverAddr;
-  SDLNet_ResolveHost(&discoverAddr, IP_MULTICAST_STR, UDP_LISTEN_HOST);
+  SDLNet_ResolveHost(&discoverAddr, IP_LISTEN, UDP_LISTEN);
   UDPpacket* packet = SDLNet_AllocPacket(1);
   packet->address.host = discoverAddr.host;
   packet->address.port = discoverAddr.port;
@@ -29,7 +29,7 @@ void SystemSpeak() {
   bool& systemOn = Globals::get<bool>("systemOn").value();
   while (systemOn) {
     SDLNet_UDP_Send(speakSocket, -1, packet);
-    Thread::sleep(5000, &systemOn);
+    Thread::sleep(MS_SPEAK, &systemOn);
   }
   SDLNet_FreePacket(packet);
   SDLNet_UDP_Close(speakSocket);

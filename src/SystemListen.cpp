@@ -20,9 +20,11 @@
 #include "Thread.hpp"
 #include "Define.hpp"
 #include "Platform.hpp"
+#include "Helpers.hpp"
 
 using namespace std;
 using namespace platform;
+using namespace helpers;
 
 static void printAddr(Uint32 host, Uint16 port) {
   printf("\tAddress: %d", ((Uint8*)&host)[0]);
@@ -32,7 +34,7 @@ static void printAddr(Uint32 host, Uint16 port) {
 }
 
 void SystemListen() {
-  MulticastSocket sock(Globals::get<Uint32>("localIP").value(), UDP_LISTEN_HOST, IP_MULTICAST_NET);
+  MulticastSocket sock(Globals::get<Uint32>("localIP").value(), UDP_LISTEN, str2Network(IP_LISTEN));
   bool& systemOn = Globals::get<bool>("systemOn").value();
   Atomic<map<Uint32, Uint32>>& peers = Globals::get<map<Uint32, Uint32>>("peers");
   IPaddress addr;
@@ -50,6 +52,6 @@ void SystemListen() {
       printf("\n");
       fflush(stdout);
     }
-    Thread::sleep(50);
+    Thread::sleep(MS_SLEEP);
   }
 }

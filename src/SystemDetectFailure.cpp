@@ -19,6 +19,7 @@
 // local
 #include "Globals.hpp"
 #include "Thread.hpp"
+#include "Define.hpp"
 
 using namespace std;
 
@@ -28,7 +29,7 @@ void SystemDetectFailure() {
   while (systemOn) {
     peers.lock();
     for (auto it = peers.value().begin(); it != peers.value().end();) {
-      if (SDL_GetTicks() - it->second  >= 10000) {
+      if (SDL_GetTicks() - it->second  >= MS_DETECTFAILURE) {
         printf("\t%x caiu\n", it->first);
         fflush(stdout);
         peers.value().erase(it++);
@@ -37,6 +38,6 @@ void SystemDetectFailure() {
         ++it;
     }
     peers.unlock();
-    Thread::sleep(50);
+    Thread::sleep(MS_SLEEP);
   }
 }
