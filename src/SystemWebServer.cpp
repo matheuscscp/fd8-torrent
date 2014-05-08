@@ -33,11 +33,15 @@ void SystemWebServer() {
       char buf[HTTP_MAX_BUFFER_SIZE];
       memset(buf, 0, HTTP_MAX_BUFFER_SIZE);
       SDLNet_TCP_Recv(client, buf, HTTP_MAX_BUFFER_SIZE);
-      printf("%s\n", buf);
+      printf("------ PACOTE ------------------------------------------\n");
+      printf("\n%s\n", buf);
       fflush(stdout);
       
       char fn[100], buftmp[100];
       sscanf(buf, "%s %s", buftmp, fn);
+      printf("\nFN: %s\n", fn);
+      printf("\nBUF: %S\n", buf);
+
       if (string(fn) == "/")
         strcpy(fn, "/index.html");
       FILE* fp = fopen((string("./www") + fn).c_str(), "rb");
