@@ -18,7 +18,7 @@
 // local
 #include "Globals.hpp"
 #include "Thread.hpp"
-#include "Define.hpp"
+#include "Defines.hpp"
 #include "Platform.hpp"
 #include "Helpers.hpp"
 

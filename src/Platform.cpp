@@ -21,7 +21,7 @@
 #endif
 
 // local
-#include "Define.hpp"
+#include "Defines.hpp"
 
 using namespace std;
 
@@ -117,7 +117,7 @@ vector<char> MulticastSocket::read(uint32_t& host, uint16_t& port) {
 void browser() {
   char cmd[100];
 #ifdef _WIN32
-  sprintf(cmd, "start http://localhost:%d", TCP_WEB_HOST);
+  sprintf(cmd, "start http://localhost:%d", TCP_WEBSERVER);
 #else
   sprintf(cmd, "sensible-browser http://localhost:%d", TCP_WEB_HOST);
 #endif
