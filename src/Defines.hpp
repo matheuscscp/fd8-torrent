@@ -11,7 +11,7 @@
 // network addresses
 #define IP_LISTEN             "224.69.69.69"
 #define UDP_LISTEN            6969
-#define TCP_WEBSERVER         80
+#define TCP_WEBSERVER         8080
 
 // sizes
 #define SIZE_WEBSERVER_MAXBUF 0x10000
