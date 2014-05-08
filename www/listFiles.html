@@ -4,10 +4,14 @@
 
 	<button onclick="addFileInput()">+</button>
 	<button onclick="submitFilesButtonClicked()">Enviar</button>
-</div>
-<div class="search-bar" id="file-search">
-	<img src="lupa.png" />
-	<input type="text" class="finder">
+	<span id="form-message"></span>
 </div>
 
-<table class="file-explorer table-find">
+<table class="search-bar" id="user-search">
+	<tr>
+		<td class="img-td"><img src="img/lupa.png" /></td>
+		<td><input type="text" class="finder" placeholder="Buscar usuário"></td>
+	</tr>
+</table>
+
+<table class="file-explorer table">
