@@ -16,6 +16,8 @@ using namespace std;
 map<string, AtomicBase*> Globals::globals;
 bool Globals::isInit = false;
 
+#include <cstdio>
+
 void Globals::init() {
   // check if is already initialized
   if (isInit)
@@ -42,6 +44,17 @@ void Globals::init() {
     int i;
     for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
     SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addrs[i]), 0);
+    
+    
+    
+    SDLNet_ResolveHost(&addr, nullptr, 0);
+    SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addr), 0);
+    printf("%x\n", addr.host);
+    fflush(stdout);
+    
+    
+    
+    
     *localIP = addr.host;
     globals["localIP"] = new Atomic<Uint32>(localIP);
   }
