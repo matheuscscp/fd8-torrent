@@ -19,58 +19,55 @@ function init(){
 function getHostIP(){
 	var client;
 	client = configureBrowserRequest(client);	
-	client.open("POST", "?R-host-ip", true);
-	client.send();
 	
 	client.onreadystatechange = function() {
-		if(client.readyState == 4 && client.status == 200)
-			return client.responseText;
-		else
-			return "-";
+		if(client.readyState == 4 && client.status == 200){
+			document.getElementById("host-ip").innerHTML = client.responseText;
+		}
+		else{
+			document.getElementById("host-ip").innerHTML = "-";
+		}
 	}
 	
-	return '-'; 
+	client.open("POST", "?Rhost-ip", true);
+	client.send();
 }
 
 // Funcao que pergunta ao servidor o numero de hosts e retorna o mesmo
 function getNumberOfHosts(){ 
 	var client;
 	client = configureBrowserRequest(client);	
-	client.open("POST", "?R-n-hosts", true);
+	client.open("POST", "?Rn-hosts", true);
 	client.send();
 	
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200)
-			return client.responseText;
+			document.getElementById("host-ip").innerHTML = client.responseText;
 		else
-			return "-";
+			document.getElementById("host-ip").innerHTML = "-";
 	}
-	
-	return '-'; 
 }
 
 // Funcao que pergunta ao servidor o estado do servidor e retorna-o
 function getServerStatus(){ 
 	var client;
 	client = configureBrowserRequest(client);	
-	client.open("POST", "?R-server-state", true);
+	client.open("POST", "?Rserver-state", true);
 	client.send();
 	
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200)
-			return "On";
+			document.getElementById("server-status").innerHTML = "On";
 		else
-			return "Off";
+			document.getElementById("server-status").innerHTML = "Off";
 	}
-
-	return 'Off'; 
 }
 
 // Funcao para atualizar as informacoes na barra lateral do sistema
 function refreshSideInfo(){
-	document.getElementById("host-ip").innerHTML = getHostIP();
-	document.getElementById("n-hosts").innerHTML = getNumberOfHosts();
-	document.getElementById("server-status").innerHTML = getServerStatus();
+	getHostIP();
+	//document.getElementById("n-hosts").innerHTML = getNumberOfHosts();
+	getServerStatus();
 }
 
 // Funcao que da funcionalidade ao menu. Ao clicar em uma opcao ele faz a 
@@ -165,7 +162,7 @@ function addingUser(){
 			}
 		}
 
-		xmlhttp.open("POST", "?add-user", true);
+		xmlhttp.open("POST", "?Sadd-user", true);
 		xmlhttp.send("user=" + username + "&pass=" + password);
 		loader.style.display = 'none';
 	}
