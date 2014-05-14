@@ -13,6 +13,7 @@
 #include <cstdio>
 
 // lib
+#include <SDL_net.h>
 #ifdef _WIN32
   #include <ws2tcpip.h>
 #else
@@ -114,7 +115,7 @@ vector<char> MulticastSocket::read(uint32_t& host, uint16_t& port) {
 // platform functions
 // =============================================================================
 
-void browser() {
+void openBrowser() {
   char cmd[100];
 #ifdef _WIN32
   sprintf(cmd, "start http://localhost:%d", TCP_WEBSERVER);
@@ -122,6 +123,21 @@ void browser() {
   sprintf(cmd, "sensible-browser http://localhost:%d", TCP_WEB_HOST);
 #endif
   system(cmd);
+}
+
+uint32_t getLocalIP() {
+  IPaddress addr;
+#ifdef _WIN32
+  SDLNet_ResolveHost(&addr, nullptr, 0);
+  SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addr), 0);
+#else
+  IPaddress addrs[100];
+  int total = SDLNet_GetLocalAddresses(addrs, 100);
+  int i;
+  for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
+  SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addrs[i]), 0);
+#endif
+  return addr.host;
 }
 
 } // namespace platform

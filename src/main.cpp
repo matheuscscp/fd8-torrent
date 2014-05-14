@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
         System::stop();
     }
     if (System::isRunning() && browse.leftClicked())
-      browser();
+      openBrowser();
     
     // render
     bg.render(0, 0);

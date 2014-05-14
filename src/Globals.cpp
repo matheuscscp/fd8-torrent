@@ -8,10 +8,11 @@
 // this
 #include "Globals.hpp"
 
-// lib
-#include <SDL_net.h>
+// local
+#include "Platform.hpp"
 
 using namespace std;
+using namespace platform;
 
 map<string, AtomicBase*> Globals::globals;
 bool Globals::isInit = false;
@@ -33,30 +34,14 @@ void Globals::init() {
   
   // peers
   {
-    globals["peers"] = new Atomic<map<Uint32, Uint32>>(new map<Uint32, Uint32>);
+    globals["peers"] = new Atomic<map<uint32_t, uint32_t>>(new map<uint32_t, uint32_t>);
   }
   
   // localIP
   {
-    Uint32* localIP = new Uint32;
-    IPaddress addr, addrs[100];
-    int total = SDLNet_GetLocalAddresses(addrs, 100);
-    int i;
-    for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
-    SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addrs[i]), 0);
-    
-    
-    
-    SDLNet_ResolveHost(&addr, nullptr, 0);
-    SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addr), 0);
-    printf("%x\n", addr.host);
-    fflush(stdout);
-    
-    
-    
-    
-    *localIP = addr.host;
-    globals["localIP"] = new Atomic<Uint32>(localIP);
+    uint32_t* ip = new uint32_t;
+    *ip = getLocalIP();
+    globals["localIP"] = new Atomic<uint32_t>(ip);
   }
 }
 

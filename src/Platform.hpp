@@ -24,7 +24,8 @@ class MulticastSocket {
     std::vector<char> read(uint32_t& host, uint16_t& port);
 };
 
-void browser();
+void openBrowser();
+uint32_t getLocalIP();
 
 }
 
