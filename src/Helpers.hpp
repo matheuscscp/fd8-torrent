@@ -10,10 +10,12 @@
 
 // standard
 #include <cstdint>
+#include <string>
 
 namespace helpers {
 
 uint32_t str2Network(const char* str);
+std::string network2str(uint32_t ipaddr);
 
 }
 
