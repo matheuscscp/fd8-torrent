@@ -8,6 +8,9 @@
 // this
 #include "Globals.hpp"
 
+// standard
+#include <set>
+
 // local
 #include "Platform.hpp"
 
@@ -42,6 +45,11 @@ void Globals::init() {
     uint32_t* ip = new uint32_t;
     *ip = getLocalIP();
     globals["localIP"] = new Atomic<uint32_t>(ip);
+  }
+  
+  // users
+  {
+    globals["users"] = new Atomic<set<string>>(new set<string>);
   }
 }
 
