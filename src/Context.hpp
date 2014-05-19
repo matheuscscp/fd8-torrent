@@ -8,8 +8,12 @@
 #ifndef CONTEXT_HPP_
 #define CONTEXT_HPP_
 
-#include <SDL.h>
+// standard
 #include <map>
+#include <string>
+
+// lib
+#include <SDL.h>
 
 class Context {
   public:
