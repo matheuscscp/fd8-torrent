@@ -24,7 +24,7 @@ void Thread::start() {
   
   // start
   started = true;
-  thread = SDL_CreateThread(exec, nullptr, &f);
+  thread = SDL_CreateThread(exec, nullptr, new function<void()>(f));
 }
 
 void Thread::join() {
@@ -56,7 +56,8 @@ void Thread::sleep(uint32_t ms, const bool* keepCondition) {
 }
 
 int Thread::exec(void* func) {
-  auto& f = *((function<void()>*)func);
-  f();
+  auto fptr = (function<void()>*)func;
+  (*fptr)();
+  delete fptr;
   return 0;
 }

@@ -8,6 +8,9 @@
 #ifndef ATOMIC_HPP_
 #define ATOMIC_HPP_
 
+// lib
+#include <memory>
+
 // local
 #include "Mutex.hpp"
 
@@ -18,7 +21,7 @@ class AtomicBase {
 template <class T>
 class Atomic : public AtomicBase {
   private:
-    T* val;
+    std::unique_ptr<T> val;
     Mutex mutex;
   public:
     Atomic(T* val) : val(val) {
@@ -26,7 +29,7 @@ class Atomic : public AtomicBase {
     }
     
     ~Atomic() {
-      delete val;
+      
     }
     
     void lock() {
@@ -38,7 +41,7 @@ class Atomic : public AtomicBase {
     }
     
     T& value() const {
-      return *val;
+      return *(val.get());
     }
 };
 
