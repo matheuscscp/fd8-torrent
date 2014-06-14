@@ -49,7 +49,7 @@ class Context {
   public:
     static void init(const char* title, int w, int h, const char* icon);
     static void close();
-    static bool shouldQuit();
+    static bool quitRequested();
     static void input();
     static void render();
     static InputState key(SDL_Keycode keycode);

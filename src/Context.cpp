@@ -66,7 +66,7 @@ void Context::close() {
   SDL_Quit();
 }
 
-bool Context::shouldQuit() {
+bool Context::quitRequested() {
   return quit;
 }
 

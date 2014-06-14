@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
   Context::Image stop("img/stop.png");
   Context::Image browse("img/browse.png");
   
-  while (!Context::shouldQuit()) {
+  while (!Context::quitRequested()) {
     Context::input();
     
     // update
