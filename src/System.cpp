@@ -42,6 +42,7 @@ bool System::stop(bool wait) {
   if (wait)
     thread->join();
   delete thread;
+  thread = nullptr;
   return true;
 }
 
