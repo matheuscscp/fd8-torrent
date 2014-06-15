@@ -50,10 +50,9 @@ bool System::running() {
 
 System::System() :
 localAddress(Address::local()),
-mainUDPSocket(
-  Address(localAddress.ip, Address::htons(UDP_LISTEN)),
-  Address(IP_LISTEN).ip
-) {
+multicastAddress(IP_LISTEN, UDP_LISTEN),
+mainUDPSocket(multicastAddress)
+{
   // httpServer
   {
 //    TCPsocket* httpServer = new TCPsocket;

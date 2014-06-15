@@ -32,11 +32,31 @@ Address::Address(uint32_t ip, uint16_t port) : ip(ip), port(port) {
   
 }
 
-Address::Address(const string& ip, uint16_t port) {
-  IPaddress tmp;
-  SDLNet_ResolveHost(&tmp, ip.c_str(), port);
-  this->ip = tmp.host;
-  this->port = tmp.port;
+Address::Address(const string& ip, const string& port) : ip(0), port(0) {
+  if (ip.size()) {
+    IPaddress tmp;
+    SDLNet_ResolveHost(&tmp, ip.c_str(), 0);
+    this->ip = tmp.host;
+  }
+  if (port.size()) {
+    sscanf(port.c_str(), "%hu", &this->port);
+    this->port = htons(this->port);
+  }
+}
+
+Address Address::local() {
+  IPaddress addr;
+#ifdef _WIN32
+  SDLNet_ResolveHost(&addr, nullptr, 0);
+  SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addr), 0);
+#else
+  IPaddress addrs[100];
+  int total = SDLNet_GetLocalAddresses(addrs, 100);
+  int i;
+  for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
+  SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addrs[i]), 0);
+#endif
+  return Address(addr.host, 0);
 }
 
 string Address::toString() const {
@@ -61,21 +81,6 @@ string Address::toString() const {
   return string(tmp);
 }
 
-Address Address::local() {
-  IPaddress addr;
-#ifdef _WIN32
-  SDLNet_ResolveHost(&addr, nullptr, 0);
-  SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addr), 0);
-#else
-  IPaddress addrs[100];
-  int total = SDLNet_GetLocalAddresses(addrs, 100);
-  int i;
-  for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
-  SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addrs[i]), 0);
-#endif
-  return Address(addr.host, 0);
-}
-
 uint32_t Address::ntohl(uint32_t ip) {
   return SDLNet_Read32(&ip);
 }
@@ -96,13 +101,15 @@ uint16_t Address::htons(uint16_t port) {
 // class UDPSocket;
 // =============================================================================
 
-UDPSocket::UDPSocket(uint16_t port) {
+UDPSocket::UDPSocket(const string& port) {
+  Address nport("", port);
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
-  setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)TRUE, sizeof(BOOL));
+  int optval = 1;
+  setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
   SOCKADDR_IN addr;
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(port);
+  addr.sin_port = nport.port;
   addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
   bind(sd, (SOCKADDR*)&addr, sizeof(SOCKADDR_IN));
 #else
@@ -111,24 +118,24 @@ UDPSocket::UDPSocket(uint16_t port) {
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(int));
   sockaddr_in addr;
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(port);
+  addr.sin_port = nport.port;
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   bind(sd, (sockaddr*)&addr, sizeof(sockaddr_in));
 #endif
 }
 
-UDPSocket::UDPSocket(const Address& address, uint32_t group) {
+UDPSocket::UDPSocket(const Address& multicastAddress) {
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
   int optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
   ip_mreq mreq;
-  mreq.imr_multiaddr.S_un.S_addr = group;
-  mreq.imr_interface.S_un.S_addr = address.ip;
+  mreq.imr_multiaddr.S_un.S_addr = multicastAddress.ip;
+  mreq.imr_interface.S_un.S_addr = Address::local().ip;
   setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(ip_mreq));
   SOCKADDR_IN addr;
   addr.sin_family = AF_INET;
-  addr.sin_port = address.port;
+  addr.sin_port = multicastAddress.port;
   addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
   bind(sd, (SOCKADDR*)&addr, sizeof(SOCKADDR_IN));
 #else
@@ -136,12 +143,12 @@ UDPSocket::UDPSocket(const Address& address, uint32_t group) {
   int optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(int));
   ip_mreq mreq;
-  mreq.imr_multiaddr.s_addr = group;
-  mreq.imr_interface.s_addr = address.ip;
+  mreq.imr_multiaddr.s_addr = multicastAddress.ip;
+  mreq.imr_interface.s_addr = Address::local().ip;
   setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(ip_mreq));
   sockaddr_in addr;
   addr.sin_family = AF_INET;
-  addr.sin_port = address.port;
+  addr.sin_port = multicastAddress.port;
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   bind(sd, (sockaddr*)&addr, sizeof(sockaddr_in));
 #endif
@@ -186,8 +193,7 @@ vector<char> UDPSocket::recv(Address& address) {
     char buf[0x1000];
     SOCKADDR_IN addr;
     int addrsize = sizeof(SOCKADDR_IN);
-    int total = recvfrom(sd, buf, 0x1000, 0, (SOCKADDR*)&addr, &addrsize);
-    data.assign(buf, buf + total);
+    data.assign(buf, buf + recvfrom(sd, buf, 0x1000, 0, (SOCKADDR*)&addr, &addrsize));
     address = Address(addr.sin_addr.S_un.S_addr, addr.sin_port);
   }
 #else
@@ -201,12 +207,60 @@ vector<char> UDPSocket::recv(Address& address) {
     char buf[0x1000];
     sockaddr_in addr;
     socklen_t addrsize = sizeof(sockaddr_in);
-    int total = recvfrom(sd, buf, 0x1000, 0, (sockaddr*)&addr, &addrsize);
-    data.assign(buf, buf + total);
+    data.assign(buf, buf + recvfrom(sd, buf, 0x1000, 0, (sockaddr*)&addr, &addrsize));
     address = Address(addr.sin_addr.s_addr, addr.sin_port);
   }
 #endif
   return data;
+}
+
+// =============================================================================
+// class TCPSocket;
+// =============================================================================
+
+TCPSocket::TCPSocket(void* sd) : sd(sd) {
+  
+}
+
+TCPSocket::~TCPSocket() {
+  if (sd)
+    SDLNet_TCP_Close(TCPsocket(sd));
+}
+
+// =============================================================================
+// class TCPConnection;
+// =============================================================================
+
+TCPConnection::TCPConnection(void* sd) : TCPSocket(sd) {
+  
+}
+
+void TCPConnection::send(const vector<char>& data) {
+  if (sd)
+    SDLNet_TCP_Send(TCPsocket(sd), &data[0], data.size());
+}
+
+vector<char> TCPConnection::recv(int maxlen) {
+  if (sd == nullptr)
+    return vector<char>();
+  vector<char> data;
+  char* buf = new char[maxlen];
+  data.assign(buf, buf + SDLNet_TCP_Recv(TCPsocket(sd), buf, maxlen));
+  return data;
+}
+
+// =============================================================================
+// class TCPServer;
+// =============================================================================
+
+TCPServer::TCPServer(const string& port) : TCPSocket(0) {
+  IPaddress addr;
+  SDLNet_ResolveHost(&addr, nullptr, Address("", port).port);
+  sd = SDLNet_TCP_Open(&addr);
+}
+
+TCPConnection TCPServer::accept() {
+  return TCPConnection(SDLNet_TCP_Accept(TCPsocket(sd)));
 }
 
 } // namespace network

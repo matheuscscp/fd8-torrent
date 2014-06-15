@@ -25,6 +25,7 @@ class System {
     std::map<uint32_t, helpers::Timer> peers;
     std::set<std::string> users;
     network::Address localAddress;
+    network::Address multicastAddress;
     network::UDPSocket mainUDPSocket;
   public:
     static bool start();

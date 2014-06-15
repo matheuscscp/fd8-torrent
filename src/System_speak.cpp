@@ -20,7 +20,6 @@ using namespace helpers;
 
 void System::speak() {
   static Timer timer;
-  static Address multicastAddress(IP_LISTEN, UDP_LISTEN);
   static vector<char> data;
   static StaticInitializer staticInitializer([&]() {
     data.push_back(0xFF);
