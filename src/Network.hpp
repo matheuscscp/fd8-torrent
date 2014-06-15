@@ -15,6 +15,9 @@
 
 namespace network {
 
+void init();
+void close();
+
 struct Address {
   uint32_t ip;
   uint16_t port;

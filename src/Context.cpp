@@ -43,10 +43,6 @@ void Context::init(const char* title, int w, int h, const char* icon) {
     fprintf(stderr, "IMG_Init failure\n");
     exit(0);
   }
-  if (SDLNet_Init()) {
-    fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
-    exit(0);
-  }
   window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (icon) {
@@ -61,7 +57,6 @@ void Context::init(const char* title, int w, int h, const char* icon) {
 void Context::close() {
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
-  SDLNet_Quit();
   IMG_Quit();
   SDL_Quit();
 }

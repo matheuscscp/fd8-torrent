@@ -12,6 +12,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
+  
   Context::init("..::fd8-torrent::..", 512, 512, "img/icon.jpg");
   
   Context::Image bg("img/bg.jpg");
@@ -42,8 +43,9 @@ int main(int argc, char* argv[]) {
     Context::render();
   }
   
-  System::stop(true);
   Context::close();
+  
+  System::stop(true);
   
   return 0;
 }

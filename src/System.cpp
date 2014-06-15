@@ -24,11 +24,13 @@ bool System::start() {
     return false;
   started = true;
   thread = new Thread([]() {
+    init();
     {
       System sys;
       initialized = true;
       sys.run();
     }
+    close();
     initialized = false;
   });
   thread->start();
