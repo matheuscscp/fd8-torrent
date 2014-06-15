@@ -162,21 +162,21 @@ UDPSocket::~UDPSocket() {
 #endif
 }
 
-void UDPSocket::send(const Address& address, const vector<char>& data) {
+void UDPSocket::send(const Address& address, int maxlen, const char* data) {
 #ifdef _WIN32
   SOCKADDR_IN servaddr;
   memset((void*)&servaddr, 0, sizeof(SOCKADDR_IN));
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = address.ip;
   servaddr.sin_port = address.port;
-  sendto(sd, &data[0], data.size(), 0, (SOCKADDR*)&servaddr, sizeof(SOCKADDR_IN));
+  sendto(sd, data, maxlen, 0, (SOCKADDR*)&servaddr, sizeof(SOCKADDR_IN));
 #else
   sockaddr_in servaddr;
   memset(&servaddr, 0, sizeof(sockaddr_ir));
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = address.ip;
   servaddr.sin_port = address.port;
-  sendto(sd, &data[0], data.size(), 0, &servaddr, sizeof(sockaddr_in));
+  sendto(sd, data, maxlen, 0, &servaddr, sizeof(sockaddr_in));
 #endif
 }
 
@@ -235,18 +235,15 @@ TCPConnection::TCPConnection(void* sd) : TCPSocket(sd) {
   
 }
 
-void TCPConnection::send(const vector<char>& data) {
+void TCPConnection::send(int maxlen, const char* data) {
   if (sd)
-    SDLNet_TCP_Send(TCPsocket(sd), &data[0], data.size());
+    SDLNet_TCP_Send(TCPsocket(sd), data, maxlen);
 }
 
-vector<char> TCPConnection::recv(int maxlen) {
+int TCPConnection::recv(int maxlen, char* data) {
   if (sd == nullptr)
-    return vector<char>();
-  vector<char> data;
-  char* buf = new char[maxlen];
-  data.assign(buf, buf + SDLNet_TCP_Recv(TCPsocket(sd), buf, maxlen));
-  return data;
+    return 0;
+  return SDLNet_TCP_Recv(TCPsocket(sd), data, maxlen);
 }
 
 // =============================================================================
@@ -259,8 +256,11 @@ TCPServer::TCPServer(const string& port) : TCPSocket(0) {
   sd = SDLNet_TCP_Open(&addr);
 }
 
-TCPConnection TCPServer::accept() {
-  return TCPConnection(SDLNet_TCP_Accept(TCPsocket(sd)));
+unique_ptr<TCPConnection> TCPServer::accept() {
+  TCPsocket sock = SDLNet_TCP_Accept(TCPsocket(sd));
+  if (sock == nullptr)
+    return unique_ptr<TCPConnection>(nullptr);
+  return unique_ptr<TCPConnection>(new TCPConnection(sock));
 }
 
 } // namespace network

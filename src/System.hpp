@@ -12,13 +12,16 @@
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
 // local
+#include "Concurrency.hpp"
 #include "Helpers.hpp"
 #include "Network.hpp"
 
 class System {
   private:
+    static concurrency::Thread* thread;
     static bool started;
     static bool initialized;
     
@@ -27,9 +30,10 @@ class System {
     network::Address localAddress;
     network::Address multicastAddress;
     network::UDPSocket mainUDPSocket;
+    network::TCPServer httpTCPServer;
   public:
     static bool start();
-    static bool stop();
+    static bool stop(bool wait = false);
     static bool changing();
     static bool running();
   private:
@@ -39,7 +43,7 @@ class System {
     void listen();
     void detectFailure();
     void httpServer();
-    void httpServer_dataRequest(char* cRequest, char* buffer);
+    void httpServer_dataRequest(char* cRequest, const char* buffer);
 };
 
 #endif /* SYSTEM_HPP_ */

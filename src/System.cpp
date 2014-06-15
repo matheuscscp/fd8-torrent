@@ -9,12 +9,13 @@
 #include "System.hpp"
 
 // local
-#include "Thread.hpp"
 #include "Defines.hpp"
 
 using namespace std;
+using namespace concurrency;
 using namespace network;
 
+Thread* System::thread = nullptr;
 bool System::started = false;
 bool System::initialized = false;
 
@@ -22,21 +23,25 @@ bool System::start() {
   if (started | initialized)
     return false;
   started = true;
-  Thread([]() {
+  thread = new Thread([]() {
     {
       System sys;
       initialized = true;
       sys.run();
     }
     initialized = false;
-  }).start();
+  });
+  thread->start();
   return true;
 }
 
-bool System::stop() {
+bool System::stop(bool wait) {
   if (!started | !initialized)
     return false;
   started = false;
+  if (wait)
+    thread->join();
+  delete thread;
   return true;
 }
 
@@ -50,17 +55,11 @@ bool System::running() {
 
 System::System() :
 localAddress(Address::local()),
-multicastAddress(IP_LISTEN, UDP_LISTEN),
-mainUDPSocket(multicastAddress)
+multicastAddress(IP_MULTICAST, UDP_MULTICAST),
+mainUDPSocket(multicastAddress),
+httpTCPServer(TCP_HTTPSERVER)
 {
-  // httpServer
-  {
-//    TCPsocket* httpServer = new TCPsocket;
-//    IPaddress addr;
-//    SDLNet_ResolveHost(&addr, nullptr, TCP_WEBSERVER);
-//    *httpServer = SDLNet_TCP_Open(&addr);
-//    globals["httpServer"] = new Atomic<TCPsocket>(httpServer);
-  }
+  
 }
 
 void System::run() {

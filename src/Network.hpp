@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <memory>
 
 namespace network {
 
@@ -37,7 +38,7 @@ class UDPSocket {
     UDPSocket(const std::string& port);
     UDPSocket(const Address& multicastAddress);
     ~UDPSocket();
-    void send(const Address& address, const std::vector<char>& data);
+    void send(const Address& address, int maxlen, const char* data);
     std::vector<char> recv(Address& address);
 };
 
@@ -52,16 +53,16 @@ class TCPSocket {
 class TCPConnection : public TCPSocket {
   public:
     TCPConnection(void* sd);
-    void send(const std::vector<char>& data);
-    std::vector<char> recv(int maxlen);
+    void send(int maxlen, const char* data);
+    int recv(int maxlen, char* data);
 };
 
 class TCPServer : public TCPSocket {
   public:
     TCPServer(const std::string& port);
-    TCPConnection accept();
+    std::unique_ptr<TCPConnection> accept();
 };
 
-}
+} // namespace network
 
 #endif /* NETWORK_HPP_ */

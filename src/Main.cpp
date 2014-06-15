@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     Context::render();
   }
   
-  System::stop();
+  System::stop(true);
   Context::close();
   
   return 0;

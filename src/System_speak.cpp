@@ -20,15 +20,12 @@ using namespace helpers;
 
 void System::speak() {
   static Timer timer;
-  static vector<char> data;
-  static StaticInitializer staticInitializer([&]() {
-    data.push_back(0xFF);
-  });
+  static const char data = 0xFF;
   
   if (!timer.counting())
     timer.start();
   if (timer.time() > MS_SPEAK) {
-    mainUDPSocket.send(multicastAddress, data);
+    mainUDPSocket.send(multicastAddress, 1, &data);
     timer.start();
   }
 }

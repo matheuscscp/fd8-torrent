@@ -80,9 +80,9 @@ bool Timer::counting() {
 void openBrowser() {
   char cmd[100];
 #ifdef _WIN32
-  sprintf(cmd, "start http://localhost:%s", TCP_WEBSERVER);
+  sprintf(cmd, "start http://localhost:%s", TCP_HTTPSERVER);
 #else
-  sprintf(cmd, "sensible-browser http://localhost:%s", TCP_WEBSERVER);
+  sprintf(cmd, "sensible-browser http://localhost:%s", TCP_HTTPSERVER);
 #endif
   system(cmd);
 }

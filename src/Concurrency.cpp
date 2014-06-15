@@ -1,17 +1,23 @@
 /*
- * Thread.cpp
+ * Concurrency.cpp
  *
- *  Created on: Apr 29, 2014
+ *  Created on: Jun 15, 2014
  *      Author: Pimenta
  */
 
 // this
-#include "Thread.hpp"
+#include "Concurrency.hpp"
 
 // lib
 #include <SDL.h>
 
 using namespace std;
+
+namespace concurrency {
+
+// =============================================================================
+// class Thread;
+// =============================================================================
 
 Thread::Thread(const function<void()>& f) : f(f), started(false), thread(nullptr) {
   
@@ -61,3 +67,33 @@ int Thread::exec(void* func) {
   delete fptr;
   return 0;
 }
+
+// =============================================================================
+// class Mutex;
+// =============================================================================
+
+Mutex::Mutex() {
+  mutex = SDL_CreateMutex();
+}
+
+Mutex::~Mutex() {
+  SDL_DestroyMutex((SDL_mutex*)mutex);
+}
+
+void Mutex::lock() {
+  SDL_mutexP((SDL_mutex*)mutex);
+}
+
+void Mutex::unlock() {
+  SDL_mutexV((SDL_mutex*)mutex);
+}
+
+// =============================================================================
+// class AtomicBase;
+// =============================================================================
+
+AtomicBase::~AtomicBase() {
+  
+}
+
+} // namespace concurrency
