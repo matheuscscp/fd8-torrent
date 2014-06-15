@@ -12,7 +12,6 @@
 #include <vector>
 #include <string>
 #include <cstdint>
-#include <memory>
 
 namespace network {
 
@@ -60,7 +59,7 @@ class TCPConnection : public TCPSocket {
 class TCPServer : public TCPSocket {
   public:
     TCPServer(const std::string& port);
-    std::unique_ptr<TCPConnection> accept();
+    TCPConnection* accept();
 };
 
 } // namespace network

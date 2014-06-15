@@ -24,11 +24,11 @@ using namespace concurrency;
 using namespace network;
 
 // static variables
-static unique_ptr<TCPConnection> client;
+static TCPConnection* client = nullptr;
 
 void System::httpServer() {
   client = httpTCPServer.accept();
-  if (client.get() == nullptr)
+  if (client == nullptr)
     return;
   
   char* data = new char[SIZE_HTTPSERVER_MAXBUF];
@@ -62,7 +62,8 @@ void System::httpServer() {
     }
   }
   
-  client = unique_ptr<TCPConnection>(nullptr);
+  delete client;
+  client = nullptr;
 }
 
 void System::httpServer_dataRequest(char* cRequest, const char* buffer){

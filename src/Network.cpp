@@ -252,15 +252,15 @@ int TCPConnection::recv(int maxlen, char* data) {
 
 TCPServer::TCPServer(const string& port) : TCPSocket(0) {
   IPaddress addr;
-  SDLNet_ResolveHost(&addr, nullptr, Address("", port).port);
+  SDLNet_ResolveHost(&addr, nullptr, Address::ntohs(Address("", port).port));
   sd = SDLNet_TCP_Open(&addr);
 }
 
-unique_ptr<TCPConnection> TCPServer::accept() {
+TCPConnection* TCPServer::accept() {
   TCPsocket sock = SDLNet_TCP_Accept(TCPsocket(sd));
   if (sock == nullptr)
-    return unique_ptr<TCPConnection>(nullptr);
-  return unique_ptr<TCPConnection>(new TCPConnection(sock));
+    return nullptr;
+  return new TCPConnection(sock);
 }
 
 } // namespace network
