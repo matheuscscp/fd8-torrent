@@ -8,6 +8,9 @@
 // this
 #include "SystemSpeak.hpp"
 
+// standard
+#include <vector>
+
 // lib
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_stdinc.h>
@@ -16,21 +19,24 @@
 #include "Globals.hpp"
 #include "Thread.hpp"
 #include "Defines.hpp"
+#include "Network.hpp"
+#include "Helpers.hpp"
+
+using namespace std;
+using namespace helpers;
+using namespace network;
 
 void SystemSpeak() {
-  UDPsocket speakSocket = SDLNet_UDP_Open(0);
-  IPaddress discoverAddr;
-  SDLNet_ResolveHost(&discoverAddr, IP_LISTEN, UDP_LISTEN);
-  UDPpacket* packet = SDLNet_AllocPacket(1);
-  packet->address.host = discoverAddr.host;
-  packet->address.port = discoverAddr.port;
-  packet->len = 1;
-  *((Uint8*)packet->data) = (Uint8)0xFF;
-  bool& systemOn = Globals::get<bool>("systemOn").value();
-  while (systemOn) {
-    SDLNet_UDP_Send(speakSocket, -1, packet);
-    Thread::sleep(MS_SPEAK, &systemOn);
+  static Timer timer;
+  static UDPSocket& mainUDPSocket = Globals::get<UDPSocket>("mainUDPSocket").value();
+  static Address multicastAddr(IP_LISTEN, UDP_LISTEN);
+  static vector<char> data;
+  static StaticInitializer staticInitializer([&]() {
+    data.push_back(0xFF);
+  });
+  
+  if (timer.time() > MS_SPEAK) {
+    mainUDPSocket.send(multicastAddr, data);
+    timer.start();
   }
-  SDLNet_FreePacket(packet);
-  SDLNet_UDP_Close(speakSocket);
 }

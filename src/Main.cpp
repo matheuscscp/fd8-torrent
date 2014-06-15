@@ -6,11 +6,11 @@
  */
 
 #include "Context.hpp"
-#include "Platform.hpp"
 #include "System.hpp"
+#include "Globals.hpp"
+#include "Helpers.hpp"
 
 using namespace std;
-using namespace platform;
 
 int main(int argc, char* argv[]) {
   Context::init("..::fd8-torrent::..", 512, 512, "img/icon.jpg");
@@ -24,21 +24,21 @@ int main(int argc, char* argv[]) {
     Context::input();
     
     // update
-    if (start.leftClicked()) {
+    if (start.leftClicked() && System::running() == Globals::ready()) {
       if (!System::start())
         System::stop();
     }
-    if (System::isRunning() && browse.leftClicked())
-      openBrowser();
+    if (browse.leftClicked() && System::running() && Globals::ready())
+      helpers::openBrowser();
     
     // render
     bg.render(0, 0);
-    if (!System::isRunning())
-      start.render(155, 300);
-    else {
+    if (System::running() && Globals::ready()) {
       stop.render(155, 300);
       browse.render(205, 102);
     }
+    else
+      start.render(155, 300);
     
     Context::render();
   }

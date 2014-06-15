@@ -19,25 +19,22 @@
 // local
 #include "Globals.hpp"
 #include "Thread.hpp"
+#include "Helpers.hpp"
 #include "Defines.hpp"
 
 using namespace std;
+using namespace helpers;
 
 void SystemDetectFailure() {
-  bool& systemOn = Globals::get<bool>("systemOn").value();
-  Atomic<map<Uint32, Uint32>>& peers = Globals::get<map<Uint32, Uint32>>("peers");
-  while (systemOn) {
-    peers.lock();
-    for (auto it = peers.value().begin(); it != peers.value().end();) {
-      if (SDL_GetTicks() - it->second  >= MS_DETECTFAILURE) {
-        printf("\t%x caiu\n", it->first);
-        fflush(stdout);
-        peers.value().erase(it++);
-      }
-      else
-        ++it;
+  static map<uint32_t, Timer>& peers = Globals::get<map<uint32_t, Timer>>("peers").value();
+  
+  for (auto it = peers.begin(); it != peers.end();) {
+    if (it->second.time() >= MS_DETECTFAILURE) {
+      printf("\t%x caiu\n", it->first);
+      fflush(stdout);
+      peers.erase(it++);
     }
-    peers.unlock();
-    Thread::sleep(MS_SLEEP);
+    else
+      ++it;
   }
 }

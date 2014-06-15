@@ -22,11 +22,16 @@
 #include "Thread.hpp"
 #include "Defines.hpp"
 #include "Helpers.hpp"
+#include "Network.hpp"
 
 using namespace std;
 using namespace helpers;
+using namespace network;
 
-// statics
+// static functions
+static void serverDataRequest(char* cRequest, char* buffer);
+
+// static variables
 static TCPsocket client;
 
 void SystemWebServer() {
@@ -74,15 +79,14 @@ void SystemWebServer() {
   SDLNet_TCP_Close(server);
 }
 
-void serverDataRequest(char* cRequest, char* buffer){
+static void serverDataRequest(char* cRequest, char* buffer){
 	string request = string(cRequest).substr(3, strlen(cRequest));
 
 	cout << "\nREQUEST: " << request << "\n";
 
 	if (request == "host-ip"){
 		printf("\n%s\n", buffer);
-		Uint32& nHostIP = Globals::get<Uint32>("localIP").value();
-		string hostIP = network2str(nHostIP);
+		string hostIP = Address(Globals::get<uint32_t>("localIP").value(), 0).toString();
 		SDLNet_TCP_Send(client, hostIP.c_str(), hostIP.size() + 1);
 	} else if( request == "n-hosts" ){
 
@@ -90,4 +94,3 @@ void serverDataRequest(char* cRequest, char* buffer){
 		SDLNet_TCP_Send(client, "On", 3);
 	}
 }
-

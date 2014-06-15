@@ -17,8 +17,8 @@
 #define SIZE_WEBSERVER_MAXBUF 0x10000
 
 // times
-#define MS_SLEEP              50
-#define MS_DETECTFAILURE      10000
-#define MS_SPEAK              5000
+#define MS_SLEEP              20
+#define MS_DETECTFAILURE      9000
+#define MS_SPEAK              3000
 
 #endif /* DEFINE_HPP_ */

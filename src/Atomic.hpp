@@ -15,7 +15,8 @@
 #include "Mutex.hpp"
 
 class AtomicBase {
-    
+  public:
+    virtual ~AtomicBase();
 };
 
 template <class T>

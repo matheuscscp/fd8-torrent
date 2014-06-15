@@ -10,13 +10,32 @@
 
 // standard
 #include <cstdint>
-#include <string>
+#include <functional>
 
 namespace helpers {
 
-uint32_t str2Network(const char* str);
-std::string network2str(uint32_t ipaddr);
+class StaticInitializer {
+  public:
+    StaticInitializer(std::function<void()> f);
+};
 
-}
+class Timer {
+  private:
+    bool started;
+    bool paused;
+    uint32_t initialTime;
+    uint32_t pauseTime;
+  public:
+    Timer();
+    void start();
+    void pause();
+    void resume();
+    void reset();
+    uint32_t time();
+};
+
+void openBrowser();
+
+} // namespace helpers
 
 #endif /* HELPERS_HPP_ */

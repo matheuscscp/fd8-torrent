@@ -23,6 +23,8 @@ class Globals {
     static void init();
     static void close();
     
+    static bool ready();
+    
     template <class T>
     static Atomic<T>& get(const std::string& key) {
       return *((Atomic<T>*)globals[key]);

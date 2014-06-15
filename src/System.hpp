@@ -12,14 +12,14 @@
 
 class System {
   private:
-    static void run();
+    static bool isRunning;
     static Thread* thread;
-    static bool running;
   public:
     static bool start();
     static bool stop();
-    static bool isRunning();
+    static bool running();
   private:
+    static void run();
 };
 
 #endif /* SYSTEM_HPP_ */

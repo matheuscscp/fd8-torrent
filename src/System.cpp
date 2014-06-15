@@ -9,61 +9,50 @@
 #include "System.hpp"
 
 // local
+#include "Defines.hpp"
 #include "Globals.hpp"
 #include "SystemDetectFailure.hpp"
 #include "SystemListen.hpp"
 #include "SystemSpeak.hpp"
 #include "SystemWebServer.hpp"
 
+bool System::isRunning = false;
 Thread* System::thread = nullptr;
-bool System::running = false;
 
 bool System::start() {
-  if (running)
+  if (isRunning)
     return false;
+  isRunning = true;
   
   thread = new Thread(System::run);
   thread->start();
-  running = true;
   return true;
 }
 
 bool System::stop() {
-  if (!running)
+  if (!isRunning)
     return false;
+  isRunning = false;
   
   Globals::get<bool>("systemOn").value() = false;
   thread->join();
-  running = false;
+  delete thread;
   return true;
 }
 
-bool System::isRunning() {
-  return running;
+bool System::running() {
+  return isRunning;
 }
 
 void System::run() {
-  // init
   Globals::init();
-  
-  // all system threads
-  Thread speak(SystemSpeak);
-  Thread listen(SystemListen);
-  Thread detectFailure(SystemDetectFailure);
-  Thread webServer(SystemWebServer);
-  
-  // start all threads
-  speak.start();
-  listen.start();
-  detectFailure.start();
-  webServer.start();
-  
-  // join all threads
-  speak.join();
-  listen.join();
-  detectFailure.join();
-  webServer.join();
-  
-  // close
+  bool& systemOn = Globals::get<bool>("systemOn").value();
+  while (systemOn) {
+    SystemSpeak();
+    SystemListen();
+    SystemDetectFailure();
+    //SystemWebServer();
+    Thread::sleep(MS_SLEEP);
+  }
   Globals::close();
 }

@@ -9,6 +9,5 @@
 #define SYSTEMWEBSERVER_HPP_
 
 void SystemWebServer();
-void serverDataRequest(char* cRequest, char* buffer);
 
 #endif /* SYSTEMWEBSERVER_HPP_ */

@@ -12,27 +12,75 @@
 #include <cstdio>
 
 // lib
-#include <SDL_net.h>
+#include <SDL.h>
+
+// local
+#include "Defines.hpp"
 
 using namespace std;
 
 namespace helpers {
 
-uint32_t str2Network(const char* str) {
-  IPaddress addr;
-  SDLNet_ResolveHost(&addr, str, 0);
-  return addr.host;
+// =============================================================================
+// class StaticInitializer;
+// =============================================================================
+
+StaticInitializer::StaticInitializer(function<void()> f) {
+  f();
 }
 
-string network2str(uint32_t ipaddr) {
-  char tmp[16];
-  sprintf(tmp, "%d.%d.%d.%d",
-    int(((uint8_t*)&ipaddr)[0]),
-    int(((uint8_t*)&ipaddr)[1]),
-    int(((uint8_t*)&ipaddr)[2]),
-    int(((uint8_t*)&ipaddr)[3])
-  );
-  return string(tmp);
+// =============================================================================
+// class Timer;
+// =============================================================================
+
+Timer::Timer() : started(false), paused(false), initialTime(0), pauseTime(0) {
+  
+}
+
+void Timer::start() {
+  started = true;
+  paused = false;
+  initialTime = SDL_GetTicks();
+}
+
+void Timer::pause() {
+  if (!paused) {
+    paused = true;
+    pauseTime = SDL_GetTicks();
+  }
+}
+
+void Timer::resume() {
+  if (paused) {
+    paused = false;
+    initialTime += SDL_GetTicks() - pauseTime;
+  }
+}
+
+void Timer::reset() {
+  started = false;
+}
+
+uint32_t Timer::time() {
+  if (!started)
+    return 0;
+  if (paused)
+    return pauseTime - initialTime;
+  return SDL_GetTicks() - initialTime;
+}
+
+// =============================================================================
+// functions
+// =============================================================================
+
+void openBrowser() {
+  char cmd[100];
+#ifdef _WIN32
+  sprintf(cmd, "start http://localhost:%d", TCP_WEBSERVER);
+#else
+  sprintf(cmd, "sensible-browser http://localhost:%d", TCP_WEB_HOST);
+#endif
+  system(cmd);
 }
 
 } // namespace helpers
