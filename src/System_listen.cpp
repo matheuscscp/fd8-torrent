@@ -1,30 +1,19 @@
 /*
- * SystemListen.cpp
+ * System_listen.cpp
  *
- *  Created on: Apr 29, 2014
+ *  Created on: Jun 15, 2014
  *      Author: Pimenta
  */
 
 // this
-#include "SystemListen.hpp"
+#include "System.hpp"
 
 // standard
-#include <map>
 #include <cstdio>
-
-// lib
-#include <SDL2/SDL_net.h>
-
-// local
-#include "Globals.hpp"
-#include "Thread.hpp"
-#include "Defines.hpp"
-#include "Network.hpp"
-#include "Helpers.hpp"
+#include <vector>
 
 using namespace std;
 using namespace network;
-using namespace helpers;
 
 static void printAddr(uint32_t host, uint16_t port) {
   printf("\tAddress: %d", ((uint8_t*)&host)[0]);
@@ -33,11 +22,9 @@ static void printAddr(uint32_t host, uint16_t port) {
   printf(" %d\n", Address::ntohs(port));
 }
 
-void SystemListen() {
+void System::listen() {
   vector<char> data;
-  static UDPSocket& mainUDPSocket = Globals::get<UDPSocket>("mainUDPSocket").value();
   Address addr;
-  static map<uint32_t, Timer>& peers = Globals::get<map<uint32_t, Timer>>("peers").value();
   
   data = mainUDPSocket.recv(addr);
   if (!data.size())

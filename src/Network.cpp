@@ -28,10 +28,6 @@ namespace network {
 // struct Address;
 // =============================================================================
 
-Address::Address() : ip(0), port(0) {
-  
-}
-
 Address::Address(uint32_t ip, uint16_t port) : ip(ip), port(port) {
   
 }
@@ -125,7 +121,7 @@ UDPSocket::UDPSocket(const Address& address, uint32_t group) {
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
   int optval = 1;
-  int tmp = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
+  setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
   ip_mreq mreq;
   mreq.imr_multiaddr.S_un.S_addr = group;
   mreq.imr_interface.S_un.S_addr = address.ip;

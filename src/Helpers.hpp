@@ -32,6 +32,7 @@ class Timer {
     void resume();
     void reset();
     uint32_t time();
+    bool counting();
 };
 
 void openBrowser();

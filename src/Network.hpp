@@ -19,9 +19,8 @@ namespace network {
 struct Address {
   uint32_t ip;
   uint16_t port;
-  Address();
-  Address(uint32_t ip, uint16_t port);
-  Address(const std::string& ip, uint16_t port); // port in host order
+  Address(uint32_t ip = 0, uint16_t port = 0);
+  Address(const std::string& ip, uint16_t port = 0); // port in host order
   std::string toString() const;
   static Address local();
   static uint32_t ntohl(uint32_t ip);

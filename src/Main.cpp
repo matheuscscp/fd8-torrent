@@ -7,7 +7,6 @@
 
 #include "Context.hpp"
 #include "System.hpp"
-#include "Globals.hpp"
 #include "Helpers.hpp"
 
 using namespace std;
@@ -24,16 +23,16 @@ int main(int argc, char* argv[]) {
     Context::input();
     
     // update
-    if (start.leftClicked() && System::running() == Globals::ready()) {
+    if (start.leftClicked() && !System::changing()) {
       if (!System::start())
         System::stop();
     }
-    if (browse.leftClicked() && System::running() && Globals::ready())
+    if (browse.leftClicked() && System::running())
       helpers::openBrowser();
     
     // render
     bg.render(0, 0);
-    if (System::running() && Globals::ready()) {
+    if (System::running()) {
       stop.render(155, 300);
       browse.render(205, 102);
     }
