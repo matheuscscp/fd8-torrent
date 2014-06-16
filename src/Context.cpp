@@ -55,10 +55,20 @@ void Context::init(const char* title, int w, int h, const char* icon) {
 }
 
 void Context::close() {
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
+  closeWindow();
   IMG_Quit();
   SDL_Quit();
+}
+
+void Context::closeWindow() {
+  if (renderer) {
+    SDL_DestroyRenderer(renderer);
+    renderer = nullptr;
+  }
+  if (window) {
+    SDL_DestroyWindow(window);
+    window = nullptr;
+  }
 }
 
 bool Context::quitRequested() {

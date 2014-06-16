@@ -73,4 +73,7 @@ void System::run() {
     httpServer();
     Thread::sleep(MS_SLEEP);
   }
+  
+  for (auto& httpThread : httpThreads)
+    httpThread.join();
 }

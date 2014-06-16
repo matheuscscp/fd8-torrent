@@ -49,6 +49,7 @@ class Context {
   public:
     static void init(const char* title, int w, int h, const char* icon);
     static void close();
+    static void closeWindow();
     static bool quitRequested();
     static void input();
     static void render();

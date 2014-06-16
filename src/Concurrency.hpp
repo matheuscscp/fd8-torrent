@@ -17,17 +17,24 @@ namespace concurrency {
 class Thread {
   private:
     std::function<void()> f;
-    bool started;
     void* thread;
+    bool joined;
+    bool* terminated;
   public:
     Thread(const std::function<void()>& f);
+    ~Thread();
+    Thread(const Thread& other);
+    Thread& operator=(const Thread& other);
+    Thread(Thread&& other);
+    Thread& operator=(Thread&& other);
     
     void start();
     void join();
+    bool running();
     
     static void sleep(uint32_t ms, const bool* keepCondition = nullptr);
   private:
-    static int exec(void* func);
+    static int exec(void* threadInfo);
 };
 
 class Mutex {

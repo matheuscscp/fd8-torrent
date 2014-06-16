@@ -19,28 +19,97 @@ namespace concurrency {
 // class Thread;
 // =============================================================================
 
-Thread::Thread(const function<void()>& f) : f(f), started(false), thread(nullptr) {
+struct ThreadInfo {
+  function<void()> f;
+  bool* terminated;
+  ThreadInfo(const function<void()>& f, bool* terminated) :
+  f(f), terminated(terminated) {}
+  ~ThreadInfo() { delete terminated; }
+};
+
+Thread::Thread(const function<void()>& f) :
+f(f), thread(nullptr), joined(false), terminated(new bool) {
+  *terminated = false;
+}
+
+Thread::~Thread() {
+  if (!thread)
+    delete terminated;
+  else if (!joined)
+    SDL_DetachThread((SDL_Thread*)thread);
+}
+
+Thread::Thread(const Thread& other) :
+f(other.f),
+thread(other.thread),
+joined(other.joined),
+terminated(other.terminated)
+{
+  auto tmp = (Thread&)other;
   
+  tmp.joined = true;
+  tmp.terminated = new bool;
+  *tmp.terminated = true;
+}
+
+Thread& Thread::operator=(const Thread& other) {
+  f = other.f;
+  thread = other.thread;
+  joined = other.joined;
+  terminated = other.terminated;
+  
+  auto tmp = (Thread&)other;
+  
+  tmp.joined = true;
+  tmp.terminated = new bool;
+  *tmp.terminated = true;
+  
+  return *this;
+}
+
+Thread::Thread(Thread&& other) :
+f(other.f),
+thread(other.thread),
+joined(other.joined),
+terminated(other.terminated)
+{
+  auto tmp = (Thread&)other;
+  
+  tmp.joined = true;
+  tmp.terminated = new bool;
+  *tmp.terminated = true;
+}
+
+Thread& Thread::operator=(Thread&& other) {
+  f = other.f;
+  thread = other.thread;
+  joined = other.joined;
+  terminated = other.terminated;
+  
+  auto tmp = (Thread&)other;
+  
+  tmp.joined = true;
+  tmp.terminated = new bool;
+  *tmp.terminated = true;
+  
+  return *this;
 }
 
 void Thread::start() {
-  // check if already started
-  if (started)
+  if (thread || joined)
     return;
-  
-  // start
-  started = true;
-  thread = SDL_CreateThread(exec, nullptr, new function<void()>(f));
+  thread = SDL_CreateThread(exec, nullptr, new ThreadInfo(f, terminated));
 }
 
 void Thread::join() {
-  // check if thread exists
-  if (!thread)
+  if (joined)
     return;
-  
-  // join
   SDL_WaitThread((SDL_Thread*)thread, nullptr);
-  thread = nullptr;
+  joined = true;
+}
+
+bool Thread::running() {
+  return thread && !terminated;
 }
 
 void Thread::sleep(uint32_t ms, const bool* keepCondition) {
@@ -61,10 +130,11 @@ void Thread::sleep(uint32_t ms, const bool* keepCondition) {
   } while (true == *keepCondition && now < time);
 }
 
-int Thread::exec(void* func) {
-  auto fptr = (function<void()>*)func;
-  (*fptr)();
-  delete fptr;
+int Thread::exec(void* threadInfo) {
+  auto info = (ThreadInfo*)threadInfo;
+  info->f();
+  *info->terminated = true;
+  delete info;
   return 0;
 }
 

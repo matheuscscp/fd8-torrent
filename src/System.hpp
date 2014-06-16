@@ -12,7 +12,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vector>
+#include <list>
 
 // local
 #include "Concurrency.hpp"
@@ -31,6 +31,7 @@ class System {
     network::Address multicastAddress;
     network::UDPSocket mainUDPSocket;
     network::TCPServer httpTCPServer;
+    std::list<concurrency::Thread> httpThreads;
   public:
     static bool start();
     static bool stop(bool wait = false);

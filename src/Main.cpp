@@ -43,9 +43,9 @@ int main(int argc, char* argv[]) {
     Context::render();
   }
   
-  Context::close();
-  
+  Context::closeWindow();
   System::stop(true);
+  Context::close();
   
   return 0;
 }
