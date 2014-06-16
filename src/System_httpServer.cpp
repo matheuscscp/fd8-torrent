@@ -39,7 +39,7 @@ void System::httpServer() {
   fflush(stdout);
   
   char fn[100], buftmp[100];
-  sscanf(&data[0], "%s %s", buftmp, fn);
+  sscanf(data, "%s %s", buftmp, fn);
   //printf("\nFN: %s\n", fn);
   //printf("\nBUF: %s\n", buf);
   
