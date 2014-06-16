@@ -12,7 +12,6 @@
 #include <cstring>
 #include <cstdio>
 #include <string>
-#include <iostream>
 
 // local
 #include "Defines.hpp"
@@ -22,6 +21,9 @@
 using namespace std;
 using namespace concurrency;
 using namespace network;
+
+// static functions
+static void dataRequest(char* cRequest, const char* buffer, const string& hostIP);
 
 // static variables
 static TCPConnection* client = nullptr;
@@ -45,7 +47,7 @@ void System::httpServer() {
   
   
   if (fn[1] == '?') {
-    httpServer_dataRequest(fn, data);
+    dataRequest(fn, data, localAddress.toString());
   } else {
     if (string(fn) == "/")
       strcpy(fn, "/index.html");
@@ -103,10 +105,9 @@ void System::httpServer() {
   delete data;
 }
 
-void System::httpServer_dataRequest(char* cRequest, const char* buffer){
+static void dataRequest(char* cRequest, const char* buffer, const string& hostIP) {
   string request = string(cRequest).substr(3, strlen(cRequest));
   if (request == "host-ip"){
-    string hostIP = localAddress.toString();
     client->send(hostIP.size() + 1, hostIP.c_str());
   } else if( request == "n-hosts" ){
 

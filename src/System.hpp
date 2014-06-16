@@ -42,7 +42,6 @@ class System {
     void listen();
     void detectFailure();
     void httpServer();
-    void httpServer_dataRequest(char* cRequest, const char* buffer);
 };
 
 #endif /* SYSTEM_HPP_ */
