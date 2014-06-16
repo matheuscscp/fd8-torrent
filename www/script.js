@@ -192,6 +192,8 @@ function submitFilesButtonClicked(){
 			
 			client.open("post", "/upload", true);
 			client.setRequestHeader("Content-Type", "multipart/form-data");
+			client.setRequestHeader("Tamanho", fileSelector.files[0].size);
+			client.setRequestHeader("Nome", fileName);
 			client.send(formData);
 		}
 	}

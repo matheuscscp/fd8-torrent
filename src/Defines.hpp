@@ -14,7 +14,7 @@
 #define TCP_HTTPSERVER         "8080"
 
 // sizes
-#define SIZE_HTTPSERVER_MAXBUF 0x10000
+#define SIZE_HTTPSERVER_MAXBUF 1000000
 
 // times
 #define MS_SLEEP               20
