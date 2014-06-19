@@ -116,6 +116,28 @@ uint16_t Address::htons(uint16_t port) {
 // class UDPSocket;
 // =============================================================================
 
+UDPSocket::UDPSocket(int maxlen) : maxlen(maxlen) {
+#ifdef _WIN32
+  sd = socket(AF_INET, SOCK_DGRAM, 0);
+  int optval = 1;
+  setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
+  SOCKADDR_IN addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = 0;
+  addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+  bind(sd, (SOCKADDR*)&addr, sizeof(SOCKADDR_IN));
+#else
+  sd = socket(AF_INET, SOCK_DGRAM, 0);
+  int optval = 1;
+  setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(int));
+  sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = 0;
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  bind(sd, (sockaddr*)&addr, sizeof(sockaddr_in));
+#endif
+}
+
 UDPSocket::UDPSocket(const string& port, int maxlen) : maxlen(maxlen) {
   Address nport("", port);
 #ifdef _WIN32

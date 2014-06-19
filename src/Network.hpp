@@ -38,6 +38,7 @@ class UDPSocket {
     int sd;
     int maxlen;
   public:
+    UDPSocket(int maxlen);
     UDPSocket(const std::string& port, int maxlen);
     UDPSocket(const Address& multicastAddress, int maxlen);
     ~UDPSocket();
