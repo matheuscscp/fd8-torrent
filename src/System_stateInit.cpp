@@ -34,8 +34,12 @@ void System::stateInit() {
     uint32_t userAmount = conn.recv<uint32_t>();
     for (uint32_t i = 0; i < userAmount; i++) {
       uint32_t ip = conn.recv<uint32_t>();
-      //users[ip] = User
+      users[ip] = User(conn.recv<string>());
     }
+    
+    state = STATE_LOGIN;
+  }
+  else if (initTimer.time() > MS_INITTIMER) {
     state = STATE_LOGIN;
   }
 }

@@ -26,7 +26,7 @@ void System::listen() {
     return;
   
   // update timeout
-  peers[addr.ip].start();
+  users[addr.ip].timer.start();
   
   // print
   printf("Total bytes: %d", data.size());

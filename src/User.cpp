@@ -6,6 +6,14 @@
  */
 
 // this
-#include "User.hpp";
+#include "User.hpp"
 
+using namespace std;
 
+User::User() {
+  
+}
+
+User::User(const string& name) : name(name) {
+  
+}

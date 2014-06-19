@@ -17,8 +17,9 @@
 #define SIZE_MULTICAST_MAXLEN 0x1000
 
 // times
+#define MS_INITTIMER          3000
 #define MS_SLEEP              20
-#define MS_DETECTFAILURE      9000
-#define MS_SPEAK              3000
+#define MS_DETECTFAILURE      3000
+#define MS_SPEAK              1000
 
 #endif /* DEFINE_HPP_ */

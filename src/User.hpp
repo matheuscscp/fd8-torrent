@@ -18,6 +18,7 @@ class User {
   public:
     std::string name;
     helpers::Timer timer;
+    User();
     User(const std::string& name);
 };
 

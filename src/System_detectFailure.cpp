@@ -15,11 +15,11 @@
 #include "Defines.hpp"
 
 void System::detectFailure() {
-  for (auto it = peers.begin(); it != peers.end();) {
-    if (it->second.time() >= MS_DETECTFAILURE) {
+  for (auto it = users.begin(); it != users.end();) {
+    if (it->second.timer.time() >= MS_DETECTFAILURE) {
       printf("\t%x caiu\n", it->first);
       fflush(stdout);
-      peers.erase(it++);
+      users.erase(it++);
     }
     else
       ++it;

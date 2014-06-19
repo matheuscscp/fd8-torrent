@@ -16,6 +16,7 @@
 #include "Concurrency.hpp"
 #include "Helpers.hpp"
 #include "Network.hpp"
+#include "User.hpp"
 
 class System {
   private:
@@ -36,6 +37,7 @@ class System {
     network::UDPSocket mainUDPSocket;
     network::TCPServer mainTCPServer;
     network::TCPServer httpTCPServer;
+    helpers::Timer initTimer;
   public:
     static bool start();
     static void stop(bool wait = false);

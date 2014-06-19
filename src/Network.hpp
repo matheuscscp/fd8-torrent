@@ -63,6 +63,7 @@ class TCPConnection : public TCPSocket {
     template <typename T> void send(T data) {
       send(&data, sizeof(T));
     }
+    
     std::vector<char> recv(int maxlen);
     int recv(void* data, int maxlen);
     template <typename T> T recv() {
@@ -71,6 +72,19 @@ class TCPConnection : public TCPSocket {
       return tmp;
     }
 };
+
+template <> inline void TCPConnection::send<std::string>(std::string data) {
+  send(data.c_str(), data.size());
+  send(char('\0'));
+}
+
+template <> inline std::string TCPConnection::recv() {
+  std::string data;
+  char c;
+  while ((c = recv<char>()) != '\0')
+    data += c;
+  return data;
+}
 
 class TCPServer : public TCPSocket {
   public:

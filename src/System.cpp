@@ -69,7 +69,7 @@ mainUDPSocket(multicastAddress, SIZE_MULTICAST_MAXLEN),
 mainTCPServer(TCPUDP_MAIN),
 httpTCPServer(TCP_HTTPSERVER)
 {
-  
+  initTimer.start();
 }
 
 void System::run() {

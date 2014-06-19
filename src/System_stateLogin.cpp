@@ -27,6 +27,9 @@ using namespace helpers;
 // FIXME: esse define eh zoado, tem que tirar
 #define SIZE_HTTPSERVER_MAXBUF 0x1000
 
+// static functions
+static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip);
+
 // static variables
 static TCPConnection* client = nullptr;
 
@@ -98,9 +101,9 @@ void System::stateLogin() {
     client = nullptr;
 }
 
-int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip){
+static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip) {
   string input = string(data).substr(2, strlen(data));
-  for(auto& kv : System::users){
+  for(auto& kv : users) {
     if(string(kv.second.name) == input){
       client->send("0", 2);
       return 0;
