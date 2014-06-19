@@ -10,7 +10,6 @@
 
 // standard
 #include <map>
-#include <set>
 #include <string>
 
 // local
@@ -32,7 +31,7 @@ class System {
     
     State state;
     std::map<uint32_t, helpers::Timer> peers;
-    std::set<std::string> users;
+    std::map<uint32_t, std::string> users;
     network::Address localAddress;
     network::Address multicastAddress;
     network::UDPSocket mainUDPSocket;
