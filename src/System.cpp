@@ -62,6 +62,7 @@ bool System::running() {
 }
 
 System::System() :
+state(STATE_INIT),
 localAddress(Address::local()),
 multicastAddress(IP_MULTICAST, UDP_MULTICAST),
 mainUDPSocket(multicastAddress, SIZE_MULTICAST_MAXLEN),
@@ -72,10 +73,11 @@ httpTCPServer(TCP_HTTPSERVER)
 
 void System::run() {
   while (started) {
-    speak();
-    listen();
-    detectFailure();
-    httpServer();
+    switch (state) {
+      case STATE_INIT:  stateInit();  break;
+      case STATE_LOGIN: stateLogin(); break;
+      case STATE_IDLE:  stateIdle();  break;
+    }
     Thread::sleep(MS_SLEEP);
   }
 }

@@ -24,6 +24,13 @@ class System {
     static bool started;
     static bool initialized;
     
+    enum State {
+      STATE_INIT,
+      STATE_LOGIN,
+      STATE_IDLE
+    };
+    
+    State state;
     std::map<uint32_t, helpers::Timer> peers;
     std::set<std::string> users;
     network::Address localAddress;
@@ -38,6 +45,11 @@ class System {
   private:
     System();
     void run();
+    
+    void stateInit();
+    void stateLogin();
+    void stateIdle();
+    
     void speak();
     void listen();
     void detectFailure();
