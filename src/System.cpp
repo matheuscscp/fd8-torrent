@@ -37,15 +37,20 @@ bool System::start() {
   return true;
 }
 
-bool System::stop(bool wait) {
+void System::stop(bool wait) {
+  if (wait && thread == nullptr) {
+    while (initialized)
+      Thread::sleep(200);
+    return;
+  }
   if (!started | !initialized)
-    return false;
+    return;
   started = false;
   if (wait)
     thread->join();
   delete thread;
   thread = nullptr;
-  return true;
+  return;
 }
 
 bool System::changing() {

@@ -32,7 +32,7 @@ class System {
     network::TCPServer httpTCPServer;
   public:
     static bool start();
-    static bool stop(bool wait = false);
+    static void stop(bool wait = false);
     static bool changing();
     static bool running();
   private:
