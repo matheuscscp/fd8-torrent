@@ -30,8 +30,7 @@ class System {
     };
     
     State state;
-    std::map<uint32_t, helpers::Timer> peers;
-    std::map<uint32_t, std::string> users;
+    std::map<uint32_t, User> users;
     network::Address localAddress;
     network::Address multicastAddress;
     network::UDPSocket mainUDPSocket;
