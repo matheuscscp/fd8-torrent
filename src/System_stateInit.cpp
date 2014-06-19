@@ -6,7 +6,11 @@
  */
 
 #include "System.hpp"
+#include "Network.hpp"
+
+using namespace network;
 
 void System::stateInit() {
-  
+  Address addr;
+  mainUDPSocket.recv(addr);
 }
