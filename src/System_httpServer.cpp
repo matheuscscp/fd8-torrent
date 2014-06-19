@@ -18,6 +18,9 @@
 #include "Concurrency.hpp"
 #include "Network.hpp"
 
+// FIXME: esse define eh zoado, tem que tirar
+#define SIZE_HTTPSERVER_MAXBUF 0x1000
+
 using namespace std;
 using namespace concurrency;
 using namespace network;

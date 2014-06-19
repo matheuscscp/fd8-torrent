@@ -59,7 +59,7 @@ bool System::running() {
 System::System() :
 localAddress(Address::local()),
 multicastAddress(IP_MULTICAST, UDP_MULTICAST),
-mainUDPSocket(multicastAddress),
+mainUDPSocket(multicastAddress, SIZE_MULTICAST_MAXLEN),
 httpTCPServer(TCP_HTTPSERVER)
 {
   

@@ -9,16 +9,16 @@
 #define DEFINE_HPP_
 
 // network addresses
-#define IP_MULTICAST           "224.69.69.69"
-#define UDP_MULTICAST          "6969"
-#define TCP_HTTPSERVER         "8080"
+#define IP_MULTICAST          "224.69.69.69"
+#define UDP_MULTICAST         "6969"
+#define TCP_HTTPSERVER        "8080"
 
 // sizes
-#define SIZE_HTTPSERVER_MAXBUF 1000000
+#define SIZE_MULTICAST_MAXLEN 0x1000
 
 // times
-#define MS_SLEEP               20
-#define MS_DETECTFAILURE       9000
-#define MS_SPEAK               3000
+#define MS_SLEEP              20
+#define MS_DETECTFAILURE      9000
+#define MS_SPEAK              3000
 
 #endif /* DEFINE_HPP_ */

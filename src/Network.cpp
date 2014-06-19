@@ -116,7 +116,7 @@ uint16_t Address::htons(uint16_t port) {
 // class UDPSocket;
 // =============================================================================
 
-UDPSocket::UDPSocket(const string& port) {
+UDPSocket::UDPSocket(const string& port, int maxlen) : maxlen(maxlen), buf(new char[maxlen]) {
   Address nport("", port);
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -139,7 +139,7 @@ UDPSocket::UDPSocket(const string& port) {
 #endif
 }
 
-UDPSocket::UDPSocket(const Address& multicastAddress) {
+UDPSocket::UDPSocket(const Address& multicastAddress, int maxlen) : maxlen(maxlen), buf(new char[maxlen]) {
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
   int optval = 1;
@@ -175,6 +175,7 @@ UDPSocket::~UDPSocket() {
 #else
   close(sd);
 #endif
+  delete buf;
 }
 
 void UDPSocket::send(const Address& address, int maxlen, const char* data) {
@@ -205,10 +206,9 @@ vector<char> UDPSocket::recv(Address& address) {
   timeout.tv_sec = 0;
   timeout.tv_usec = 0;
   if (select(0, &fds, nullptr, nullptr, &timeout) > 0) {
-    char buf[0x1000];
     SOCKADDR_IN addr;
     int addrsize = sizeof(SOCKADDR_IN);
-    data.assign(buf, buf + recvfrom(sd, buf, 0x1000, 0, (SOCKADDR*)&addr, &addrsize));
+    data.assign(buf, buf + recvfrom(sd, buf, maxlen, 0, (SOCKADDR*)&addr, &addrsize));
     address = Address(addr.sin_addr.S_un.S_addr, addr.sin_port);
   }
 #else
@@ -219,10 +219,9 @@ vector<char> UDPSocket::recv(Address& address) {
   timeout.tv_sec = 0;
   timeout.tv_usec = 0;
   if (select(sd + 1, &fds, nullptr, nullptr, &timeout) > 0) {
-    char buf[0x1000];
     sockaddr_in addr;
     socklen_t addrsize = sizeof(sockaddr_in);
-    data.assign(buf, buf + recvfrom(sd, buf, 0x1000, 0, (sockaddr*)&addr, &addrsize));
+    data.assign(buf, buf + recvfrom(sd, buf, maxlen, 0, (sockaddr*)&addr, &addrsize));
     address = Address(addr.sin_addr.s_addr, addr.sin_port);
   }
 #endif

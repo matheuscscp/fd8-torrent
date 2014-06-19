@@ -36,9 +36,11 @@ struct Address {
 class UDPSocket {
   private:
     int sd;
+    int maxlen;
+    char* buf;
   public:
-    UDPSocket(const std::string& port);
-    UDPSocket(const Address& multicastAddress);
+    UDPSocket(const std::string& port, int maxlen);
+    UDPSocket(const Address& multicastAddress, int maxlen);
     ~UDPSocket();
     void send(const Address& address, int maxlen, const char* data);
     std::vector<char> recv(Address& address);
