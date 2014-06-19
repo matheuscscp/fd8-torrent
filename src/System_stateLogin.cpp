@@ -5,8 +5,109 @@
  *      Author: Pimenta
  */
 
+// this
 #include "System.hpp"
 
+// standard
+#include <cstring>
+#include <cstdio>
+#include <string>
+
+// local
+#include "Defines.hpp"
+#include "Concurrency.hpp"
+#include "Network.hpp"
+#include "Helpers.hpp"
+
+using namespace std;
+using namespace concurrency;
+using namespace network;
+using namespace helpers;
+
+// FIXME: esse define eh zoado, tem que tirar
+#define SIZE_HTTPSERVER_MAXBUF 0x1000
+
+// static variables
+static TCPConnection* client = nullptr;
+
 void System::stateLogin() {
-  
+  client = httpTCPServer.accept();
+  if (client == nullptr)
+    return;
+
+  vector<char> data = client->recv(SIZE_HTTPSERVER_MAXBUF);
+  data.push_back(0);
+
+  char fn[100], buftmp[100];
+  sscanf(&data[0], "%s %s", buftmp, fn);
+
+  if (fn[1] == '?') {
+      if(loginAttempt(fn, users, localAddress.ip))
+        state = STATE_IDLE;
+    } else {
+      if (string(fn) == "/")
+        strcpy(fn, "/index.html");
+      FILE* fp = fopen((string("./www") + fn).c_str(), "rb");
+      if (fp) {
+        if (string(fn).find(".html") != string::npos) {
+          const char* header =
+            "HTTP/1.1 200 OK\r\n"
+            "Connection: close\r\r"
+            "Content-Type: text/html\r\n"
+            "\r\n"
+          ;
+          client->send(header, strlen(header));
+        }
+        else if (string(fn).find(".css") != string::npos) {
+          const char* header =
+            "HTTP/1.1 200 OK\r\n"
+            "Connection: close\r\r"
+            "Content-Type: text/css\r\n"
+            "\r\n"
+          ;
+          client->send(header, strlen(header));
+        }
+        else if (string(fn).find(".js") != string::npos) {
+          const char* header =
+            "HTTP/1.1 200 OK\r\n"
+            "Connection: close\r\r"
+            "Content-Type: application/javascript\r\n"
+            "\r\n"
+          ;
+          client->send(header, strlen(header));
+        }
+        else {
+          const char* header =
+            "HTTP/1.1 200 OK\r\n"
+            "Connection: close\r\r"
+            "Content-Type: application/octet-stream\r\n"
+            "\r\n"
+          ;
+          client->send(header, strlen(header));
+        }
+        client->send(readFile(fp));
+        fclose(fp);
+      }
+      else {
+        const char* msg = "<html><body>Pagina nao encontrada.</body></html>";
+        client->send(msg, strlen(msg) + 1);
+      }
+    }
+
+    delete client;
+    client = nullptr;
+}
+
+int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip){
+  string input = string(data).substr(2, strlen(data));
+  for(auto& kv : System::users){
+    if(string(kv.second.name) == input){
+      client->send("0", 2);
+      return 0;
+    }
+  }
+
+  users[ip] = User(input);
+  client->send("1", 2);
+  return 1;
 }
