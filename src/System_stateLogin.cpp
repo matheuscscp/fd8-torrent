@@ -37,10 +37,12 @@ void System::stateLogin() {
   client = httpTCPServer.accept();
   if (client == nullptr)
     return;
-
+  
   vector<char> data = client->recv(SIZE_HTTPSERVER_MAXBUF);
   data.push_back(0);
-
+  printf("total bytes request: %d\n%s\n", data.size(), &data[0]);
+  fflush(stdout);
+  
   char fn[100], buftmp[100];
   sscanf(&data[0], "%s %s", buftmp, fn);
 
@@ -49,7 +51,7 @@ void System::stateLogin() {
         state = STATE_IDLE;
     } else {
       if (string(fn) == "/")
-        strcpy(fn, "/index.html");
+        strcpy(fn, "/login.html");
       FILE* fp = fopen((string("./www") + fn).c_str(), "rb");
       if (fp) {
         if (string(fn).find(".html") != string::npos) {

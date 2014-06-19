@@ -7,8 +7,7 @@ function submitLogin(){
 		xmlhttp = new XMLHttpRequest();
 	else // code for IE6, IE5
 		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-	
-	client = configureBrowserRequest(client);	
+		
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200){
 			if(client.response == 0){
