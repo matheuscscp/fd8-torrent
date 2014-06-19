@@ -17,6 +17,7 @@
 #include "Defines.hpp"
 #include "Concurrency.hpp"
 #include "Network.hpp"
+#include "Helpers.hpp"
 
 // FIXME: esse define eh zoado, tem que tirar
 #define SIZE_HTTPSERVER_MAXBUF 0x1000
@@ -24,9 +25,10 @@
 using namespace std;
 using namespace concurrency;
 using namespace network;
+using namespace helpers;
 
 // static functions
-static void dataRequest(char* cRequest, const char* buffer, const string& hostIP);
+static void dataRequest(char* cRequest, const string& hostIP);
 
 // static variables
 static TCPConnection* client = nullptr;
@@ -36,21 +38,20 @@ void System::httpServer() {
   if (client == nullptr)
     return;
   
-  char* data = new char[SIZE_HTTPSERVER_MAXBUF];
-  memset(data, 0, SIZE_HTTPSERVER_MAXBUF);
-  int tot = client->recv(SIZE_HTTPSERVER_MAXBUF, data);
+  vector<char> data = client->recv(SIZE_HTTPSERVER_MAXBUF);
+  data.push_back(0);
   //printf("------ PACOTE ------------------------------------------\n");
-  printf("total bytes request: %d\n%s\n", tot, data);
+  printf("total bytes request: %d\n%s\n", data.size(), &data[0]);
   fflush(stdout);
   
   char fn[100], buftmp[100];
-  sscanf(data, "%s %s", buftmp, fn);
+  sscanf(&data[0], "%s %s", buftmp, fn);
   //printf("\nFN: %s\n", fn);
   //printf("\nBUF: %s\n", buf);
   
   
   if (fn[1] == '?') {
-    dataRequest(fn, data, localAddress.toString());
+    dataRequest(fn, localAddress.toString());
   } else {
     if (string(fn) == "/")
       strcpy(fn, "/index.html");
@@ -63,7 +64,7 @@ void System::httpServer() {
           "Content-Type: text/html\r\n"
           "\r\n"
         ;
-        client->send(strlen(header), header);
+        client->send(header, strlen(header));
       }
       else if (string(fn).find(".css") != string::npos) {
         const char* header = 
@@ -72,7 +73,7 @@ void System::httpServer() {
           "Content-Type: text/css\r\n"
           "\r\n"
         ;
-        client->send(strlen(header), header);
+        client->send(header, strlen(header));
       }
       else if (string(fn).find(".js") != string::npos) {
         const char* header = 
@@ -81,7 +82,7 @@ void System::httpServer() {
           "Content-Type: application/javascript\r\n"
           "\r\n"
         ;
-        client->send(strlen(header), header);
+        client->send(header, strlen(header));
       }
       else {
         const char* header = 
@@ -90,31 +91,28 @@ void System::httpServer() {
           "Content-Type: application/octet-stream\r\n"
           "\r\n"
         ;
-        client->send(strlen(header), header);
+        client->send(header, strlen(header));
       }
-      size_t total;
-      while ((total = fread(data, sizeof(char), SIZE_HTTPSERVER_MAXBUF, fp)) > 0)
-        client->send(total, data);
+      client->send(readFile(fp));
       fclose(fp);
     }
     else {
       const char* msg = "<html><body>Pagina nao encontrada.</body></html>";
-      client->send(strlen(msg) + 1, msg);
+      client->send(msg, strlen(msg) + 1);
     }
   }
   
   delete client;
   client = nullptr;
-  delete data;
 }
 
-static void dataRequest(char* cRequest, const char* buffer, const string& hostIP) {
+static void dataRequest(char* cRequest, const string& hostIP) {
   string request = string(cRequest).substr(3, strlen(cRequest));
   if (request == "host-ip"){
-    client->send(hostIP.size() + 1, hostIP.c_str());
+    client->send(hostIP.c_str(), hostIP.size() + 1);
   } else if( request == "n-hosts" ){
 
   } else if( request == "server-state" ){
-    client->send(3, "On");
+    client->send("On", 3);
   }
 }

@@ -87,4 +87,15 @@ void openBrowser() {
   system(cmd);
 }
 
+vector<char> readFile(FILE* fp) {
+  vector<char> data;
+  int size;
+  fseek(fp, 0, SEEK_END);
+  size = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+  data.resize(size);
+  fread(&data[0], size, 1, fp);
+  return data;
+}
+
 } // namespace helpers

@@ -11,6 +11,8 @@
 // standard
 #include <cstdint>
 #include <functional>
+#include <string>
+#include <vector>
 
 namespace helpers {
 
@@ -36,6 +38,7 @@ class Timer {
 };
 
 void openBrowser();
+std::vector<char> readFile(FILE* fp);
 
 } // namespace helpers
 

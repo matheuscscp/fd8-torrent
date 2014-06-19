@@ -25,7 +25,7 @@ void System::speak() {
   if (!timer.counting())
     timer.start();
   if (timer.time() > MS_SPEAK) {
-    mainUDPSocket.send(multicastAddress, 1, &data);
+    mainUDPSocket.send(multicastAddress, &data, 1);
     timer.start();
   }
 }

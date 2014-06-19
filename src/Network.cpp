@@ -116,7 +116,7 @@ uint16_t Address::htons(uint16_t port) {
 // class UDPSocket;
 // =============================================================================
 
-UDPSocket::UDPSocket(const string& port, int maxlen) : maxlen(maxlen), buf(new char[maxlen]) {
+UDPSocket::UDPSocket(const string& port, int maxlen) : maxlen(maxlen) {
   Address nport("", port);
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -139,7 +139,7 @@ UDPSocket::UDPSocket(const string& port, int maxlen) : maxlen(maxlen), buf(new c
 #endif
 }
 
-UDPSocket::UDPSocket(const Address& multicastAddress, int maxlen) : maxlen(maxlen), buf(new char[maxlen]) {
+UDPSocket::UDPSocket(const Address& multicastAddress, int maxlen) : maxlen(maxlen) {
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
   int optval = 1;
@@ -175,10 +175,13 @@ UDPSocket::~UDPSocket() {
 #else
   close(sd);
 #endif
-  delete buf;
 }
 
-void UDPSocket::send(const Address& address, int maxlen, const char* data) {
+void UDPSocket::send(const Address& address, const vector<char>& data) {
+  send(address, &data[0], data.size());
+}
+
+void UDPSocket::send(const Address& address, const char* data, int maxlen) {
 #ifdef _WIN32
   SOCKADDR_IN servaddr;
   memset((void*)&servaddr, 0, sizeof(SOCKADDR_IN));
@@ -208,7 +211,8 @@ vector<char> UDPSocket::recv(Address& address) {
   if (select(0, &fds, nullptr, nullptr, &timeout) > 0) {
     SOCKADDR_IN addr;
     int addrsize = sizeof(SOCKADDR_IN);
-    data.assign(buf, buf + recvfrom(sd, buf, maxlen, 0, (SOCKADDR*)&addr, &addrsize));
+    data.resize(maxlen);
+    data.resize(recvfrom(sd, &data[0], maxlen, 0, (SOCKADDR*)&addr, &addrsize));
     address = Address(addr.sin_addr.S_un.S_addr, addr.sin_port);
   }
 #else
@@ -221,7 +225,8 @@ vector<char> UDPSocket::recv(Address& address) {
   if (select(sd + 1, &fds, nullptr, nullptr, &timeout) > 0) {
     sockaddr_in addr;
     socklen_t addrsize = sizeof(sockaddr_in);
-    data.assign(buf, buf + recvfrom(sd, buf, maxlen, 0, (sockaddr*)&addr, &addrsize));
+    data.resize(maxlen);
+    data.resize(recvfrom(sd, &data[0], maxlen, 0, (sockaddr*)&addr, &addrsize));
     address = Address(addr.sin_addr.s_addr, addr.sin_port);
   }
 #endif
@@ -254,15 +259,23 @@ TCPConnection::TCPConnection(const Address& addr) {
   sd = SDLNet_TCP_Open(&tmp);
 }
 
-void TCPConnection::send(int maxlen, const char* data) {
+void TCPConnection::send(const vector<char>& data) {
+  if (sd)
+    SDLNet_TCP_Send(TCPsocket(sd), &data[0], data.size());
+}
+
+void TCPConnection::send(const char* data, int maxlen) {
   if (sd)
     SDLNet_TCP_Send(TCPsocket(sd), data, maxlen);
 }
 
-int TCPConnection::recv(int maxlen, char* data) {
-  if (sd)
-    return SDLNet_TCP_Recv(TCPsocket(sd), data, maxlen);
-  return 0;
+vector<char> TCPConnection::recv(int maxlen) {
+  vector<char> data;
+  if (sd) {
+    data.resize(maxlen);
+    data.resize(SDLNet_TCP_Recv(TCPsocket(sd), &data[0], maxlen));
+  }
+  return data;
 }
 
 // =============================================================================
