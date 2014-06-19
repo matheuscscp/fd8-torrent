@@ -9,8 +9,8 @@
 #define DEFINE_HPP_
 
 // network addresses
-#define IP_MULTICAST          "224.69.69.69"
-#define UDP_MULTICAST         "6969"
+#define IP_MAIN               "224.69.69.69"
+#define TCPUDP_MAIN           "6969"
 #define TCP_HTTPSERVER        "8080"
 
 // sizes

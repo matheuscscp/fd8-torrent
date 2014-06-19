@@ -35,6 +35,7 @@ class System {
     network::Address localAddress;
     network::Address multicastAddress;
     network::UDPSocket mainUDPSocket;
+    network::TCPServer mainTCPServer;
     network::TCPServer httpTCPServer;
   public:
     static bool start();
