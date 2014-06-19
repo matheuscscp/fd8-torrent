@@ -47,14 +47,14 @@ class UDPSocket {
 class TCPSocket {
   protected:
     void* sd;
+    TCPSocket();
   public:
-    TCPSocket(void* sd);
-    virtual ~TCPSocket() = 0;
+    virtual ~TCPSocket();
 };
 
 class TCPConnection : public TCPSocket {
   public:
-    TCPConnection(void* sd);
+    TCPConnection(const Address& addr);
     void send(int maxlen, const char* data);
     int recv(int maxlen, char* data);
 };

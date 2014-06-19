@@ -233,7 +233,7 @@ vector<char> UDPSocket::recv(Address& address) {
 // class TCPSocket;
 // =============================================================================
 
-TCPSocket::TCPSocket(void* sd) : sd(sd) {
+TCPSocket::TCPSocket() : sd(0) {
   
 }
 
@@ -246,8 +246,13 @@ TCPSocket::~TCPSocket() {
 // class TCPConnection;
 // =============================================================================
 
-TCPConnection::TCPConnection(void* sd) : TCPSocket(sd) {
-  
+TCPConnection::TCPConnection(const Address& addr) {
+  if (!addr.port)
+    return;
+  IPaddress tmp;
+  tmp.host = addr.ip;
+  tmp.port = addr.port;
+  sd = SDLNet_TCP_Open(&tmp);
 }
 
 void TCPConnection::send(int maxlen, const char* data) {
@@ -256,26 +261,29 @@ void TCPConnection::send(int maxlen, const char* data) {
 }
 
 int TCPConnection::recv(int maxlen, char* data) {
-  if (sd == nullptr)
-    return 0;
-  return SDLNet_TCP_Recv(TCPsocket(sd), data, maxlen);
+  if (sd)
+    return SDLNet_TCP_Recv(TCPsocket(sd), data, maxlen);
+  return 0;
 }
 
 // =============================================================================
 // class TCPServer;
 // =============================================================================
 
-TCPServer::TCPServer(const string& port) : TCPSocket(0) {
+TCPServer::TCPServer(const string& port) {
   IPaddress addr;
   SDLNet_ResolveHost(&addr, nullptr, Address::ntohs(Address("", port).port));
   sd = SDLNet_TCP_Open(&addr);
 }
 
 TCPConnection* TCPServer::accept() {
-  TCPsocket sock = SDLNet_TCP_Accept(TCPsocket(sd));
-  if (sock == nullptr)
-    return nullptr;
-  return new TCPConnection(sock);
+  TCPsocket newsd = SDLNet_TCP_Accept(TCPsocket(sd));
+  if (newsd) {
+    TCPConnection* conn = new TCPConnection(Address(0, 0));
+    ((TCPServer*)conn)->sd = newsd;
+    return conn;
+  }
+  return nullptr;
 }
 
 } // namespace network
