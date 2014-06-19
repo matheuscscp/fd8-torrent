@@ -1,0 +1,70 @@
+*{ margin: 0; padding: 0; font-family: "Segoe UI";}
+body{ overflow: hidden; }
+
+#wrapper{
+	text-align: center;
+	margin-top: 130px;
+}
+
+#wrapper img{
+	width: 600px;
+}
+
+#wrapper input{
+	height: 32px;
+}
+
+#login{
+	text-align: left;
+	margin: 0 auto;
+	background: #000;
+	width: 255px;
+	padding: 20px;
+}
+
+#login label{
+	color: #fff;
+	font-size: 21pt;
+}
+
+button{
+	border: 0;
+	outline: none;
+	background: #33E7FF;
+	color: white;
+	padding: 3px 15px;
+	margin: 10px 10px 4px 0px;
+	font-weight: bold;
+	font-size: 18px;
+	text-decoration: none;
+	display: inline-block; /* needed for anchors */
+	position: relative;
+	transition: ease all 0.1s;
+	cursor: pointer;
+	box-shadow: 1px 0px #007E8F, 0px 1px #00B4CC,
+				2px 1px #007E8F, 1px 2px #00B4CC,
+				3px 2px #007E8F, 2px 3px #00B4CC,
+				4px 3px #007E8F, 3px 4px #00B4CC,
+				5px 4px #007E8F, 4px 5px #00B4CC,
+				6px 5px #007E8F, 5px 6px #00B4CC;
+}
+
+button:hover{
+	transform: translate(2px, 2px);
+	-webkit-transform: translate(2px, 2px);
+	-moz-transform: translate(2px, 2px);
+	-o-transform: translate(2px, 2px);
+	box-shadow: 1px 0px #007E8F, 0px 1px #00B4CC,
+				2px 1px #007E8F, 1px 2px #00B4CC,
+				3px 2px #007E8F, 2px 3px #00B4CC,
+				4px 3px #007E8F, 3px 4px #00B4CC;
+}
+
+button:active{
+	transform: translate(4px, 4px);
+	-webkit-transform: translate(4px, 4px);
+	-moz-transform: translate(4px, 4px);
+	-o-transform: translate(4px, 4px);
+	box-shadow: 1px 0px #007E8F, 0px 1px #00B4CC,
+				2px 1px #007E8F, 1px 2px #00B4CC;
+}
