@@ -43,7 +43,7 @@ class UDPSocket {
     UDPSocket(const Address& multicastAddress, int maxlen);
     ~UDPSocket();
     void send(const Address& address, const std::vector<char>& data);
-    void send(const Address& address, const char* data, int maxlen);
+    void send(const Address& address, const void* data, int maxlen);
     std::vector<char> recv(Address& address);
 };
 
@@ -59,8 +59,17 @@ class TCPConnection : public TCPSocket {
   public:
     TCPConnection(const Address& addr);
     void send(const std::vector<char>& data);
-    void send(const char* data, int maxlen);
+    void send(const void* data, int maxlen);
+    template <typename T> void send(T data) {
+      send(&data, sizeof(T));
+    }
     std::vector<char> recv(int maxlen);
+    int recv(void* data, int maxlen);
+    template <typename T> T recv() {
+      T tmp;
+      recv(&tmp, sizeof(T));
+      return tmp;
+    }
 };
 
 class TCPServer : public TCPSocket {
