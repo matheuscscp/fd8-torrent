@@ -42,10 +42,13 @@ function getNumberOfHosts(){
 	
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200)
-			document.getElementById("host-ip").innerHTML = client.responseText;
+			document.getElementById("n-hosts").innerHTML = client.responseText;
 		else
-			document.getElementById("host-ip").innerHTML = "-";
+			document.getElementById("n-hosts").innerHTML = "-";
 	}
+	
+	client.open("POST", "?Rn-hosts", true);
+  client.send();
 }
 
 // Funcao que pergunta ao servidor o estado do servidor e retorna-o
@@ -56,8 +59,9 @@ function getServerStatus(){
 	client.send();
 	
 	client.onreadystatechange = function() {
-		if(client.readyState == 4 && client.status == 200)
+		if(client.readyState == 4 && client.status == 200) {
 			document.getElementById("server-status").innerHTML = "On";
+		}
 		else
 			document.getElementById("server-status").innerHTML = "Off";
 	}
@@ -66,7 +70,7 @@ function getServerStatus(){
 // Funcao para atualizar as informacoes na barra lateral do sistema
 function refreshSideInfo(){
 	getHostIP();
-	//document.getElementById("n-hosts").innerHTML = getNumberOfHosts();
+	getNumberOfHosts();
 	getServerStatus();
 }
 

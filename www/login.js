@@ -14,9 +14,9 @@ function submitLogin(){
 				campoMsg.innerHTML = "Este usuário já existe no sistema!";
 				campoMsg.style.color = '#f00';
 			}
-		}
-		else{
-			alert("Houve um erro com a conexão com o servidor.");
+			else {
+				window.location.href = "/index.html";
+			}
 		}
 	}
 	

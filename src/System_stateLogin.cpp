@@ -47,9 +47,10 @@ void System::stateLogin() {
   sscanf(&data[0], "%s %s", buftmp, fn);
 
   if (fn[1] == '?') {
-      if(loginAttempt(fn, users, localAddress.ip))
-        state = STATE_IDLE;
-    } else {
+    if(loginAttempt(fn, users, localAddress.ip))
+      state = STATE_IDLE;
+    }
+    else {
       if (string(fn) == "/")
         strcpy(fn, "/login.html");
       FILE* fp = fopen((string("./www") + fn).c_str(), "rb");
