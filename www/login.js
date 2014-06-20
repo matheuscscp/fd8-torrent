@@ -1,4 +1,4 @@
-function submitLogin(){
+Ôªøfunction submitLogin(){
 	var username = document.getElementById('input').value;
 	var server;
 	
@@ -9,9 +9,10 @@ function submitLogin(){
 		
 	server.onreadystatechange = function() {
 		if(server.readyState == 4 && server.status == 200){
-			if(server.response == 0){
+			
+			if(parseInt(server.response) == 0){
 				var campoMsg = document.getElementById('msg');
-				campoMsg.innerHTML = "Este usu·rio j· existe no sistema!";
+				campoMsg.innerHTML = "Este usu√°rio j√° existe no sistema!";
 				campoMsg.style.color = '#f00';
 			}
 			else {

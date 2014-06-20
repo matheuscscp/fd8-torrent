@@ -10,6 +10,7 @@
 
 // standard
 #include <vector>
+#include <cstdio>
 
 // local
 #include "Network.hpp"

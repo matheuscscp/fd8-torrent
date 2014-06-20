@@ -103,7 +103,7 @@ void System::httpServer() {
 
 static void dataRequest(char* cRequest, const string& hostIP, int nUsers) {
   string request = string(cRequest).substr(string(cRequest).find("?") + 2, strlen(cRequest));
-  fflush(stdout);
+
   if (request == "host-ip"){
     client->send(hostIP.c_str(), hostIP.size() + 1);
   } else if( request == "n-hosts" ){
