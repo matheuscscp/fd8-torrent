@@ -67,7 +67,8 @@ localAddress(Address::local()),
 multicastAddress(IP_MAIN, TCPUDP_MAIN),
 mainUDPSocket(multicastAddress, SIZE_MULTICAST_MAXLEN),
 mainTCPServer(TCPUDP_MAIN),
-httpTCPServer(TCP_HTTPSERVER)
+httpTCPServer(TCP_HTTPSERVER),
+httpThread([]() {})
 {
   initTimer.start();
 }

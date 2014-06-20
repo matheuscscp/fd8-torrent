@@ -48,7 +48,7 @@ void System::stateLogin() {
 
   if (fn[1] == '?') {
     if(loginAttempt(fn, users, localAddress.ip))
-      state = STATE_IDLE;
+      changeToIdle();
     }
     else {
       if (string(fn) == "/")

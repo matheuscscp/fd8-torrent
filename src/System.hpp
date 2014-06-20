@@ -38,6 +38,7 @@ class System {
     network::TCPServer mainTCPServer;
     network::TCPServer httpTCPServer;
     helpers::Timer initTimer;
+    concurrency::Thread httpThread;
   public:
     static bool start();
     static void stop(bool wait = false);
@@ -48,7 +49,11 @@ class System {
     void run();
     
     void stateInit();
+    
+    void changeToLogin();
     void stateLogin();
+    
+    void changeToIdle();
     void stateIdle();
     
     void speak();

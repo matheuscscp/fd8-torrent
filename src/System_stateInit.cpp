@@ -37,9 +37,9 @@ void System::stateInit() {
       users[ip] = User(conn.recv<string>());
     }
     
-    state = STATE_LOGIN;
+    changeToLogin();
   }
   else if (initTimer.time() > MS_INITTIMER) {
-    state = STATE_LOGIN;
+    changeToLogin();
   }
 }
