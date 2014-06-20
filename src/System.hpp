@@ -17,6 +17,7 @@
 #include "Helpers.hpp"
 #include "Network.hpp"
 #include "User.hpp"
+#include "Folder.hpp"
 
 class System {
   private:
@@ -39,6 +40,7 @@ class System {
     network::TCPServer httpTCPServer;
     helpers::Timer initTimer;
     concurrency::Thread httpThread;
+    Folder rootFolder;
   public:
     static bool start();
     static void stop(bool wait = false);
