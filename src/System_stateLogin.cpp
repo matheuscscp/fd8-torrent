@@ -33,6 +33,10 @@ static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip);
 // static variables
 static TCPConnection* client = nullptr;
 
+void System::changeToLogin() {
+  
+}
+
 void System::stateLogin() {
   client = httpTCPServer.accept();
   if (client == nullptr)
