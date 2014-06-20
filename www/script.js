@@ -1,5 +1,5 @@
 // variavel global para indicar a pagina que o sistema se encontra
-var page = 'home';
+var page = 1;
 
 // Funcao para inicializar a variavel de requisicao para o servidor
 function configureBrowserRequest(xmlhttp){
@@ -48,7 +48,7 @@ function getNumberOfHosts(){
 	}
 	
 	client.open("POST", "?Rn-hosts", true);
-  client.send();
+	client.send();
 }
 
 // Funcao que pergunta ao servidor o estado do servidor e retorna-o
@@ -72,104 +72,34 @@ function refreshSideInfo(){
 	getHostIP();
 	getNumberOfHosts();
 	getServerStatus();
+	if(page == 3)
+		requestAndPutHTML("?Rlist-users", "users-list");
 }
 
-// Funcao que da funcionalidade ao menu. Ao clicar em uma opcao ele faz a 
-// requisicao da pagina correspondente e manda para a div 'content'
-function menuOpClicked(option){
-	var request = defineRequest(option.id);
-	var xmlhttp;
-	page = option.id;
-	
-	xmlhttp = configureBrowserRequest(xmlhttp);
-	
-	xmlhttp.onreadystatechange = function() {
-		if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
-			document.getElementById("content").innerHTML = xmlhttp.responseText;
+function requestAndPutHTML(command, areaId){
+	var server;
+	server = configureBrowserRequest(server);	
+	server.onreadystatechange = function() {
+		if(server.readyState == 4 && server.status == 200){
+			document.getElementById(areaId).innerHTML = server.responseText;
 		}
 	}
-
-	xmlhttp.open("POST", request, true);
-	xmlhttp.send();
+	server.open("POST", command, true);
+	server.send();
 }
 
-// Funcao que abre a div de cadastro de novo usuario/arquivo
-function addButtonClicked(){
-	var action = "new-" + page.substring(7);
-	alert(action);
-	document.getElementById(action).style.display = 'block';
+function optionListUser(){
+	requestAndPutHTML("listUsers.html", "content");
+	requestAndPutHTML("?Rlist-users", "users-list");
 }
 
-function defineRequest(ID){
-	switch (ID){
-		case 'menuop-home':
-			changeContentHeader(false, '#fff', '');
-			return 'home.html'; 
-		break;
-		case 'menuop-user': 		
-			changeContentHeader(true, '#f00', '#FF5C5C');
-			return 'listUsers.html'; 
-		break;
-		case 'menuop-file': 		
-			changeContentHeader(true, '#00f', '#7070FF');
-			return 'listFiles.html'; 
-		break;
-		case 'menuop-host': 		
-			changeContentHeader(false, '#00a118', '');
-			return 'listHosts.html'; 
-		break;
-		case 'menuop-presentation': 
-			changeContentHeader(false, '#F5E900', '');
-			return 'presentation.html'; 
-		break;
-		default: alert("Link inválido"); break;
-	}
+function optionListFiles(){
+	requestAndPutHTML("listFiles.html", "content");
+	requestAndPutHTML("?Rlist-files", "files-list");
 }
 
-function changeContentHeader(addOption, color, button){
-	document.getElementById('content-header').style.background = color;
-	document.getElementById('add-button').style.background = button;
-	
-	if (addOption){
-		document.getElementById("add-button").style.display = 'block';
-		document.getElementById("content-header-offset").style.display = 'none';
-	} else{
-		document.getElementById("add-button").style.display = 'none';
-		document.getElementById("content-header-offset").style.display = 'block';
-	}
-}
-
-function addingUser(){
-	var username = document.getElementById("input-user").value;
-	var password = document.getElementById("input-pass").value;
-	var msgArea = document.getElementById("form-message");
-	var loader = document.getElementById("loader");
-	var xmlhttp;
-	
-	if( !username || !password ){
-		msgArea.innerHTML = "Preencha todos os campos!";
-		msgArea.style.color = '#f00';
-	} else{
-		loader.style.display = 'block';
-		alert("oi");
-		xmlhttp = configureBrowserRequest(xmlhttp);
-		
-		xmlhttp.onreadystatechange = function() {
-			if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
-				if (xmlhttp.responseText == '1'){
-					msgArea.innerHTML = "Usuário cadastrado com sucesso!";
-					msgArea.style.color = '#00ff00';
-				} else{
-					msgArea.innerHTML = "Ocorreu um erro no cadastro. Tente novamente";
-					msgArea.style.color = '#f00';
-				}
-			}
-		}
-
-		xmlhttp.open("POST", "?Sadd-user", true);
-		xmlhttp.send("user=" + username + "&pass=" + password);
-		loader.style.display = 'none';
-	}
+function optionUploadFile(){
+	requestAndPutHTML("uploadFile.html", "content");
 }
 
 function addFileInput(){

@@ -13,6 +13,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <sstream>
 
 namespace helpers {
 
@@ -39,6 +40,20 @@ class Timer {
 
 void openBrowser();
 std::vector<char> readFile(FILE* fp);
+
+template <typename T> std::string toString(T value) {
+  std::stringstream ss;
+  ss << value;
+  return ss.str();
+}
+
+template <typename T> T fromString(const std::string& strValue) {
+  std::stringstream ss;
+  ss << strValue;
+  T value;
+  ss >> value;
+  return value;
+}
 
 } // namespace helpers
 

@@ -28,7 +28,7 @@ using namespace network;
 using namespace helpers;
 
 // static functions
-static void dataRequest(char* cRequest, const string& hostIP, int nUsers);
+static void dataRequest(char* cRequest, const string& hostIP, map<uint32_t, User>& users);
 
 // static variables
 static TCPConnection* client = nullptr;
@@ -46,7 +46,7 @@ void System::httpServer() {
   char fn[100], buftmp[100];
   sscanf(&data[0], "%s %s", buftmp, fn);
   if (string(fn).find("?") != string::npos) {
-    dataRequest(fn, localAddress.toString(), users.size());
+    dataRequest(fn, localAddress.toString(), users);
   } else {
     if (string(fn) == "/")
       strcpy(fn, "/index.html");
@@ -101,16 +101,27 @@ void System::httpServer() {
   client = nullptr;
 }
 
-static void dataRequest(char* cRequest, const string& hostIP, int nUsers) {
+static void dataRequest(char* cRequest, const string& hostIP, map<uint32_t, User>& users) {
   string request = string(cRequest).substr(string(cRequest).find("?") + 2, strlen(cRequest));
 
   if (request == "host-ip"){
     client->send(hostIP.c_str(), hostIP.size() + 1);
   } else if( request == "n-hosts" ){
     char tmp[10];
-    sprintf(tmp, "%d", nUsers);
+    sprintf(tmp, "%d", users.size());
     client->send(tmp, strlen(tmp) + 1);
   } else if( request == "server-state" ){
     client->send("On", 3);
+  } else if( request == "list-users" ){
+    string tableContent;
+    for(auto& kv : users) {
+      tableContent += "<tr><td>";
+      tableContent += kv.second.name;
+      tableContent += "</td>";
+      tableContent += "<td>";
+      tableContent += Address(kv.first, 0).toString();
+      tableContent += "</td></tr>";
+    }
+    client->send(tableContent.c_str(), tableContent.size());
   }
 }
