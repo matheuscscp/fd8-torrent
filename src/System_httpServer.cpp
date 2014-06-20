@@ -28,7 +28,7 @@ using namespace network;
 using namespace helpers;
 
 // static functions
-static void dataRequest(char* cRequest, const string& hostIP);
+static void dataRequest(char* cRequest, const string& hostIP, int nUsers);
 
 // static variables
 static TCPConnection* client = nullptr;
@@ -40,18 +40,13 @@ void System::httpServer() {
   
   vector<char> data = client->recv(SIZE_HTTPSERVER_MAXBUF);
   data.push_back(0);
-  //printf("------ PACOTE ------------------------------------------\n");
   printf("total bytes request: %d\n%s\n", data.size(), &data[0]);
   fflush(stdout);
   
   char fn[100], buftmp[100];
   sscanf(&data[0], "%s %s", buftmp, fn);
-  //printf("\nFN: %s\n", fn);
-  //printf("\nBUF: %s\n", buf);
-  
-  
-  if (fn[1] == '?') {
-    dataRequest(fn, localAddress.toString());
+  if (string(fn).find("?") != string::npos) {
+    dataRequest(fn, localAddress.toString(), users.size());
   } else {
     if (string(fn) == "/")
       strcpy(fn, "/index.html");
@@ -106,12 +101,15 @@ void System::httpServer() {
   client = nullptr;
 }
 
-static void dataRequest(char* cRequest, const string& hostIP) {
-  string request = string(cRequest).substr(3, strlen(cRequest));
+static void dataRequest(char* cRequest, const string& hostIP, int nUsers) {
+  string request = string(cRequest).substr(string(cRequest).find("?") + 2, strlen(cRequest));
+  fflush(stdout);
   if (request == "host-ip"){
     client->send(hostIP.c_str(), hostIP.size() + 1);
   } else if( request == "n-hosts" ){
-
+    char tmp[10];
+    sprintf(tmp, "%d", nUsers);
+    client->send(tmp, strlen(tmp) + 1);
   } else if( request == "server-state" ){
     client->send("On", 3);
   }

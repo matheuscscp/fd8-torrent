@@ -52,9 +52,11 @@ class System {
     void stateIdle();
     
     void speak();
+    void httpServer();
+    void answerRequests();
+    
     void listen();
     void detectFailure();
-    void httpServer();
 };
 
 #endif /* SYSTEM_HPP_ */
