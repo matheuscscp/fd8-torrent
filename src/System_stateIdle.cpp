@@ -14,14 +14,14 @@
 using namespace concurrency;
 
 void System::changeToIdle() {
-  httpThread = Thread([&]() {
-    while (state == STATE_IDLE) {
-      httpServer();
+  state = STATE_IDLE;
+  httpThread = Thread([this]() {
+    while (this->state == STATE_IDLE) {
+      this->httpServer();
       Thread::sleep(MS_SLEEP);
     }
   });
   httpThread.start();
-  state = STATE_IDLE;
 }
 
 void System::stateIdle() {

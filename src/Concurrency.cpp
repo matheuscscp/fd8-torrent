@@ -73,11 +73,9 @@ thread(other.thread),
 joined(other.joined),
 terminated(other.terminated)
 {
-  auto tmp = (Thread&)other;
-  
-  tmp.joined = true;
-  tmp.terminated = new bool;
-  *tmp.terminated = true;
+  other.joined = true;
+  other.terminated = new bool;
+  *other.terminated = true;
 }
 
 Thread& Thread::operator=(Thread&& other) {
@@ -86,11 +84,9 @@ Thread& Thread::operator=(Thread&& other) {
   joined = other.joined;
   terminated = other.terminated;
   
-  auto tmp = (Thread&)other;
-  
-  tmp.joined = true;
-  tmp.terminated = new bool;
-  *tmp.terminated = true;
+  other.joined = true;
+  other.terminated = new bool;
+  *other.terminated = true;
   
   return *this;
 }
