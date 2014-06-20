@@ -21,6 +21,7 @@ void System::changeToIdle() {
     }
   });
   httpThread.start();
+  state = STATE_IDLE;
 }
 
 void System::stateIdle() {

@@ -34,7 +34,7 @@ static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip);
 static TCPConnection* client = nullptr;
 
 void System::changeToLogin() {
-  
+  state = STATE_LOGIN;
 }
 
 void System::stateLogin() {
