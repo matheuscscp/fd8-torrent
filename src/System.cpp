@@ -10,6 +10,7 @@
 
 // local
 #include "Defines.hpp"
+#include "FileSystem.hpp"
 
 using namespace std;
 using namespace concurrency;
@@ -70,6 +71,7 @@ mainTCPServer(TCPUDP_MAIN),
 httpTCPServer(TCP_HTTPSERVER),
 httpThread([]() {})
 {
+  FileSystem::init();
   initTimer.start();
 }
 
