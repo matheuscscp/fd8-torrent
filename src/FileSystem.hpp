@@ -37,10 +37,17 @@ class FileSystem {
     static std::map<std::string, Folder> folders; // key: full path
   public:
     static void init();
-    static Folder& getFolder(const std::string& fullPath);
-    static File& getFile(const std::string& fullPath);
+    
+    static bool createFolder(const std::string& fullPath);
+    static Folder* retrieveFolder(const std::string& fullPath);
+    static bool updateFolder(const std::string& fullPath, const std::string& newPath);
+    static bool deleteFolder(const std::string& fullPath);
+    
+    static File* retrieveFile(const std::string& fullPath);
+    
     static int getTotalFiles();
     static int getTotalSize();
+    
     static helpers::ByteQueue readFile(FILE* fp);
 };
 

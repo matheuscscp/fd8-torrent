@@ -17,14 +17,31 @@ void FileSystem::init() {
   folders.clear();
 }
 
-FileSystem::Folder& FileSystem::getFolder(const string& fullPath) {
-  return folders[fullPath];
+bool FileSystem::createFolder(const string& fullPath) {
+  //TODO
+  return false;
 }
 
-FileSystem::File& FileSystem::getFile(const string& fullPath) {
+FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
+  if (folders.find(fullPath) == folders.end())
+    return nullptr;
+  return &folders[fullPath];
+}
+
+bool FileSystem::updateFolder(const string& fullPath, const string& newPath) {
+  //TODO
+  return false;
+}
+
+bool FileSystem::deleteFolder(const string& fullPath) {
+  //TODO
+  return false;
+}
+
+FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {//FIXME
   int i;
   for (i = fullPath.size() - 1; i >= 0 && fullPath[i] != '/'; i--);
-  return folders[fullPath.substr(0, i)].files[fullPath.substr(i + 1, fullPath.size())];
+  return &folders[fullPath.substr(0, i)].files[fullPath.substr(i + 1, fullPath.size())];
 }
 
 int FileSystem::getTotalFiles() {
