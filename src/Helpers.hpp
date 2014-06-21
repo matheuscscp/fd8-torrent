@@ -15,6 +15,7 @@
 #include <vector>
 #include <sstream>
 #include <cstring>
+#include <list>
 
 namespace helpers {
 
@@ -86,6 +87,7 @@ template <> inline std::string ByteQueue::pop<std::string>() {
 // functions
 
 void openBrowser();
+std::list<std::string> explode(const std::string& str);
 
 // template functions
 

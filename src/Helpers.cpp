@@ -128,4 +128,20 @@ void openBrowser() {
   system(cmd);
 }
 
+list<string> explode(const string& str, char delim) {
+  list<string> result;
+  string tmp;
+  for (size_t i = 0; i < str.size(); i++) {
+    if (str[i] != delim)
+      tmp += str[i];
+    else if (tmp.size()) {
+      result.push_back(tmp);
+      tmp = "";
+    }
+  }
+  if (tmp.size())
+    result.push_back(tmp);
+  return result;
+}
+
 } // namespace helpers
