@@ -117,7 +117,7 @@ bool FileSystem::createFolder(const string& fullPath) {
 }
 
 FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
-  if (fullPath == "")
+  if (fullPath == "/")
     return &rootFolder;
   return rootFolder.findFolder(fullPath);
 }
