@@ -75,6 +75,11 @@ httpThread([]() {})
   initTimer.start();
 }
 
+System::~System() {
+  state = STATE_INIT;
+  httpThread.join();
+}
+
 void System::run() {
   while (started) {
     switch (state) {

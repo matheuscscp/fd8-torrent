@@ -46,6 +46,8 @@ class System {
     static bool running();
   private:
     System();
+    ~System();
+    
     void run();
     
     void stateInit();
