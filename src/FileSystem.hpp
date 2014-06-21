@@ -38,10 +38,8 @@ class FileSystem {
   public:
     static void init();
     
-    static bool parseFolderName(const std::string& name);
-    static bool parseFolderPath(const std::string& fullPath);
-    static bool parseFileName(const std::string& name);
-    static bool parseFilePath(const std::string& fullPath);
+    static bool parseName(const std::string& name);
+    static bool parsePath(const std::string& path);
     
     static bool createFolder(const std::string& fullPath);
     static Folder* retrieveFolder(const std::string& fullPath);

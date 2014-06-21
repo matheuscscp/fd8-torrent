@@ -15,56 +15,55 @@ map<string, FileSystem::Folder> FileSystem::folders;
 
 void FileSystem::init() {
   folders.clear();
+  folders["root"];
 }
 
-bool FileSystem::parseFolderName(const string& name) {
-  return false;//TODO
+bool FileSystem::parseName(const string& name) {
+  static set<char> allowedChars;
+  static StaticInitializer staticInitializar([&]() {
+    for (char c = '0'; c <= '9'; c++)
+      allowedChars.insert(c);
+    for (char c = 'a'; c <= 'z'; c++)
+      allowedChars.insert(c);
+    for (char c = 'A'; c <= 'Z'; c++)
+      allowedChars.insert(c);
+    allowedChars.insert('_');
+    allowedChars.insert('-');
+    allowedChars.insert('+');
+    allowedChars.insert('.');
+  });
+  if (!name.size())
+    return false;
+  for (int i = 0; i < int(name.size()); i++) {
+    if (allowedChars.find(name[i]) != allowedChars.end())
+      return false;
+  }
+  return true;
 }
 
-bool FileSystem::parseFolderPath(const string& fullPath) {
-  list<string> atoms = explode(fullPath, '/');
+bool FileSystem::parsePath(const string& path) {
+  if (!path.size())
+    return false;
+  list<string> atoms = explode(path, '/');
   string tmp;
   auto it = atoms.begin();
   for (int i = 0; i < int(atoms.size()) - 1; i++) {
-    if (!parseFolderName(*it))
+    if (!parseName(*it))
       return false;
     tmp += (*it);
     tmp += '/';
     it++;
   }
   if (it != atoms.end()) {
-    if (!parseFolderName(*it))
+    if (!parseName(*it))
       return false;
     tmp += (*it);
   }
-  return tmp == fullPath;
-}
-
-bool FileSystem::parseFileName(const string& name) {
-  return false;//TODO
-}
-
-bool FileSystem::parseFilePath(const string& fullPath) {
-  list<string> atoms = explode(fullPath, '/');
-  string tmp;
-  auto it = atoms.begin();
-  for (int i = 0; i < int(atoms.size()) - 1; i++) {
-    if (!parseFolderName(*it))
-      return false;
-    tmp += (*it);
-    tmp += '/';
-    it++;
-  }
-  if (it != atoms.end()) {
-    if (!parseFileName(*it))
-      return false;
-    tmp += (*it);
-  }
-  return tmp == fullPath;
+  return tmp == path;
 }
 
 bool FileSystem::createFolder(const string& fullPath) {
-  if (!parseFolderPath(fullPath)) // if the path is invalid
+  if (!parsePath(fullPath)) // if the path is invalid
     return false;
   if (folders.find(fullPath) != folders.end()) // if the folder already exists
     return false;
