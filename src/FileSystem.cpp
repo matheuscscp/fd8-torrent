@@ -120,10 +120,7 @@ bool FileSystem::createFolder(const string& fullPath) {
 }
 
 FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
-  auto folder = folders.find(fullPath);
-  if (folder == folders.end())
-    return nullptr;
-  return &folder->second;
+  return rootFolder.findFolder(fullPath);
 }
 
 bool FileSystem::updateFolder(const string& fullPath, const string& newName) {
