@@ -46,7 +46,7 @@ void System::stateLogin() {
   ByteQueue data(SIZE_HTTPSERVER_MAXBUF);
   client->recv(data);
   data.push(char('\0'));
-  printf("total bytes request: %d\n%s\n", data.size(), (char*)data.ptr());
+  printf("total bytes request: %d\n%s\n", data.size() - 1, (char*)data.ptr());
   fflush(stdout);
   
   char fn[100], buftmp[100];
