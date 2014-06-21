@@ -69,16 +69,16 @@ bool FileSystem::parsePath(const string& path) {
   auto it = atoms.begin();
   if (!parseName(*it)) // if the first name is invalid
     return false;
-  string tmp = *it;
+  string reassembledPath = *it;
   it++;
   for (int i = 1; i < int(atoms.size()); i++) { // if there's an invalid name
     if (!parseName(*it))
       return false;
-    tmp += '/';
-    tmp += (*it);
+    reassembledPath += '/';
+    reassembledPath += (*it);
     it++;
   }
-  return tmp == path; // if the reassembled path is equals to the parsed
+  return reassembledPath == path;
 }
 
 bool FileSystem::createFolder(const string& fullPath) {
