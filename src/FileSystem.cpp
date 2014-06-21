@@ -23,9 +23,10 @@ bool FileSystem::createFolder(const string& fullPath) {
 }
 
 FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
-  if (folders.find(fullPath) == folders.end())
+  auto folder = folders.find(fullPath);
+  if (folder == folders.end())
     return nullptr;
-  return &folders[fullPath];
+  return &folder->second;
 }
 
 bool FileSystem::updateFolder(const string& fullPath, const string& newPath) {
@@ -38,10 +39,17 @@ bool FileSystem::deleteFolder(const string& fullPath) {
   return false;
 }
 
-FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {//FIXME
+FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
   int i;
   for (i = fullPath.size() - 1; i >= 0 && fullPath[i] != '/'; i--);
-  return &folders[fullPath.substr(0, i)].files[fullPath.substr(i + 1, fullPath.size())];
+  auto folder = folders.find(fullPath.substr(0, i));
+  if (folder == folders.end())
+    return nullptr;
+  auto& files = folder->second.files;
+  auto file = files.find(fullPath.substr(i + 1, fullPath.size()));
+  if (file == folder->second.files.end())
+    return nullptr;
+  return &file->second;
 }
 
 int FileSystem::getTotalFiles() {
