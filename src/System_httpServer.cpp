@@ -18,7 +18,6 @@
 #include "Concurrency.hpp"
 #include "Network.hpp"
 #include "Helpers.hpp"
-#include "FileSystem.hpp"
 
 // FIXME: esse define eh zoado, tem que tirar
 #define SIZE_HTTPSERVER_MAXBUF 0x1000
@@ -39,14 +38,13 @@ void System::httpServer() {
   if (client == nullptr)
     return;
   
-  ByteQueue data(SIZE_HTTPSERVER_MAXBUF);
-  client->recv(data);
-  data.push(char('\0'));
-  printf("total bytes request: %d\n%s\n", data.size() - 1, (char*)data.ptr());
+  vector<char> data = client->recv(SIZE_HTTPSERVER_MAXBUF);
+  data.push_back(0);
+  printf("total bytes request: %d\n%s\n", data.size(), &data[0]);
   fflush(stdout);
   
   char fn[100], buftmp[100];
-  sscanf((char*)data.ptr(), "%s %s", buftmp, fn);
+  sscanf(&data[0], "%s %s", buftmp, fn);
   if (string(fn).find("?") != string::npos) {
     dataRequest(fn, localAddress.toString(), users);
   } else {
@@ -90,7 +88,7 @@ void System::httpServer() {
         ;
         client->send(header, strlen(header));
       }
-      client->send(FileSystem::readFile(fp));
+      client->send(readFile(fp));
       fclose(fp);
     }
     else {
