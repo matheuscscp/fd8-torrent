@@ -133,12 +133,13 @@ void Context::render() {
 }
 
 Context::InputState Context::key(SDL_Keycode keycode) {
-  if (keys.find(keycode) == keys.end()) {
+  auto it = keys.find(keycode);
+  if (it == keys.end()) {
     keys[keycode].first = false;
     keys[keycode].second = RELEASED;
     return RELEASED;
   }
-  return keys[keycode].second;
+  return it->second.second;
 }
 
 Context::InputState Context::button(int butt) {
