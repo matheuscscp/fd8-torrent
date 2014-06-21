@@ -21,8 +21,7 @@ void System::listen() {
   Address addr;
   
   data = mainUDPSocket.recv(addr);
-  //if (!data.size() || addr.ip == localAddress.ip)
-  if (!data.size())
+  if (!data.size() || addr.ip == localAddress.ip)
     return;
   
   // update timeout

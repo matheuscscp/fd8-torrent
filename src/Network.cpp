@@ -219,7 +219,7 @@ void UDPSocket::send(const Address& address, const ByteQueue& data) {
 }
 
 ByteQueue UDPSocket::recv(Address& address) {
-  ByteQueue data(maxlen);
+  ByteQueue data;
 #ifdef _WIN32
   fd_set fds;
   timeval timeout;
@@ -230,6 +230,7 @@ ByteQueue UDPSocket::recv(Address& address) {
   if (select(0, &fds, nullptr, nullptr, &timeout) > 0) {
     SOCKADDR_IN addr;
     int addrsize = sizeof(SOCKADDR_IN);
+    data.resize(maxlen);
     data.resize(size_t(recvfrom(SOCKET(sd), (char*)data.ptr(), maxlen, 0, (SOCKADDR*)&addr, &addrsize)));
     address = Address(addr.sin_addr.S_un.S_addr, addr.sin_port);
   }
@@ -243,6 +244,7 @@ ByteQueue UDPSocket::recv(Address& address) {
   if (select(sd + 1, &fds, nullptr, nullptr, &timeout) > 0) {
     sockaddr_in addr;
     socklen_t addrsize = sizeof(sockaddr_in);
+    data.resize(maxlen);
     data.resize(size_t(recvfrom(sd, data.ptr(), maxlen, 0, (sockaddr*)&addr, &addrsize)));
     address = Address(addr.sin_addr.s_addr, addr.sin_port);
   }
