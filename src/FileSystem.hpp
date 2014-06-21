@@ -29,10 +29,14 @@ class FileSystem {
     
     struct Folder {
       public:
+        Folder* parent;
         std::map<std::string, Folder> subfolders;
         std::map<std::string, File> files;
+        Folder(Folder* parent);
+        void clear();
         int getTotalFiles();
         int getTotalSize();
+        Folder* findFolder(const std::string& subPath);
     };
   private:
     static Folder rootFolder;

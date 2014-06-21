@@ -11,8 +11,17 @@
 using namespace std;
 using namespace helpers;
 
-FileSystem::Folder FileSystem::rootFolder;
+FileSystem::Folder FileSystem::rootFolder(nullptr);
 uint32_t FileSystem::localIP;
+
+FileSystem::Folder::Folder(Folder* parent) : parent(parent) {
+  
+}
+
+void FileSystem::Folder::clear() {
+  subfolders.clear();
+  files.clear();
+}
 
 int FileSystem::Folder::getTotalFiles() {
   int total = files.size();
@@ -30,10 +39,19 @@ int FileSystem::Folder::getTotalSize() {
   return total;
 }
 
+FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath) {
+  pair<string, string> divided = divideFirst(subPath, '/');
+  auto folder = subfolders.find(divided.first);
+  if (folder == subfolders.end()) // if the first name is not in subfolders
+    return nullptr;
+  if (divided.second == "") // if first name is the only name
+    return &folder->second;
+  return folder->second.findFolder(divided.second); // recursive call
+}
+
 void FileSystem::init(uint32_t localIP) {
-  rootFolder.subfolders.clear();
-  rootFolder.files.clear();
-  system("rm www/files/*");
+  rootFolder.clear();
+  system("rm -rf www/files/*");
   FileSystem::localIP = localIP;
 }
 
@@ -84,14 +102,20 @@ bool FileSystem::parsePath(const string& path) {
 bool FileSystem::createFolder(const string& fullPath) {
   if (!parsePath(fullPath)) // if the path is invalid
     return false;
-  if (folders.find(fullPath) != folders.end()) // if the folder already exists
-    return false;
-  pair<string, string> divided = divide(fullPath, '/');
-  auto motherFolder = folders.find(divided.first);
-  if (motherFolder == folders.end()) // if the mother folder doesn't exist
-    return false;
-  motherFolder->second.subfolders.insert(divided.second);
-  folders[fullPath];
+  pair<string, string> divided = divideLast(fullPath, '/');
+  if (divided.second == "") { // if fullPath is a folder itself
+    if (rootFolder.findFolder(fullPath)) // if the folder already exist
+      return false;
+    rootFolder.subfolders[fullPath].parent = rootFolder;
+  }
+  else { // if fullPath has two or more folders
+    Folder* parentFolder = rootFolder.findFolder(divided.first);
+    if (!parentFolder) // if the parent folder doesn't exist
+      return false;
+    if (parentFolder->findFolder(divided.second)) // if the folder already exist
+      return false;
+    parentFolder->subfolders[divided.second].parent = parentFolder;
+  }
   return true;
 }
 
