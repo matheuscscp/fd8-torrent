@@ -17,9 +17,26 @@ void FileSystem::init() {
   folders.clear();
 }
 
+bool FileSystem::parseFolderPath(const string& fullPath) {
+  return false;//TODO
+}
+
+bool FileSystem::parseFilePath(const string& fullPath) {
+  return false;//TODO
+}
+
 bool FileSystem::createFolder(const string& fullPath) {
-  //TODO
-  return false;
+  if (!parseFolderPath(fullPath)) // if the path is invalid
+    return false;
+  if (folders.find(fullPath) != folders.end()) // if the folder already exists
+    return false;
+  pair<string, string> divided = divide(fullPath, '/');
+  auto motherFolder = folders.find(divided.first);
+  if (motherFolder == folders.end()) // if the mother folder doesn't exist
+    return false;
+  motherFolder->second.subfolders.insert(fullPath);
+  folders[fullPath];
+  return true;
 }
 
 FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {

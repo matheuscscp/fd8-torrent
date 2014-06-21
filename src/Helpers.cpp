@@ -144,4 +144,18 @@ list<string> explode(const string& str, char delim) {
   return result;
 }
 
+pair<string, string> divide(const string& str, char delim) {
+  pair<string, string> result;
+  int i;
+  for (i = int(str.size()) - 1; i >= 0 && str[i] != delim; i--);
+  if (i < 0)
+    result.first = str;
+  else {
+    result.second = str.substr(i + 1, str.size());
+    for (; i >= 0 && str[i] == delim; i--);
+    result.first = str.substr(0, i + 1);
+  }
+  return result;
+}
+
 } // namespace helpers

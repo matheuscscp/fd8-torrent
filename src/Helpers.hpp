@@ -87,7 +87,8 @@ template <> inline std::string ByteQueue::pop<std::string>() {
 // functions
 
 void openBrowser();
-std::list<std::string> explode(const std::string& str);
+std::list<std::string> explode(const std::string& str, char delim);
+std::pair<std::string, std::string> divide(const std::string& str, char delim);
 
 // template functions
 
