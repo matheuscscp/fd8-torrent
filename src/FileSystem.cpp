@@ -62,7 +62,7 @@ bool FileSystem::parsePath(const string& path) {
   return tmp == path;
 }
 
-bool FileSystem::createFolder(const string& fullPath) {
+bool FileSystem::createFolder(const string& fullPath) {//FIXME sync
   if (!parsePath(fullPath)) // if the path is invalid
     return false;
   if (folders.find(fullPath) != folders.end()) // if the folder already exists
