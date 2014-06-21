@@ -32,9 +32,9 @@ bool FileSystem::parseName(const string& name) {
     allowedChars.insert('+');
     allowedChars.insert('.');
   });
-  if (!name.size())
+  if (!name.size()) // if the name is empty
     return false;
-  for (int i = 0; i < int(name.size()); i++) {
+  for (int i = 0; i < int(name.size()); i++) { // check if all chars are allowed
     if (allowedChars.find(name[i]) != allowedChars.end())
       return false;
   }
