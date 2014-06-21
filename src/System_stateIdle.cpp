@@ -25,6 +25,7 @@ void System::changeToIdle() {
 }
 
 void System::stateIdle() {
+  listen();
   speak();
   answerRequests();
 }

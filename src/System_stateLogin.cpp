@@ -18,6 +18,7 @@
 #include "Concurrency.hpp"
 #include "Network.hpp"
 #include "Helpers.hpp"
+#include "FileSystem.hpp"
 
 using namespace std;
 using namespace concurrency;
@@ -42,13 +43,14 @@ void System::stateLogin() {
   if (client == nullptr)
     return;
   
-  vector<char> data = client->recv(SIZE_HTTPSERVER_MAXBUF);
-  data.push_back(0);
-  printf("total bytes request: %d\n%s\n", data.size(), &data[0]);
+  ByteQueue data(SIZE_HTTPSERVER_MAXBUF);
+  client->recv(data);
+  data.push(char('\0'));
+  printf("total bytes request: %d\n%s\n", data.size(), (char*)data.ptr());
   fflush(stdout);
   
   char fn[100], buftmp[100];
-  sscanf(&data[0], "%s %s", buftmp, fn);
+  sscanf((char*)data.ptr(), "%s %s", buftmp, fn);
 
   if (fn[1] == '?') {
     if(loginAttempt(fn, users, localAddress.ip))
@@ -95,7 +97,7 @@ void System::stateLogin() {
           ;
           client->send(header, strlen(header));
         }
-        client->send(readFile(fp));
+        client->send(FileSystem::readFile(fp));
         fclose(fp);
       }
       else {

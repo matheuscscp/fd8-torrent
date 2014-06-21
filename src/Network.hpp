@@ -13,6 +13,9 @@
 #include <string>
 #include <cstdint>
 
+// local
+#include "Helpers.hpp"
+
 namespace network {
 
 void init();
@@ -36,15 +39,14 @@ struct Address {
 class UDPSocket {
   private:
     int sd;
-    int maxlen;
+    size_t maxlen;
   public:
-    UDPSocket(int maxlen);
-    UDPSocket(const std::string& port, int maxlen);
-    UDPSocket(const Address& multicastAddress, int maxlen);
+    UDPSocket(size_t maxlen);
+    UDPSocket(const std::string& port, size_t maxlen);
+    UDPSocket(const Address& multicastAddress, size_t maxlen);
     ~UDPSocket();
-    void send(const Address& address, const std::vector<char>& data);
-    void send(const Address& address, const void* data, int maxlen);
-    std::vector<char> recv(Address& address);
+    void send(const Address& address, const helpers::ByteQueue& data);
+    helpers::ByteQueue recv(Address& address);
 };
 
 class TCPSocket {
@@ -58,27 +60,29 @@ class TCPSocket {
 class TCPConnection : public TCPSocket {
   public:
     TCPConnection(const Address& addr);
-    void send(const std::vector<char>& data);
-    void send(const void* data, int maxlen);
+    
+    void send(const helpers::ByteQueue& data);
+    void send(const void* data, size_t maxlen);
+    void send(const std::string& data, bool withoutNullTermination = false);
     template <typename T> void send(T data) {
-      send(&data, sizeof(T));
+      send((const void*)&data, sizeof(T));
     }
     
-    std::vector<char> recv(int maxlen);
-    int recv(void* data, int maxlen);
+    void recv(helpers::ByteQueue& data);
+    size_t recv(void* data, size_t maxlen);
     template <typename T> T recv() {
-      T tmp;
-      recv(&tmp, sizeof(T));
-      return tmp;
+      T data = 0;
+      recv(&data, sizeof(T));
+      return data;
     }
 };
 
 template <> inline void TCPConnection::send<std::string>(std::string data) {
-  send(data.c_str(), data.size());
+  send((const void*)data.c_str(), data.size());
   send(char('\0'));
 }
 
-template <> inline std::string TCPConnection::recv() {
+template <> inline std::string TCPConnection::recv<std::string>() {
   std::string data;
   char c;
   while ((c = recv<char>()) != '\0')

@@ -14,25 +14,23 @@
 
 using namespace std;
 using namespace network;
+using namespace helpers;
 
 void System::listen() {
-  vector<char> data;
+  ByteQueue data;
   Address addr;
   
   data = mainUDPSocket.recv(addr);
+  //if (!data.size() || addr.ip == localAddress.ip)
   if (!data.size())
-    return;
-  if (addr.ip == localAddress.ip)
     return;
   
   // update timeout
-  users[addr.ip].timer.start();
+  User& user = users[addr.ip];
+  user.name = data.pop<string>();
+  user.timer.start();
   
   // print
-  printf("Total bytes: %d", data.size());
-  printf("\tAddress: %s\n", addr.toString().c_str());
-  for (auto byte : data)
-    printf("%x ", ((int)byte) & 0xFF);
-  printf("\n");
+  printf("Beacon: %s - User: %s\n", addr.toString().c_str(), user.name.c_str());
   fflush(stdout);
 }

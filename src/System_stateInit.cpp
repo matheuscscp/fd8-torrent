@@ -20,11 +20,11 @@
 using namespace std;
 using namespace network;
 using namespace fd8protocol;
+using namespace helpers;
 
 void System::stateInit() {
   Address addr;
-  vector<char> data = mainUDPSocket.recv(addr);
-  if (data.size()) {
+  if (mainUDPSocket.recv(addr).size()) {
     // open connection with the peer
     TCPConnection conn(Address(addr.ip, Address("", TCPUDP_MAIN).port));
     

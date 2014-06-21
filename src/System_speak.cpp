@@ -24,12 +24,7 @@ void System::speak() {
   if (!timer.counting())
     timer.start();
   if (timer.time() > MS_SPEAK) {
-    vector<char> data;
-    string& name = users[localAddress.ip].name;
-    uint32_t nameSize = name.size();
-    data.insert(data.end(), (char*)&nameSize, ((char*)&nameSize) + 4);
-    data.insert(data.end(), name.c_str(), name.c_str() + name.size());
-    mainUDPSocket.send(multicastAddress, data);
+    mainUDPSocket.send(multicastAddress, ByteQueue().push(users[localAddress.ip].name));
     timer.start();
   }
 }

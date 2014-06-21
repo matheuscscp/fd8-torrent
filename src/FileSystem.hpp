@@ -13,6 +13,10 @@
 #include <set>
 #include <string>
 #include <map>
+#include <cstdio>
+
+// local
+#include "Helpers.hpp"
 
 class FileSystem {
   public:
@@ -34,6 +38,7 @@ class FileSystem {
     static void init();
     static Folder& getFolder(const std::string& fullPath);
     static File& getFile(const std::string& fullPath);
+    static helpers::ByteQueue readFile(FILE* fp);
 };
 
 #endif /* FILESYSTEM_HPP_ */

@@ -9,6 +9,7 @@
 #include "FileSystem.hpp"
 
 using namespace std;
+using namespace helpers;
 
 map<string, FileSystem::Folder> FileSystem::folders;
 
@@ -24,4 +25,13 @@ FileSystem::File& FileSystem::getFile(const string& fullPath) {
   int i;
   for (i = fullPath.size() - 1; i >= 0 && fullPath[i] != '/'; i--);
   return folders[fullPath.substr(0, i)].files[fullPath.substr(i + 1, fullPath.size())];
+}
+
+ByteQueue FileSystem::readFile(FILE* fp) {
+  fseek(fp, 0, SEEK_END);
+  size_t size = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+  ByteQueue data(size);
+  fread(data.ptr(), size, 1, fp);
+  return data;
 }

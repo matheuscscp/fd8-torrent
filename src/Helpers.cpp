@@ -74,6 +74,47 @@ bool Timer::counting() {
 }
 
 // =============================================================================
+// class ByteQueue;
+// =============================================================================
+
+ByteQueue::ByteQueue(size_t size) {
+  buf.resize(size);
+}
+
+size_t ByteQueue::size() const {
+  return buf.size();
+}
+
+void ByteQueue::resize(size_t size) {
+  buf.resize(size);
+}
+
+void* ByteQueue::ptr() const {
+  return buf.size() ? (void*)&buf[0] : nullptr;
+}
+
+ByteQueue& ByteQueue::push(const void* data, size_t maxlen) {
+  buf.insert(buf.end(), (uint8_t*)data, ((uint8_t*)data) + maxlen);
+  return *this;
+}
+
+ByteQueue& ByteQueue::push(const string& data, bool withoutNullTermination) {
+  buf.insert(buf.end(), (uint8_t*)data.c_str(), ((uint8_t*)data.c_str()) + data.size());
+  if (!withoutNullTermination)
+    buf.push_back(uint8_t(0));
+  return *this;
+}
+
+size_t ByteQueue::pop(void* data, size_t maxlen) {
+  size_t total = maxlen <= buf.size() ? maxlen : buf.size();
+  if (!total)
+    return 0;
+  memcpy(data, (const void*)&buf[0], total);
+  buf.erase(buf.begin(), buf.begin() + total);
+  return total;
+}
+
+// =============================================================================
 // functions
 // =============================================================================
 
@@ -85,17 +126,6 @@ void openBrowser() {
   sprintf(cmd, "sensible-browser http://localhost:%s", TCP_HTTPSERVER);
 #endif
   system(cmd);
-}
-
-vector<char> readFile(FILE* fp) {
-  vector<char> data;
-  int size;
-  fseek(fp, 0, SEEK_END);
-  size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-  data.resize(size);
-  fread(&data[0], size, 1, fp);
-  return data;
 }
 
 } // namespace helpers

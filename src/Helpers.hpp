@@ -14,8 +14,11 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cstring>
 
 namespace helpers {
+
+// classes
 
 class StaticInitializer {
   public:
@@ -38,8 +41,53 @@ class Timer {
     bool counting();
 };
 
+class ByteQueue {
+  private:
+    std::vector<uint8_t> buf;
+  public:
+    ByteQueue(size_t size = 0);
+    size_t size() const;
+    void resize(size_t size);
+    void* ptr() const;
+    
+    ByteQueue& push(const void* data, size_t maxlen);
+    ByteQueue& push(const std::string& data, bool withoutNullTermination = false);
+    template <typename T> ByteQueue& push(T data) {
+      buf.insert(buf.end(), (uint8_t*)&data, ((uint8_t*)&data) + sizeof(T));
+      return *this;
+    }
+    
+    size_t pop(void* data, size_t maxlen);
+    template <typename T> T pop() {
+      T data = 0;
+      size_t total = sizeof(T) <= buf.size() ? sizeof(T) : buf.size();
+      if (!total)
+        return data;
+      memcpy((void*)&data, (const void*)&buf[0], total);
+      buf.erase(buf.begin(), buf.begin() + total);
+      return data;
+    }
+};
+
+template <> inline ByteQueue& ByteQueue::push<std::string>(std::string data) {
+  buf.insert(buf.end(), (uint8_t*)data.c_str(), ((uint8_t*)data.c_str()) + data.size());
+  buf.push_back(uint8_t(0));
+  return *this;
+}
+
+template <> inline std::string ByteQueue::pop<std::string>() {
+  std::string data;
+  char c;
+  while ((c = pop<char>()) != '\0')
+    data += c;
+  return data;
+}
+
+// functions
+
 void openBrowser();
-std::vector<char> readFile(FILE* fp);
+
+// template functions
 
 template <typename T> std::string toString(T value) {
   std::stringstream ss;
