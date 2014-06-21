@@ -39,6 +39,8 @@ class FileSystem {
     static void init();
     static Folder& getFolder(const std::string& fullPath);
     static File& getFile(const std::string& fullPath);
+    static int getTotalFiles();
+    static int getTotalSize();
     static helpers::ByteQueue readFile(FILE* fp);
 };
 

@@ -27,6 +27,22 @@ FileSystem::File& FileSystem::getFile(const string& fullPath) {
   return folders[fullPath.substr(0, i)].files[fullPath.substr(i + 1, fullPath.size())];
 }
 
+int FileSystem::getTotalFiles() {
+  int total = 0;
+  for (auto& kv : folders)
+    total += kv.second.files.size();
+  return total;
+}
+
+int FileSystem::getTotalSize() {
+  int total = 0;
+  for (auto& kv1 : folders) {
+    for (auto& kv2 : kv1.second.files)
+      total += kv2.second.size;
+  }
+  return total;
+}
+
 ByteQueue FileSystem::readFile(FILE* fp) {
   fseek(fp, 0, SEEK_END);
   size_t size = ftell(fp);
