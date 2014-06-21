@@ -22,7 +22,22 @@ bool FileSystem::parseFolderName(const string& name) {
 }
 
 bool FileSystem::parseFolderPath(const string& fullPath) {
-  return false;//TODO
+  list<string> atoms = explode(fullPath, '/');
+  string tmp;
+  auto it = atoms.begin();
+  for (int i = 0; i < int(atoms.size()) - 1; i++) {
+    if (!parseFolderName(*it))
+      return false;
+    tmp += (*it);
+    tmp += '/';
+    it++;
+  }
+  if (it != atoms.end()) {
+    if (!parseFolderName(*it))
+      return false;
+    tmp += (*it);
+  }
+  return tmp == fullPath;
 }
 
 bool FileSystem::parseFileName(const string& name) {
@@ -30,7 +45,22 @@ bool FileSystem::parseFileName(const string& name) {
 }
 
 bool FileSystem::parseFilePath(const string& fullPath) {
-  return false;//TODO
+  list<string> atoms = explode(fullPath, '/');
+  string tmp;
+  auto it = atoms.begin();
+  for (int i = 0; i < int(atoms.size()) - 1; i++) {
+    if (!parseFolderName(*it))
+      return false;
+    tmp += (*it);
+    tmp += '/';
+    it++;
+  }
+  if (it != atoms.end()) {
+    if (!parseFileName(*it))
+      return false;
+    tmp += (*it);
+  }
+  return tmp == fullPath;
 }
 
 bool FileSystem::createFolder(const string& fullPath) {
