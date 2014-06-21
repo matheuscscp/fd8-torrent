@@ -10,7 +10,6 @@
 
 // standard
 #include <cstdint>
-#include <set>
 #include <string>
 #include <map>
 #include <cstdio>
@@ -30,20 +29,21 @@ class FileSystem {
     
     struct Folder {
       public:
-        std::set<std::string> subfolders; // value: full path
-        std::map<std::string, File> files; // key: only file name
+        std::map<std::string, Folder> subfolders;
+        std::map<std::string, File> files;
     };
   private:
-    static std::map<std::string, Folder> folders; // key: full path
+    static Folder rootFolder;
+    static uint32_t localIP;
   public:
-    static void init();
+    static void init(uint32_t localIP);
     
     static bool parseName(const std::string& name);
     static bool parsePath(const std::string& path);
     
     static bool createFolder(const std::string& fullPath);
     static Folder* retrieveFolder(const std::string& fullPath);
-    static bool updateFolder(const std::string& fullPath, const std::string& newPath);
+    static bool updateFolder(const std::string& fullPath, const std::string& newName);
     static bool deleteFolder(const std::string& fullPath);
     
     static File* retrieveFile(const std::string& fullPath);

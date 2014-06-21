@@ -144,7 +144,21 @@ list<string> explode(const string& str, char delim) {
   return result;
 }
 
-pair<string, string> divide(const string& str, char delim) {
+pair<string, string> divideFirst(const string& str, char delim) {
+  pair<string, string> result;
+  int i;
+  for (i = 0; i < int(str.size()) && str[i] != delim; i++);
+  if (i >= int(str.size()))
+    result.first = str;
+  else {
+    result.first = str.substr(0, i);
+    for(; i < int(str.size()) && str[i] == delim; i++);
+    result.second = str.substr(i, str.size());
+  }
+  return result;
+}
+
+pair<string, string> divideLast(const string& str, char delim) {
   pair<string, string> result;
   int i;
   for (i = int(str.size()) - 1; i >= 0 && str[i] != delim; i--);

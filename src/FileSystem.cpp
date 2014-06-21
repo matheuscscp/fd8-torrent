@@ -11,11 +11,14 @@
 using namespace std;
 using namespace helpers;
 
-map<string, FileSystem::Folder> FileSystem::folders;
+FileSystem::Folder FileSystem::rootFolder;
+uint32_t FileSystem::localIP;
 
-void FileSystem::init() {
-  folders.clear();
-  folders["root"];
+void FileSystem::init(uint32_t localIP) {
+  rootFolder.subfolders.clear();
+  rootFolder.files.clear();
+  system("rm www/files/*");
+  FileSystem::localIP = localIP;
 }
 
 bool FileSystem::parseName(const string& name) {
@@ -42,24 +45,24 @@ bool FileSystem::parseName(const string& name) {
 }
 
 bool FileSystem::parsePath(const string& path) {
-  if (!path.size())
+  if (!path.size()) // if the path is empty
     return false;
   list<string> atoms = explode(path, '/');
-  string tmp;
+  if (!atoms.size()) // if no atom was found
+    return false;
   auto it = atoms.begin();
-  for (int i = 0; i < int(atoms.size()) - 1; i++) {
+  if (!parseName(*it)) // if the first name is invalid
+    return false;
+  string tmp = *it;
+  it++;
+  for (int i = 1; i < int(atoms.size()); i++) { // if there's an invalid name
     if (!parseName(*it))
       return false;
-    tmp += (*it);
     tmp += '/';
+    tmp += (*it);
     it++;
   }
-  if (it != atoms.end()) {
-    if (!parseName(*it))
-      return false;
-    tmp += (*it);
-  }
-  return tmp == path;
+  return tmp == path; // if the reassembled path is equals to the parsed
 }
 
 bool FileSystem::createFolder(const string& fullPath) {
@@ -71,7 +74,7 @@ bool FileSystem::createFolder(const string& fullPath) {
   auto motherFolder = folders.find(divided.first);
   if (motherFolder == folders.end()) // if the mother folder doesn't exist
     return false;
-  motherFolder->second.subfolders.insert(fullPath);
+  motherFolder->second.subfolders.insert(divided.second);
   folders[fullPath];
   return true;
 }
@@ -83,9 +86,34 @@ FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
   return &folder->second;
 }
 
-bool FileSystem::updateFolder(const string& fullPath, const string& newPath) {
+bool FileSystem::updateFolder(const string& fullPath, const string& newName) {
+  if (fullPath == "root") // if the full path is the root folder
+    return false;
+  if (!parseName(newName)) // if the new name is invalid
+    return false;
+  pair<string, string> fullDivided = divide(fullPath, '/');
+  if (fullDivided.second == newName) // if the new name is the current name
+    return false;
+  auto folder = folders.find(fullPath);
+  if (folder == folders.end()) // if the folder doesn't exist
+    return false;
+  
+  // create a new folder
+  string newPath = (fullDivided.first + "/") + newName;
+  auto& newFolder = folders[newPath];
+  newFolder.subfolders = folder->second.subfolders;
+  newFolder.files = folder->second.files;
+  
+  // erase old folder
+  folders.erase(folder);
+  
+  for (auto& subfolder : newFolder.subfolders)
+    updateFolder((fullPath + "/")
+  
+  // rename files stored in this peer
   //TODO
-  return false;
+  
+  return true;
 }
 
 bool FileSystem::deleteFolder(const string& fullPath) {
@@ -94,16 +122,7 @@ bool FileSystem::deleteFolder(const string& fullPath) {
 }
 
 FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
-  int i;
-  for (i = fullPath.size() - 1; i >= 0 && fullPath[i] != '/'; i--);
-  auto folder = folders.find(fullPath.substr(0, i));
-  if (folder == folders.end())
-    return nullptr;
-  auto& files = folder->second.files;
-  auto file = files.find(fullPath.substr(i + 1, fullPath.size()));
-  if (file == folder->second.files.end())
-    return nullptr;
-  return &file->second;
+  return nullptr;//TODO
 }
 
 int FileSystem::getTotalFiles() {

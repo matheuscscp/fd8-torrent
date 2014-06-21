@@ -71,7 +71,7 @@ mainTCPServer(TCPUDP_MAIN),
 httpTCPServer(TCP_HTTPSERVER),
 httpThread([]() {})
 {
-  FileSystem::init();
+  FileSystem::init(localAddress.ip);
   initTimer.start();
 }
 
