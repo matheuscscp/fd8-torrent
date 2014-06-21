@@ -115,7 +115,7 @@ static void dataRequest(char* cRequest, const string& hostIP, map<uint32_t, User
     client->send("On", 3);
   } else if( request.find("folder") != string::npos ){
     string folderPath = string(request).substr(string(request).find("?") + 1, request.size());
-    FileSystem::Folder& folder = FileSystem::getFolder(folderPath);
+    FileSystem::Folder& folder = FileSystem::retrieveFolder(folderPath);
     string tableContent;
     for(auto& subfolder : folder.subfolders) {
       tableContent += "<tr><td><label onclick='openFolder(this)'>";
@@ -125,7 +125,7 @@ static void dataRequest(char* cRequest, const string& hostIP, map<uint32_t, User
   } else if( request.find("file") != string::npos ){
   } else if( request.find("detail-file") != string::npos ){
     string fullPath = string(request).substr(string(request).find("?") + 1, request.size());
-    FileSystem::File& file = FileSystem::getFile(fullPath);
+    FileSystem::File& file = FileSystem::retrieveFile(fullPath);
     string json = "{ 'fullPath' : '";
     json += fullPath;
     json += "', 'size' : '";
