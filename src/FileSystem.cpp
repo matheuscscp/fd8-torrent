@@ -17,7 +17,15 @@ void FileSystem::init() {
   folders.clear();
 }
 
+bool FileSystem::parseFolderName(const string& name) {
+  return false;//TODO
+}
+
 bool FileSystem::parseFolderPath(const string& fullPath) {
+  return false;//TODO
+}
+
+bool FileSystem::parseFileName(const string& name) {
   return false;//TODO
 }
 
