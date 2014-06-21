@@ -51,7 +51,6 @@ void System::stateLogin() {
   
   char fn[100], buftmp[100];
   sscanf((char*)data.ptr(), "%s %s", buftmp, fn);
-
   if (fn[1] == '?') {
     if(loginAttempt(fn, users, localAddress.ip))
       changeToIdle();
