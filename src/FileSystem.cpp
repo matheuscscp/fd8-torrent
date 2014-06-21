@@ -24,22 +24,24 @@ void FileSystem::Folder::clear() {
 }
 
 int FileSystem::Folder::getTotalFiles() {
-  int total = files.size();
+  int total = 0;
   for (auto& kv : subfolders)
     total += kv.second.getTotalFiles();
-  return total;
+  return total + files.size();
 }
 
 int FileSystem::Folder::getTotalSize() {
   int total = 0;
-  for (auto& kv : files)
-    total += kv.second.size;
   for (auto& kv : subfolders)
     total += kv.second.getTotalSize();
+  for (auto& kv : files)
+    total += kv.second.size;
   return total;
 }
 
 FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath) {
+  if (!parsePath(subPath)) // if the path is invalid
+    return nullptr;
   pair<string, string> divided = divideFirst(subPath, '/');
   auto folder = subfolders.find(divided.first);
   if (folder == subfolders.end()) // if the first name is not in subfolders
@@ -81,20 +83,15 @@ bool FileSystem::parseName(const string& name) {
 bool FileSystem::parsePath(const string& path) {
   if (!path.size()) // if the path is empty
     return false;
+  if (path == "/") // if the path is the root folder
+    return true;
   list<string> atoms = explode(path, '/');
-  if (!atoms.size()) // if no atom was found
-    return false;
-  auto it = atoms.begin();
-  if (!parseName(*it)) // if the first name is invalid
-    return false;
-  string reassembledPath = *it;
-  it++;
-  for (int i = 1; i < int(atoms.size()); i++) { // if there's an invalid name
-    if (!parseName(*it))
+  string reassembledPath;
+  for (auto& folder : atoms) { // reassemble the exploded path
+    if (!parseName(folder)) // if there is an invalid folder name
       return false;
     reassembledPath += '/';
-    reassembledPath += (*it);
-    it++;
+    reassembledPath += folder;
   }
   return reassembledPath == path;
 }
