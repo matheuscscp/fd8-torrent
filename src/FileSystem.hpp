@@ -25,6 +25,7 @@ class FileSystem {
         int size;
         uint32_t peer1;
         uint32_t peer2;
+        std::string author;
     };
     
     struct Folder {
