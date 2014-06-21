@@ -31,6 +31,8 @@ class FileSystem {
       public:
         std::map<std::string, Folder> subfolders;
         std::map<std::string, File> files;
+        int getTotalFiles();
+        int getTotalSize();
     };
   private:
     static Folder rootFolder;

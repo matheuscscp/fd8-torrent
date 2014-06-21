@@ -14,6 +14,22 @@ using namespace helpers;
 FileSystem::Folder FileSystem::rootFolder;
 uint32_t FileSystem::localIP;
 
+int FileSystem::Folder::getTotalFiles() {
+  int total = files.size();
+  for (auto& kv : subfolders)
+    total += kv.second.getTotalFiles();
+  return total;
+}
+
+int FileSystem::Folder::getTotalSize() {
+  int total = 0;
+  for (auto& kv : files)
+    total += kv.second.size;
+  for (auto& kv : subfolders)
+    total += kv.second.getTotalSize();
+  return total;
+}
+
 void FileSystem::init(uint32_t localIP) {
   rootFolder.subfolders.clear();
   rootFolder.files.clear();
@@ -126,19 +142,11 @@ FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
 }
 
 int FileSystem::getTotalFiles() {
-  int total = 0;
-  for (auto& kv : folders)
-    total += kv.second.files.size();
-  return total;
+  return rootFolder.getTotalFiles();
 }
 
 int FileSystem::getTotalSize() {
-  int total = 0;
-  for (auto& kv1 : folders) {
-    for (auto& kv2 : kv1.second.files)
-      total += kv2.second.size;
-  }
-  return total;
+  return rootFolder.getTotalSize();
 }
 
 ByteQueue FileSystem::readFile(FILE* fp) {
