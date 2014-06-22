@@ -174,7 +174,14 @@ FileSystem::Folder* FileSystem::updateFolder(const string& fullPath, const strin
 }
 
 bool FileSystem::deleteFolder(const string& fullPath) {
-  return false;//TODO
+  Folder* parent;
+  Folder* folder = rootFolder.findFolder(fullPath, &parent);
+  if (!parent || !folder) // if parent of folder doesn't exist
+    return false;
+  pair<string, string> brokenPath = extractLast(fullPath, '/');
+  parent->subfolders.erase(brokenPath.second);
+  //TODO remove files in this peer
+  return false;
 }
 
 FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
