@@ -118,9 +118,9 @@ static void dataRequest(char* cRequest, const string& hostIP, map<uint32_t, User
     string folderPath = string(request).substr(string(request).find("?") + 1, request.size());
     FileSystem::Folder* folder = FileSystem::retrieveFolder(folderPath);
     string tableContent;
-    for(auto& subfolder : folder->subfolders) {
+    for(auto& kv : folder->subfolders) {
       tableContent += "<tr><td><label onclick='openFolder(this)'>";
-      tableContent += subfolder;
+      tableContent += kv.first;
       tableContent += "</label></td></tr>";
     }
   } else if( request.find("file") != string::npos ){

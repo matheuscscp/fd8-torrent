@@ -46,9 +46,9 @@ class FileSystem {
     static bool parseName(const std::string& name);
     static bool parsePath(const std::string& path);
     
-    static bool createFolder(const std::string& fullPath);
+    static Folder* createFolder(const std::string& fullPath);
     static Folder* retrieveFolder(const std::string& fullPath);
-    static bool updateFolder(const std::string& fullPath, const std::string& newName);
+    static Folder* updateFolder(const std::string& fullPath, const std::string& newName);
     static bool deleteFolder(const std::string& fullPath);
     
     static File* retrieveFile(const std::string& fullPath);

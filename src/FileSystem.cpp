@@ -8,10 +8,14 @@
 // this
 #include "FileSystem.hpp"
 
+// standard
+#include <cstdlib>
+#include <set>
+
 using namespace std;
 using namespace helpers;
 
-FileSystem::Folder FileSystem::rootFolder(nullptr);
+FileSystem::Folder FileSystem::rootFolder;
 uint32_t FileSystem::localIP;
 
 void FileSystem::Folder::clear() {
@@ -106,24 +110,25 @@ bool FileSystem::parsePath(const string& path) {
   return reassembledPath == path;
 }
 
-bool FileSystem::createFolder(const string& fullPath) {
+FileSystem::Folder* FileSystem::createFolder(const string& fullPath) {
   if (!parsePath(fullPath)) // if the path is invalid
-    return false;
+    return nullptr;
+  Folder* newFolder;
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   if (brokenPath.second == "") { // if fullPath is a folder itself
     if (rootFolder.findFolder(fullPath)) // if the folder already exist
-      return false;
-    rootFolder.subfolders[fullPath];
+      return nullptr;
+    newFolder = &rootFolder.subfolders[fullPath];
   }
   else { // if fullPath has two or more folders
     Folder* parentFolder = rootFolder.findFolder(brokenPath.first);
     if (!parentFolder) // if the parent folder doesn't exist
-      return false;
+      return nullptr;
     if (parentFolder->findFolder(brokenPath.second)) // if folder already exist
-      return false;
-    parentFolder->subfolders[brokenPath.second];
+      return nullptr;
+    newFolder = &parentFolder->subfolders[brokenPath.second];
   }
-  return true;
+  return newFolder;
 }
 
 FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
@@ -132,12 +137,12 @@ FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
   return rootFolder.findFolder(fullPath);
 }
 
-bool FileSystem::updateFolder(const string& fullPath, const string& newName) {
+FileSystem::Folder* FileSystem::updateFolder(const string& fullPath, const string& newName) {
   if (!parsePath(fullPath) || !parseName(newName)) // if args are invalid
-    return false;
+    return nullptr;
   Folder* folder = retrieveFolder(fullPath);
   if (!folder) // if the folder doesn't exist
-    return false;
+    return nullptr;
   Folder* newFolder;
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   if (brokenPath.second == "") // if fullPath is a folder itself
@@ -145,11 +150,11 @@ bool FileSystem::updateFolder(const string& fullPath, const string& newName) {
   else // if fullPath has two or more names
     newFolder = createFolder((brokenPath.first + "/") + newName);
   if (!newFolder) // if a folder already exist with the new path
-    return false;
+    return nullptr;
   newFolder->subfolders = folder->subfolders;
   newFolder->files = folder->files;
   //TODO rename files in this peer
-  return true;
+  return newFolder;
 }
 
 bool FileSystem::deleteFolder(const string& fullPath) {
