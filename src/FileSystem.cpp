@@ -14,10 +14,6 @@ using namespace helpers;
 FileSystem::Folder FileSystem::rootFolder(nullptr);
 uint32_t FileSystem::localIP;
 
-FileSystem::Folder::Folder(Folder* parent) : parent(parent) {
-  
-}
-
 void FileSystem::Folder::clear() {
   subfolders.clear();
   files.clear();
@@ -117,7 +113,7 @@ bool FileSystem::createFolder(const string& fullPath) {
   if (brokenPath.second == "") { // if fullPath is a folder itself
     if (rootFolder.findFolder(fullPath)) // if the folder already exist
       return false;
-    rootFolder.subfolders[fullPath].parent = rootFolder;
+    rootFolder.subfolders[fullPath];
   }
   else { // if fullPath has two or more folders
     Folder* parentFolder = rootFolder.findFolder(brokenPath.first);
@@ -125,7 +121,7 @@ bool FileSystem::createFolder(const string& fullPath) {
       return false;
     if (parentFolder->findFolder(brokenPath.second)) // if folder already exist
       return false;
-    parentFolder->subfolders[brokenPath.second].parent = parentFolder;
+    parentFolder->subfolders[brokenPath.second];
   }
   return true;
 }
@@ -137,32 +133,22 @@ FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
 }
 
 bool FileSystem::updateFolder(const string& fullPath, const string& newName) {
-  if (fullPath == "root") // if the full path is the root folder
+  if (!parsePath(fullPath) || !parseName(newName)) // if args are invalid
     return false;
-  if (!parseName(newName)) // if the new name is invalid
+  Folder* folder = retrieveFolder(fullPath);
+  if (!folder) // if the folder doesn't exist
     return false;
-  pair<string, string> fullDivided = divide(fullPath, '/');
-  if (fullDivided.second == newName) // if the new name is the current name
+  Folder* newFolder;
+  pair<string, string> brokenPath = extractLast(fullPath, '/');
+  if (brokenPath.second == "") // if fullPath is a folder itself
+    newFolder = createFolder(string("/") + newName);
+  else // if fullPath has two or more names
+    newFolder = createFolder((brokenPath.first + "/") + newName);
+  if (!newFolder) // if a folder already exist with the new path
     return false;
-  auto folder = folders.find(fullPath);
-  if (folder == folders.end()) // if the folder doesn't exist
-    return false;
-  
-  // create a new folder
-  string newPath = (fullDivided.first + "/") + newName;
-  auto& newFolder = folders[newPath];
-  newFolder.subfolders = folder->second.subfolders;
-  newFolder.files = folder->second.files;
-  
-  // erase old folder
-  folders.erase(folder);
-  
-  for (auto& subfolder : newFolder.subfolders)
-    updateFolder((fullPath + "/")
-  
-  // rename files stored in this peer
-  //TODO
-  
+  newFolder->subfolders = folder->subfolders;
+  newFolder->files = folder->files;
+  //TODO rename files in this peer
   return true;
 }
 
