@@ -51,6 +51,10 @@ FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath) {
   return folder->second.findFolder(divided.second); // recursive call
 }
 
+FileSystem::File* FileSystem::Folder::findFile(const string& subPath) {
+  return nullptr;//TODO
+}
+
 void FileSystem::init(uint32_t localIP) {
   rootFolder.clear();
   system("rm -rf www/files/*");
@@ -158,7 +162,7 @@ bool FileSystem::deleteFolder(const string& fullPath) {
 }
 
 FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
-  return nullptr;//TODO
+  return rootFolder.findFile(fullPath);
 }
 
 int FileSystem::getTotalFiles() {

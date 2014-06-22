@@ -114,6 +114,15 @@ size_t ByteQueue::pop(void* data, size_t maxlen) {
   return total;
 }
 
+string ByteQueue::pop(size_t maxlen) {
+  string data(maxlen <= buf.size() ? maxlen : buf.size(), '0');
+  if (data.size()) {
+    memcpy((void*)data.c_str(), (const void*)&buf[0], data.size());
+    buf.erase(buf.begin(), buf.begin() + data.size());
+  }
+  return data;
+}
+
 // =============================================================================
 // functions
 // =============================================================================

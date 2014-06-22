@@ -59,6 +59,7 @@ class ByteQueue {
     }
     
     size_t pop(void* data, size_t maxlen);
+    std::string pop(size_t maxlen);
     template <typename T> T pop() {
       T data = 0;
       size_t total = sizeof(T) <= buf.size() ? sizeof(T) : buf.size();
