@@ -16,6 +16,7 @@ using namespace std;
 using namespace helpers;
 
 FileSystem::Folder FileSystem::rootFolder;
+uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
 
 uint32_t FileSystem::Folder::getTotalFiles() {
@@ -95,6 +96,7 @@ void FileSystem::init(uint32_t localIP) {
   rootFolder.files.clear();
   system("rm -rf www/files/*");
   FileSystem::localIP = localIP;
+  nextID = 0;
 }
 
 bool FileSystem::parseName(const string& name) {

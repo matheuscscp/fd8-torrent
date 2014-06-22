@@ -42,6 +42,7 @@ class FileSystem {
     };
   private:
     static Folder rootFolder;
+    static uint32_t nextID;
     static uint32_t localIP;
   public:
     static void init(uint32_t localIP);
