@@ -34,8 +34,11 @@ class FileSystem {
         void clear();
         int getTotalFiles();
         int getTotalSize();
-        Folder* findFolder(const std::string& subPath);
-        File* findFile(const std::string& subPath);
+        Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
+        File* findFile(const std::string& subPath, Folder** parent = nullptr);
+      private:
+        Folder* findFolder_(const std::string& subPath, Folder** parent);
+        File* findFile_(const std::string& subPath, Folder** parent);
     };
   private:
     static Folder rootFolder;

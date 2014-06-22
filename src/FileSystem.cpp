@@ -39,32 +39,60 @@ int FileSystem::Folder::getTotalSize() {
   return total;
 }
 
-FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath) {
-  if (!parsePath(subPath)) // if the path is invalid
+FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath, Folder** parent) {
+  if (!parsePath(subPath)) { // if the path is invalid
+    if (parent) // if the parent folder was requested
+      *parent = nullptr;
     return nullptr;
-  pair<string, string> brokenPath = extractFirst(subPath, '/');
-  auto folder = subfolders.find(brokenPath.first);
-  if (folder == subfolders.end()) // if the first name is not in subfolders
-    return nullptr;
-  if (brokenPath.second == "") // if first name is the only name
-    return &folder->second;
-  return folder->second.findFolder(brokenPath.second); // recursive call
+  }
+  return findFolder_(subPath, parent);
 }
 
-FileSystem::File* FileSystem::Folder::findFile(const string& subPath) {
-  if (!parsePath(subPath)) // if the path is invalid
+FileSystem::File* FileSystem::Folder::findFile(const string& subPath, Folder** parent) {
+  if (!parsePath(subPath)) { // if the path is invalid
+    if (parent) // if the parent folder was requested
+      *parent = nullptr;
     return nullptr;
+  }
+  return findFile_(subPath, parent);
+}
+
+FileSystem::Folder* FileSystem::Folder::findFolder_(const string& subPath, Folder** parent) {
+  pair<string, string> brokenPath = extractFirst(subPath, '/');
+  if (brokenPath.second == "") { // if subPath is a folder name
+    if (parent) // if the parent folder was requested
+      *parent = this;
+    auto folder = subfolders.find(brokenPath.first);
+    if (folder == subfolders.end()) // if the folder was not found
+      return nullptr;
+    return &folder->second;
+  }
+  auto parentFolder = subfolders.find(brokenPath.first);
+  if (parentFolder == subfolders.end()) { // if a parent folder was not found
+    if (parent) // if the parent folder was requested
+      *parent = nullptr;
+    return nullptr;
+  }
+  return parentFolder->second.findFolder_(brokenPath.second, parent); // recursive call
+}
+
+FileSystem::File* FileSystem::Folder::findFile_(const string& subPath, Folder** parent) {
   pair<string, string> brokenPath = extractFirst(subPath, '/');
   if (brokenPath.second == "") { // if supPath is a file name
+    if (parent) // if the parent folder was requested
+      *parent = this;
     auto file = files.find(brokenPath.first);
     if (file == files.end()) // if the file was not found
       return nullptr;
     return &file->second;
   }
-  auto folder = subfolders.find(brokenPath.first);
-  if (folder == subfolders.end()) // if folder was not found
+  auto parentFolder = subfolders.find(brokenPath.first);
+  if (parentFolder == subfolders.end()) { // if a parent folder was not found
+    if (parent) // if the parent folder was requested
+      *parent = nullptr;
     return nullptr;
-  return folder->second.findFile(brokenPath.second); // recursive call
+  }
+  return parentFolder->second.findFile_(brokenPath.second, parent); // recursive call
 }
 
 void FileSystem::init(uint32_t localIP) {
@@ -111,24 +139,12 @@ bool FileSystem::parsePath(const string& path) {
 }
 
 FileSystem::Folder* FileSystem::createFolder(const string& fullPath) {
-  if (!parsePath(fullPath)) // if the path is invalid
+  Folder* parent;
+  Folder* folder = rootFolder.findFolder(fullPath, &parent);
+  if (!parent || folder) // if parent folder was not found or the folder exist
     return nullptr;
-  Folder* newFolder;
   pair<string, string> brokenPath = extractLast(fullPath, '/');
-  if (brokenPath.second == "") { // if fullPath is a folder itself
-    if (rootFolder.findFolder(fullPath)) // if the folder already exist
-      return nullptr;
-    newFolder = &rootFolder.subfolders[fullPath];
-  }
-  else { // if fullPath has two or more folders
-    Folder* parentFolder = rootFolder.findFolder(brokenPath.first);
-    if (!parentFolder) // if the parent folder doesn't exist
-      return nullptr;
-    if (parentFolder->findFolder(brokenPath.second)) // if folder already exist
-      return nullptr;
-    newFolder = &parentFolder->subfolders[brokenPath.second];
-  }
-  return newFolder;
+  return &parent->subfolders[brokenPath.second];
 }
 
 FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
@@ -138,21 +154,21 @@ FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
 }
 
 FileSystem::Folder* FileSystem::updateFolder(const string& fullPath, const string& newName) {
-  if (!parsePath(fullPath) || !parseName(newName)) // if args are invalid
+  if (!parseName(newName)) // if the new name is invalid
     return nullptr;
-  Folder* folder = retrieveFolder(fullPath);
-  if (!folder) // if the folder doesn't exist
+  Folder* parent;
+  Folder* folder = rootFolder.findFolder(fullPath, &parent);
+  if (!parent || !folder) // if parent or folder doesn't exist
     return nullptr;
-  Folder* newFolder;
   pair<string, string> brokenPath = extractLast(fullPath, '/');
-  if (brokenPath.second == "") // if fullPath is a folder itself
-    newFolder = createFolder(string("/") + newName);
-  else // if fullPath has two or more names
-    newFolder = createFolder((brokenPath.first + "/") + newName);
-  if (!newFolder) // if a folder already exist with the new path
+  string newNameWithSlash = string("/") + newName;
+  // if the new folder already exist
+  if (parent->subfolders.find(newNameWithSlash) != parent->subfolders.end())
     return nullptr;
+  Folder* newFolder = &parent->subfolders[newNameWithSlash];
   newFolder->subfolders = folder->subfolders;
   newFolder->files = folder->files;
+  parent->subfolders.erase(brokenPath.second);
   //TODO rename files in this peer
   return newFolder;
 }

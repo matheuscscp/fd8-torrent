@@ -177,7 +177,7 @@ pair<string, string> extractLast(const string& str, char delim) {
     result.second = str.substr(i + 1, str.size());
   }
   else
-    result.first = str;
+    result.second = str;
   return result;
 }
 
