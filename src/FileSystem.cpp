@@ -156,7 +156,6 @@ FileSystem::Folder* FileSystem::updateFolder(const string& fullPath, const strin
   Folder* folder = rootFolder.findFolder(fullPath, &parent);
   if (!parent || !folder) // if parent or folder doesn't exist
     return nullptr;
-  pair<string, string> brokenPath = extractLast(fullPath, '/');
   string newNameWithSlash = string("/") + newName;
   // if the new folder already exist
   if (parent->subfolders.find(newNameWithSlash) != parent->subfolders.end())
@@ -164,6 +163,7 @@ FileSystem::Folder* FileSystem::updateFolder(const string& fullPath, const strin
   Folder* newFolder = &parent->subfolders[newNameWithSlash];
   newFolder->subfolders = folder->subfolders;
   newFolder->files = folder->files;
+  pair<string, string> brokenPath = extractLast(fullPath, '/');
   parent->subfolders.erase(brokenPath.second);
   //TODO rename files in this peer
   return newFolder;
