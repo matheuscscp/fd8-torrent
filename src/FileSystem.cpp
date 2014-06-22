@@ -18,19 +18,14 @@ using namespace helpers;
 FileSystem::Folder FileSystem::rootFolder;
 uint32_t FileSystem::localIP;
 
-void FileSystem::Folder::clear() {
-  subfolders.clear();
-  files.clear();
-}
-
-int FileSystem::Folder::getTotalFiles() {
-  int total = 0;
+uint32_t FileSystem::Folder::getTotalFiles() {
+  uint32_t total = 0;
   for (auto& kv : subfolders)
     total += kv.second.getTotalFiles();
   return total + files.size();
 }
 
-int FileSystem::Folder::getTotalSize() {
+uint64_t FileSystem::Folder::getTotalSize() {
   int total = 0;
   for (auto& kv : subfolders)
     total += kv.second.getTotalSize();
@@ -96,7 +91,8 @@ FileSystem::File* FileSystem::Folder::findFile_(const string& subPath, Folder** 
 }
 
 void FileSystem::init(uint32_t localIP) {
-  rootFolder.clear();
+  rootFolder.subfolders.clear();
+  rootFolder.files.clear();
   system("rm -rf www/files/*");
   FileSystem::localIP = localIP;
 }
@@ -184,15 +180,27 @@ bool FileSystem::deleteFolder(const string& fullPath) {
   return false;
 }
 
+FileSystem::File* FileSystem::createFile(const string& fullPath, const ByteQueue& byteQueue) {
+  return nullptr;//TODO
+}
+
 FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
   return rootFolder.findFile(fullPath);
 }
 
-int FileSystem::getTotalFiles() {
+FileSystem::File* FileSystem::updateFile(const string& fullPath, const string& newName) {
+  return nullptr;//TODO
+}
+
+bool FileSystem::deleteFile(const string& fullPath) {
+  return false;//TODO
+}
+
+uint32_t FileSystem::getTotalFiles() {
   return rootFolder.getTotalFiles();
 }
 
-int FileSystem::getTotalSize() {
+uint64_t FileSystem::getTotalSize() {
   return rootFolder.getTotalSize();
 }
 

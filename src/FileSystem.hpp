@@ -21,7 +21,8 @@ class FileSystem {
   public:
     struct File {
       public:
-        int size;
+        uint32_t id;
+        uint32_t size;
         uint32_t peer1;
         uint32_t peer2;
         std::string author;
@@ -31,9 +32,8 @@ class FileSystem {
       public:
         std::map<std::string, Folder> subfolders;
         std::map<std::string, File> files;
-        void clear();
-        int getTotalFiles();
-        int getTotalSize();
+        uint32_t getTotalFiles();
+        uint64_t getTotalSize();
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
         File* findFile(const std::string& subPath, Folder** parent = nullptr);
       private:
@@ -54,10 +54,13 @@ class FileSystem {
     static Folder* updateFolder(const std::string& fullPath, const std::string& newName);
     static bool deleteFolder(const std::string& fullPath);
     
+    static File* createFile(const std::string& fullPath, const helpers::ByteQueue& byteQueue);
     static File* retrieveFile(const std::string& fullPath);
+    static File* updateFile(const std::string& fullPath, const std::string& newName);
+    static bool deleteFile(const std::string& fullPath);
     
-    static int getTotalFiles();
-    static int getTotalSize();
+    static uint32_t getTotalFiles();
+    static uint64_t getTotalSize();
     
     static helpers::ByteQueue readFile(FILE* fp);
 };
