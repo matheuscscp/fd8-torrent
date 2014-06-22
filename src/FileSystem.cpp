@@ -42,13 +42,13 @@ int FileSystem::Folder::getTotalSize() {
 FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath) {
   if (!parsePath(subPath)) // if the path is invalid
     return nullptr;
-  pair<string, string> divided = divideFirst(subPath, '/');
-  auto folder = subfolders.find(divided.first);
+  pair<string, string> brokenPath = extractFirst(subPath, '/');
+  auto folder = subfolders.find(brokenPath.first);
   if (folder == subfolders.end()) // if the first name is not in subfolders
     return nullptr;
-  if (divided.second == "") // if first name is the only name
+  if (brokenPath.second == "") // if first name is the only name
     return &folder->second;
-  return folder->second.findFolder(divided.second); // recursive call
+  return folder->second.findFolder(brokenPath.second); // recursive call
 }
 
 FileSystem::File* FileSystem::Folder::findFile(const string& subPath) {
@@ -103,19 +103,19 @@ bool FileSystem::parsePath(const string& path) {
 bool FileSystem::createFolder(const string& fullPath) {
   if (!parsePath(fullPath)) // if the path is invalid
     return false;
-  pair<string, string> divided = divideLast(fullPath, '/');
-  if (divided.second == "") { // if fullPath is a folder itself
+  pair<string, string> brokenPath = extractLast(fullPath, '/');
+  if (brokenPath.second == "") { // if fullPath is a folder itself
     if (rootFolder.findFolder(fullPath)) // if the folder already exist
       return false;
     rootFolder.subfolders[fullPath].parent = rootFolder;
   }
   else { // if fullPath has two or more folders
-    Folder* parentFolder = rootFolder.findFolder(divided.first);
+    Folder* parentFolder = rootFolder.findFolder(brokenPath.first);
     if (!parentFolder) // if the parent folder doesn't exist
       return false;
-    if (parentFolder->findFolder(divided.second)) // if the folder already exist
+    if (parentFolder->findFolder(brokenPath.second)) // if folder already exist
       return false;
-    parentFolder->subfolders[divided.second].parent = parentFolder;
+    parentFolder->subfolders[brokenPath.second].parent = parentFolder;
   }
   return true;
 }

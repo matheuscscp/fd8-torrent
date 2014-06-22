@@ -153,32 +153,31 @@ list<string> explode(const string& str, char delim) {
   return result;
 }
 
-pair<string, string> divideFirst(const string& str, char delim) {
+pair<string, string> extractFirst(const string& str, char delim) {
   pair<string, string> result;
   int i;
   for (i = 0; i < int(str.size()) && str[i] == delim; i++);
+  for (; i < int(str.size()) && str[i] != delim; i++);
   if (i < int(str.size())) {
-    for (; i < int(str.size()) && str[i] != delim; i++)
-      result.first += str[i];
-    if (i < int(str.size()))
-      result.second = str.substr(i, str.size());
+    result.first = str.substr(0, i);
+    result.second = str.substr(i, str.size());
   }
+  else
+    result.first = str;
   return result;
 }
 
-pair<string, string> divideLast(const string& str, char delim) {
+pair<string, string> extractLast(const string& str, char delim) {
   pair<string, string> result;
   int i;
   for (i = int(str.size()) - 1; i >= 0 && str[i] != delim; i--);
-  if (i < 0)
-    result.first = str;
-  else {
-    result.second = str.substr(i + 1, str.size());
-    for (; i >= 0 && str[i] == delim; i--);
+  for (; i >= 0 && str[i] == delim; i--);
+  if (i >= 0) {
     result.first = str.substr(0, i + 1);
+    result.second = str.substr(i + 1, str.size());
   }
-  if (result.first == "")
-    result = pair<string, string>(result.second, result.first);
+  else
+    result.first = str;
   return result;
 }
 
