@@ -70,6 +70,7 @@ class TCPConnection : public TCPSocket {
     
     void recv(helpers::ByteQueue& data);
     size_t recv(void* data, size_t maxlen);
+    std::string recv(size_t maxlen);
     template <typename T> T recv() {
       T data = 0;
       recv(&data, sizeof(T));

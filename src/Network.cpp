@@ -310,6 +310,15 @@ size_t TCPConnection::recv(void* data, size_t maxlen) {
   return total;
 }
 
+string TCPConnection::recv(size_t maxlen) {
+  string data;
+  if (sd) {
+    data.resize(maxlen, '0');
+    data.resize(SDLNet_TCP_Recv(TCPsocket(sd), (void*)data.c_str(), maxlen));
+  }
+  return data;
+}
+
 // =============================================================================
 // class TCPServer;
 // =============================================================================
