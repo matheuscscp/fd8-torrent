@@ -158,8 +158,7 @@ FileSystem::Folder* FileSystem::updateFolder(const string& fullPath, const strin
 }
 
 bool FileSystem::deleteFolder(const string& fullPath) {
-  //TODO
-  return false;
+  return false;//TODO
 }
 
 FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
