@@ -52,7 +52,19 @@ FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath) {
 }
 
 FileSystem::File* FileSystem::Folder::findFile(const string& subPath) {
-  return nullptr;//TODO
+  if (!parsePath(subPath)) // if the path is invalid
+    return nullptr;
+  pair<string, string> brokenPath = extractFirst(subPath, '/');
+  if (brokenPath.second == "") { // if supPath is a file name
+    auto file = files.find(brokenPath.first);
+    if (file == files.end()) // if the file was not found
+      return nullptr;
+    return &file->second;
+  }
+  auto folder = subfolders.find(brokenPath.first);
+  if (folder == subfolders.end()) // if folder was not found
+    return nullptr;
+  return folder->second.findFile(brokenPath.second); // recursive call
 }
 
 void FileSystem::init(uint32_t localIP) {
@@ -87,8 +99,6 @@ bool FileSystem::parseName(const string& name) {
 bool FileSystem::parsePath(const string& path) {
   if (!path.size()) // if the path is empty
     return false;
-  if (path == "/") // if the path is the root folder
-    return true;
   list<string> atoms = explode(path, '/');
   string reassembledPath;
   for (auto& folder : atoms) { // reassemble the exploded path
