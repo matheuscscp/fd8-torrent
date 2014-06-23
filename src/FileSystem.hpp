@@ -27,6 +27,9 @@ class FileSystem {
         uint32_t peer2;
         std::string author;
         
+        void serialize(helpers::ByteQueue& data);
+        void deserialize(helpers::ByteQueue& data);
+        
         void erase();
     };
     
@@ -41,6 +44,9 @@ class FileSystem {
         
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
         File* findFile(const std::string& subPath, Folder** parent = nullptr);
+        
+        void serialize(helpers::ByteQueue& data);
+        void deserialize(helpers::ByteQueue& data);
       private:
         Folder* findFolder_(const std::string& subPath, Folder** parent);
         File* findFile_(const std::string& subPath, Folder** parent);

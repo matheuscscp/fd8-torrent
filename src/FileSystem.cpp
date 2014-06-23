@@ -19,6 +19,15 @@ FileSystem::Folder FileSystem::rootFolder;
 uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
 
+void FileSystem::File::serialize(ByteQueue& data) {
+  data.push((const void*)this, 16).push(author);
+}
+
+void FileSystem::File::deserialize(ByteQueue& data) {
+  data.pop((void*)this, 16);
+  author = data.pop<string>();
+}
+
 void FileSystem::File::erase() {
   char tmp[25];
   sprintf(tmp, "www/files/%08x", id);
@@ -64,6 +73,32 @@ FileSystem::File* FileSystem::Folder::findFile(const string& subPath, Folder** p
     return nullptr;
   }
   return findFile_(subPath, parent);
+}
+
+void FileSystem::Folder::serialize(ByteQueue& data) {
+  data.push(subfolders.size());
+  for (auto& kv : subfolders) {
+    data.push(kv.first);
+    kv.second.serialize(data);
+  }
+  data.push(files.size());
+  for (auto& kv : files) {
+    data.push(kv.first);
+    kv.second.serialize(data);
+  }
+}
+
+void FileSystem::Folder::deserialize(ByteQueue& data) {
+  size_t subf_size = data.pop<size_t>();
+  for (size_t i = 0; i < subf_size; i++) {
+    string key = data.pop<string>();
+    subfolders[key].deserialize(data);
+  }
+  size_t files_size = data.pop<size_t>();
+  for (size_t i = 0; i < files_size; i++) {
+    string key = data.pop<string>();
+    files[key].deserialize(data);
+  }
 }
 
 FileSystem::Folder* FileSystem::Folder::findFolder_(const string& subPath, Folder** parent) {
@@ -127,12 +162,12 @@ void FileSystem::init(uint32_t localIP) {//FIXME
 
 ByteQueue FileSystem::serialize() {
   ByteQueue data;
-  //TODO
+  rootFolder.serialize(data);
   return data;
 }
 
 void FileSystem::deserialize(ByteQueue& data) {
-  //TODO
+  rootFolder.deserialize(data);
 }
 
 bool FileSystem::parseName(const string& name) {
