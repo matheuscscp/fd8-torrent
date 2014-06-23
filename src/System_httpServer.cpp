@@ -125,6 +125,7 @@ void System::httpServer_dataRequest(char* cRequest) {
       client->send("0");
     } else {
       client->send("1");
+      send_createFolder(tmp);
     }
   } else if( request.find("Rfolder") != string::npos ){
     string folderPath = string(request).substr(string(request).find("=") + 1, request.size());
@@ -160,10 +161,12 @@ void System::httpServer_dataRequest(char* cRequest) {
     client->send(tableContent.c_str(), tableContent.size());
   } else if( request.find("Ufolder") != string::npos ){
   } else if( request.find("Dfolder") != string::npos ){
-    if(!FileSystem::deleteFolder(string(request).substr(string(request).find("=") + 1, request.size()))){
+    string tmp = string(request).substr(string(request).find("=") + 1, request.size());
+    if(!FileSystem::deleteFolder(tmp)){
       client->send("0");
     } else {
       client->send("1");
+      send_deleteFolder(tmp);
     }
   } else if( request.find("Cfile") != string::npos ){
   } else if( request.find("Rfile") != string::npos ){
