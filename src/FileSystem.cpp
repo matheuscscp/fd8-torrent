@@ -101,7 +101,13 @@ FileSystem::File* FileSystem::Folder::findFile_(const string& subPath, Folder** 
 void FileSystem::init(uint32_t localIP) {
   rootFolder.subfolders.clear();
   rootFolder.files.clear();
-  system("rm -rf www/files/*");
+#ifdef _WIN32
+  system("rmdir /Q /S www\files");
+  system("mkdir www\files");
+#else
+  system("rm -rf www/files");
+  system("mkdir www/files");
+#endif
   FileSystem::localIP = localIP;
   nextID = 0;
 }
