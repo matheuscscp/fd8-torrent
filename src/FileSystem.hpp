@@ -32,6 +32,7 @@ class FileSystem {
       public:
         std::map<std::string, Folder> subfolders;
         std::map<std::string, File> files;
+        uint32_t getTotalFolders();
         uint32_t getTotalFiles();
         uint64_t getTotalSize();
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
@@ -60,6 +61,7 @@ class FileSystem {
     static File* updateFile(const std::string& fullPath, const std::string& newName);
     static bool deleteFile(const std::string& fullPath);
     
+    static uint32_t getTotalFolders();
     static uint32_t getTotalFiles();
     static uint64_t getTotalSize();
     

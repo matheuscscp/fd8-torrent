@@ -19,6 +19,13 @@ FileSystem::Folder FileSystem::rootFolder;
 uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
 
+uint32_t FileSystem::Folder::getTotalFolders() {
+  uint32_t total = subfolders.size();
+  for (auto& kv : subfolders)
+    total += kv.second.getTotalFolders();
+  return total;
+}
+
 uint32_t FileSystem::Folder::getTotalFiles() {
   uint32_t total = 0;
   for (auto& kv : subfolders)
@@ -167,7 +174,6 @@ FileSystem::Folder* FileSystem::updateFolder(const string& fullPath, const strin
   newFolder->files = folder->files;
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   parent->subfolders.erase(brokenPath.second);
-  //TODO rename files in this peer
   return newFolder;
 }
 
@@ -196,6 +202,10 @@ FileSystem::File* FileSystem::updateFile(const string& fullPath, const string& n
 
 bool FileSystem::deleteFile(const string& fullPath) {
   return false;//TODO
+}
+
+uint32_t FileSystem::getTotalFolders() {
+  return rootFolder.getTotalFolders();
 }
 
 uint32_t FileSystem::getTotalFiles() {
