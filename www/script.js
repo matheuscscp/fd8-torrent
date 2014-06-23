@@ -1,5 +1,5 @@
 // variavel global para indicar a pagina que o sistema se encontra
-var page = 1;
+var currPath = '/';
 
 // Funcao para inicializar a variavel de requisicao para o servidor
 function configureBrowserRequest(xmlhttp){
@@ -98,7 +98,7 @@ function optionListUser(){
 
 function optionListFiles(){
 	requestAndPutHTML("listFiles.html", "content");
-	requestAndPutHTML("?Rlist-files", "files-list");
+	requestAndPutHTML("?RRfolder=" + currPath, "file-system-body");
 }
 
 function optionUploadFile(){
@@ -114,6 +114,47 @@ function addFileInput(){
 
 function newFolder(){
 	document.getElementById("newfolder-input").style.display = "block";
+	document.getElementById("newfolder-button").style.display = "block";
+}
+
+function addFolder(){
+	var folderPath = currPath + '' + document.getElementById("newfolder-input").value;
+	var server;
+	server = configureBrowserRequest(server);	
+	server.onreadystatechange = function() {
+		if(server.readyState == 4 && server.status == 200)
+			optionListFiles();
+	}
+	server.open("POST", "?RCfolder=" + folderPath, true);
+	server.send();
+}
+
+function retrieveFolder(folderPath){
+	currPath = folderPath;
+	requestAndPutHTML("?RRfolder=" + currPath, "file-system-body");
+}
+
+function updateFolder(){
+	var folderPath = currPath + '' + document.getElementById("newfolder-input").value;
+	var server;
+	server = configureBrowserRequest(server);	
+	server.onreadystatechange = function() {
+		if(server.readyState == 4 && server.status == 200)
+			optionListFiles();
+	}
+	server.open("POST", "?RUfolder=" + folderPath + "&new=" + newName, true);
+	server.send();
+}
+
+function deleteFolder(folderPath){
+	var server;
+	server = configureBrowserRequest(server);	
+	server.onreadystatechange = function() {
+		if(server.readyState == 4 && server.status == 200)
+			optionListFiles();
+	}
+	server.open("POST", "?RDfolder=" + folderPath, true);
+	server.send();
 }
 
 function submitFilesButtonClicked(){

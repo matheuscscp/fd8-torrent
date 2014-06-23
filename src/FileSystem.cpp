@@ -115,11 +115,11 @@ void FileSystem::init(uint32_t localIP) {
   rootFolder.subfolders.clear();
   rootFolder.files.clear();
 #ifdef _WIN32
-  system("rmdir /Q /S www\files");
-  system("mkdir www\files");
+  //system("rmdir /Q /S www\files");
+ // system("mkdir www\files");
 #else
-  system("rm -rf www/files");
-  system("mkdir www/files");
+  //system("rm -rf www/files");
+  //system("mkdir www/files");
 #endif
   FileSystem::localIP = localIP;
   nextID = 0;

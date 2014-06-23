@@ -59,11 +59,12 @@ class System {
     void stateIdle();
     
     void speak();
-    void httpServer();
     void answerRequests();
-    
     void listen();
     void detectFailure();
+
+    void httpServer();
+    void httpServer_dataRequest(char* cRequest);
 };
 
 #endif /* SYSTEM_HPP_ */

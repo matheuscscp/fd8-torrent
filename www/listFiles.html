@@ -2,6 +2,7 @@
 	<button id="upload-button" class="push-left" onclick="newFile()">Novo Arquivo</button>
 	<button id=newfolder-button" class="push-left" onclick="newFolder()">Nova Pasta</button>
 	<input class="push-left" type="text" placeholder="Nome para a pasta" id="newfolder-input">
+	<button id="newfolder-button" class="push-left" onclick="addFolder()" style="none">Criar</button>
 	<div class="search-bar push-left">
 		<img src="img/lupa.png" />
 		<input type="text" class="finder" placeholder="Buscar pasta ou arquivo..." autofocus>
@@ -18,20 +19,7 @@
 			<th></th>
 		</tr>
 	</thead>
-	<tbody>
-		<tr>
-			<td><img src="img/folder.png"/></td>
-			<td>Pasta teste</td>
-			<td>923874829 bytes</td>
-			<td>Autor 1</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td><img src="img/fileimg.png"/></td>
-			<td><a>Arquivo teste</a></td>
-			<td>9340 bytes</td>
-			<td>Autor 2</td>
-			<td><a><img src="img/download.png"/></a></td>
-		</tr>
+	<tbody id="file-system-body">
+		
 	</tbody>
 </table>
