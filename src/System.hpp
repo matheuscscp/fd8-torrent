@@ -65,6 +65,11 @@ class System {
 
     void httpServer();
     void httpServer_dataRequest(char* cRequest);
+    
+    // folder synchronization
+    void createFolder(const std::string& fullPath);
+    void updateFolder(const std::string& fullPath, const std::string& newName);
+    void deleteFolder(const std::string& fullPath);
 };
 
 #endif /* SYSTEM_HPP_ */

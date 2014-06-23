@@ -24,7 +24,7 @@ void System::answerRequests() {
   
   char request = peer->recv<char>();
   switch (request) {
-    case fd8protocol::MTYPE_GETUSERS:
+    case fd8protocol::MTYPE_GET_USERS:
       peer->send(uint32_t(users.size()));
       for (auto& kv : users) {
         peer->send(kv.first);

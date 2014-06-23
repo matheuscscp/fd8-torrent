@@ -29,7 +29,7 @@ void System::stateInit() {
     TCPConnection conn(Address(addr.ip, Address("", TCPUDP_MAIN).port));
     
     // send "get users" message
-    conn.send(char(MTYPE_GETUSERS));
+    conn.send(char(MTYPE_GET_USERS));
     
     // receive response
     uint32_t userAmount = conn.recv<uint32_t>();
