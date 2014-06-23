@@ -1,11 +1,11 @@
-<div class="utils-bar" id="user-search">
-	<div class="push-left">Local: <span id="filesystem-local">/</span></div>
-	<button class="push-left button-filesystem" onclick="previousFolder()">Nível Acima</button>
-	<button id="upload-button" class="push-left button-filesystem" onclick="newFile()">Novo Arquivo</button>
-	<button id="addfolder-button" class="push-left button-filesystem" onclick="newFolder()">Nova Pasta</button>
-	<input class="push-left" type="text" placeholder="Nome para a pasta" id="newfolder-input">
-	<button id="newfolder-button" class="push-left button-filesystem" onclick="addFolder()">Criar</button>
-	<div class="search-bar push-left">
+<div class="utils-bar" id="files-utils">
+	<div id="folder-localization" class="as-table"><strong>Local:</strong> <span id="filesystem-local">/</span></div>
+	<button class="as-table button-filesystem" onclick="previousFolder()">Nível Acima</button>
+	<button id="upload-button" class="as-table button-filesystem" onclick="newFile()">Novo Arquivo</button>
+	<button id="addfolder-button" class="as-table button-filesystem" onclick="newFolder()">Nova Pasta</button>
+	<input class="as-table" type="text" placeholder="Nome para a pasta" id="newfolder-input">
+	<button id="newfolder-button" class="as-table button-filesystem" onclick="addFolder()">Criar</button>
+	<div class="search-bar as-table">
 		<img src="img/lupa.png" />
 		<input type="text" class="finder" placeholder="Buscar pasta ou arquivo..." autofocus>
 	</div>
