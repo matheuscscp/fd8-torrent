@@ -102,7 +102,7 @@ void System::httpServer() {
 }
 
 void System::httpServer_dataRequest(char* cRequest) {
-  string request = string(cRequest).substr(string(cRequest).find("?") + 2, strlen(cRequest));
+  string request = string(cRequest).substr(string(cRequest).find("?") + 1, strlen(cRequest));
 
   if (request == "host-ip"){
     client->send(localAddress.toString());
@@ -156,6 +156,7 @@ void System::httpServer_dataRequest(char* cRequest) {
       tableContent += "</td><td><a";
       tableContent += "><img src='img/download.png'/></a></td></tr>";
     }
+    client->send(tableContent.c_str(), tableContent.size());
   } else if( request.find("Ufolder") != string::npos ){
   } else if( request.find("Dfolder") != string::npos ){
     if(!FileSystem::deleteFolder(string(request).substr(string(request).find("=") + 1, request.size()))){

@@ -29,7 +29,7 @@ function getHostIP(){
 		}
 	}
 	
-	client.open("POST", "?Rhost-ip", true);
+	client.open("POST", "?host-ip", true);
 	client.send();
 }
 
@@ -37,7 +37,7 @@ function getHostIP(){
 function getNumberOfHosts(){ 
 	var client;
 	client = configureBrowserRequest(client);	
-	client.open("POST", "?Rn-hosts", true);
+	client.open("POST", "?n-hosts", true);
 	client.send();
 	
 	client.onreadystatechange = function() {
@@ -47,7 +47,7 @@ function getNumberOfHosts(){
 			document.getElementById("n-hosts").innerHTML = "-";
 	}
 	
-	client.open("POST", "?Rn-hosts", true);
+	client.open("POST", "?n-hosts", true);
 	client.send();
 }
 
@@ -55,7 +55,7 @@ function getNumberOfHosts(){
 function getServerStatus(){ 
 	var client;
 	client = configureBrowserRequest(client);	
-	client.open("POST", "?Rserver-state", true);
+	client.open("POST", "?server-state", true);
 	client.send();
 	
 	client.onreadystatechange = function() {
@@ -73,10 +73,10 @@ function refreshSideInfo(){
 	getNumberOfHosts();
 	getServerStatus();
 	if(page == 3)
-		requestAndPutHTML("?Rlist-users", "users-list");
-	requestAndPutHTML("?Rtotal-file", "total-files");
-	requestAndPutHTML("?Rtotal-folder", "total-folders");
-	requestAndPutHTML("?Rtotal-size", "total-size");
+		requestAndPutHTML("?list-users", "users-list");
+	requestAndPutHTML("?total-file", "total-files");
+	requestAndPutHTML("?total-folder", "total-folders");
+	requestAndPutHTML("?total-size", "total-size");
 }
 
 function requestAndPutHTML(command, areaId){
@@ -93,12 +93,12 @@ function requestAndPutHTML(command, areaId){
 
 function optionListUser(){
 	requestAndPutHTML("listUsers.html", "content");
-	requestAndPutHTML("?Rlist-users", "users-list");
+	requestAndPutHTML("?list-users", "users-list");
 }
 
 function optionListFiles(){
 	requestAndPutHTML("listFiles.html", "content");
-	requestAndPutHTML("?RRfolder=" + currPath, "file-system-body");
+	requestAndPutHTML("?Rfolder=" + currPath, "file-system-body");
 }
 
 function optionUploadFile(){
@@ -125,13 +125,13 @@ function addFolder(){
 		if(server.readyState == 4 && server.status == 200)
 			optionListFiles();
 	}
-	server.open("POST", "?RCfolder=" + folderPath, true);
+	server.open("POST", "?Cfolder=" + folderPath, true);
 	server.send();
 }
 
 function retrieveFolder(folderPath){
 	currPath = folderPath;
-	requestAndPutHTML("?RRfolder=" + currPath, "file-system-body");
+	requestAndPutHTML("?Rfolder=" + currPath, "file-system-body");
 }
 
 function updateFolder(){
@@ -142,7 +142,7 @@ function updateFolder(){
 		if(server.readyState == 4 && server.status == 200)
 			optionListFiles();
 	}
-	server.open("POST", "?RUfolder=" + folderPath + "&new=" + newName, true);
+	server.open("POST", "?Ufolder=" + folderPath + "&new=" + newName, true);
 	server.send();
 }
 
@@ -153,7 +153,7 @@ function deleteFolder(folderPath){
 		if(server.readyState == 4 && server.status == 200)
 			optionListFiles();
 	}
-	server.open("POST", "?RDfolder=" + folderPath, true);
+	server.open("POST", "?Dfolder=" + folderPath, true);
 	server.send();
 }
 
