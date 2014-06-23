@@ -88,6 +88,7 @@ function requestAndPutHTML(command, areaId){
 	server.onreadystatechange = function() {
 		if(server.readyState == 4 && server.status == 200){
 			document.getElementById(areaId).innerHTML = server.responseText;
+			document.getElementById("filesystem-local").innerHTML = currPath;
 		}
 	}
 	server.open("POST", command, true);
@@ -124,7 +125,7 @@ function previousFolder(){
 		if (currPath[i] == "/")
 			break;
 	}
-	currPath = currPath.substring(0, i + 1);
+	currPath = currPath.substring(0, i <= 0 ? i + 1 : i);
 	retrieveFolder(currPath);
 }
 
@@ -134,7 +135,11 @@ function newFolder(){
 }
 
 function addFolder(){
-	var folderPath = currPath + '/' + document.getElementById("newfolder-input").value;
+	var folderPath;
+	if(currPath == "/")
+		folderPath = currPath + document.getElementById("newfolder-input").value;
+	else
+		folderPath = currPath + "/" + document.getElementById("newfolder-input").value;
 	var server;
 	server = configureBrowserRequest(server);	
 	server.onreadystatechange = function() {
@@ -148,7 +153,6 @@ function addFolder(){
 function retrieveFolder(folderPath){
 	currPath = folderPath;
 	optionListFiles();
-	document.getElementById("filesystem-local").innerHTML = folderPath;
 }
 
 function updateFolder(){
