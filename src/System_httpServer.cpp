@@ -135,7 +135,6 @@ void System::httpServer_dataRequest(char* cRequest) {
     }
     string tableContent;
     for(auto& kv : folder->subfolders) {
-      printf("\nPASTA LOOP LOCO %s\n\n", kv.first.c_str());
       tableContent += "<tr><td><img src='img/folder.png'/></td><td><label onclick='retrieveFolder(";
       tableContent += folderPath + kv.first;
       tableContent += ")'>";
