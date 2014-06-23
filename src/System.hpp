@@ -59,7 +59,7 @@ class System {
     void stateIdle();
     
     void speak();
-    void answerRequests();
+    void executeProtocol();
     void listen();
     void detectFailure();
 
@@ -67,9 +67,12 @@ class System {
     void httpServer_dataRequest(char* cRequest);
     
     // folder synchronization
-    void createFolder(const std::string& fullPath);
-    void updateFolder(const std::string& fullPath, const std::string& newName);
-    void deleteFolder(const std::string& fullPath);
+    void send_createFolder(const std::string& fullPath);
+    void send_updateFolder(const std::string& fullPath, const std::string& newName);
+    void send_deleteFolder(const std::string& fullPath);
+    void recv_createFolder(const std::string& fullPath);
+    void recv_updateFolder(const std::string& fullPath, const std::string& newName);
+    void recv_deleteFolder(const std::string& fullPath);
 };
 
 #endif /* SYSTEM_HPP_ */

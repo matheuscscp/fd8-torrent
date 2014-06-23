@@ -28,5 +28,5 @@ void System::stateIdle() {
   listen();
   speak();
   detectFailure();
-  answerRequests();
+  executeProtocol();
 }
