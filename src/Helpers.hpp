@@ -57,6 +57,11 @@ class ByteQueue {
       buf.insert(buf.end(), (uint8_t*)&data, ((uint8_t*)&data) + sizeof(T));
       return *this;
     }
+    template <typename T> ByteQueue& push(const std::vector<T>& data) {
+      push(data.size());
+      buf.insert(buf.end(), (uint8_t*)&data[0], ((uint8_t*)&data[0]) + sizeof(T)*data.size());
+      return *this;
+    }
     
     size_t pop(void* data, size_t maxlen);
     std::string pop(size_t maxlen);
@@ -69,6 +74,13 @@ class ByteQueue {
       buf.erase(buf.begin(), buf.begin() + total);
       return data;
     }
+    template <typename T> std::vector<T> pop(size_t* size) {
+      std::vector<T> data(pop<size_t>());
+      if (size)
+        *size = data.size();
+      pop((void*)&data[0], sizeof(T)*data.size());
+      return data;
+    }
 };
 
 template <> inline ByteQueue& ByteQueue::push<std::string>(std::string data) {
@@ -77,11 +89,27 @@ template <> inline ByteQueue& ByteQueue::push<std::string>(std::string data) {
   return *this;
 }
 
+template <> inline ByteQueue& ByteQueue::push<std::string>(const std::vector<std::string>& data) {
+  push(data.size());
+  for (auto& str : data)
+    push(str);
+  return *this;
+}
+
 template <> inline std::string ByteQueue::pop<std::string>() {
   std::string data;
   char c;
   while ((c = pop<char>()) != '\0')
     data += c;
+  return data;
+}
+
+template <> inline std::vector<std::string> ByteQueue::pop<std::string>(size_t* size) {
+  std::vector<std::string> data(pop<size_t>());
+  if (size)
+    *size = data.size();
+  for (auto& str : data)
+    str = pop<std::string>();
   return data;
 }
 

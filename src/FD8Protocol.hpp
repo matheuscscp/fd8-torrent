@@ -11,7 +11,7 @@
 namespace fd8protocol {
 
 enum {
-  MTYPE_GET_USERS = 0,
+  MTYPE_SYNC = 0,
   MTYPE_CREATE_FOLDER,
   MTYPE_UPDATE_FOLDER,
   MTYPE_DELETE_FOLDER

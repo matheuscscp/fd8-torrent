@@ -67,6 +67,11 @@ class TCPConnection : public TCPSocket {
     template <typename T> void send(T data) {
       send((const void*)&data, sizeof(T));
     }
+    template <typename T> void send(const std::vector<T>& data) {
+      helpers::ByteQueue tmp;
+      tmp.push(data);
+      send(tmp);
+    }
     
     void recv(helpers::ByteQueue& data);
     size_t recv(void* data, size_t maxlen);
@@ -74,6 +79,13 @@ class TCPConnection : public TCPSocket {
     template <typename T> T recv() {
       T data = 0;
       recv(&data, sizeof(T));
+      return data;
+    }
+    template <typename T> std::vector<T> recv(size_t* size) {
+      std::vector<T> data(recv<size_t>());
+      if (size)
+        *size = data.size();
+      recv((void*)&data[0], sizeof(T)*data.size());
       return data;
     }
 };
@@ -87,6 +99,15 @@ template <> inline std::string TCPConnection::recv<std::string>() {
   char c;
   while ((c = recv<char>()) != '\0')
     data += c;
+  return data;
+}
+
+template <> inline std::vector<std::string> TCPConnection::recv<std::string>(size_t* size) {
+  std::vector<std::string> data(recv<size_t>());
+  if (size)
+    *size = data.size();
+  for (auto& str : data)
+    str = recv<std::string>();
   return data;
 }
 

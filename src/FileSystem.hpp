@@ -54,6 +54,9 @@ class FileSystem {
   public:
     static void init(uint32_t localIP);
     
+    static helpers::ByteQueue serialize();
+    static void deserialize(helpers::ByteQueue& data);
+    
     static bool parseName(const std::string& name);
     static bool parsePath(const std::string& path);
     

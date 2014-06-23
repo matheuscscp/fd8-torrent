@@ -20,7 +20,7 @@ uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
 
 void FileSystem::File::erase() {
-  char tmp[20];
+  char tmp[25];
   sprintf(tmp, "www/files/%08x", id);
   remove(tmp);
 }
@@ -111,7 +111,7 @@ void FileSystem::Folder::eraseFiles() {
     kv.second.erase();
 }
 
-void FileSystem::init(uint32_t localIP) {
+void FileSystem::init(uint32_t localIP) {//FIXME
   rootFolder.subfolders.clear();
   rootFolder.files.clear();
 #ifdef _WIN32
@@ -123,6 +123,16 @@ void FileSystem::init(uint32_t localIP) {
 #endif
   FileSystem::localIP = localIP;
   nextID = 0;
+}
+
+ByteQueue FileSystem::serialize() {
+  ByteQueue data;
+  //TODO
+  return data;
+}
+
+void FileSystem::deserialize(ByteQueue& data) {
+  //TODO
 }
 
 bool FileSystem::parseName(const string& name) {

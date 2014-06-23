@@ -16,6 +16,7 @@
 #include "Network.hpp"
 #include "Defines.hpp"
 #include "FD8Protocol.hpp"
+#include "FileSystem.hpp"
 
 using namespace std;
 using namespace network;
@@ -28,14 +29,20 @@ void System::stateInit() {
     // open connection with the peer
     TCPConnection conn(Address(addr.ip, Address("", TCPUDP_MAIN).port));
     
-    // send "get users" message
-    conn.send(char(MTYPE_GET_USERS));
+    conn.send(char(MTYPE_SYNC));
     
-    // receive response
+    // receive user table
     uint32_t userAmount = conn.recv<uint32_t>();
     for (uint32_t i = 0; i < userAmount; i++) {
       uint32_t ip = conn.recv<uint32_t>();
       users[ip] = User(conn.recv<string>());
+    }
+    
+    // receive file system
+    {
+      ByteQueue data(conn.recv<uint32_t>());
+      conn.recv(data);
+      FileSystem::deserialize(data);
     }
     
     changeToLogin();
