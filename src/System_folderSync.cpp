@@ -8,12 +8,18 @@
 // this
 #include "System.hpp"
 
+// local
+#include "Network.hpp"
+
 using namespace std;
 using namespace concurrency;
+using namespace network;
 
 void System::createFolder(const string& fullPath) {
   Thread([]() {
-    
+    for (auto& kv : users) {
+      
+    }
   }).start();
 }
 
