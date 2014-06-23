@@ -1,6 +1,8 @@
 <div class="utils-bar" id="user-search">
+	<div class="push-left">Local: <span id="filesystem-local">/</span></div>
+	<button class="push-left button-filesystem" onclick="previousFolder()">Nível Acima</button>
 	<button id="upload-button" class="push-left button-filesystem" onclick="newFile()">Novo Arquivo</button>
-	<button id=newfolder-button" class="push-left button-filesystem" onclick="newFolder()">Nova Pasta</button>
+	<button id="addfolder-button" class="push-left button-filesystem" onclick="newFolder()">Nova Pasta</button>
 	<input class="push-left" type="text" placeholder="Nome para a pasta" id="newfolder-input">
 	<button id="newfolder-button" class="push-left button-filesystem" onclick="addFolder()">Criar</button>
 	<div class="search-bar push-left">

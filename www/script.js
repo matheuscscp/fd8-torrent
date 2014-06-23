@@ -1,5 +1,6 @@
 // variavel global para indicar a pagina que o sistema se encontra
 var currPath = '/';
+var page = 1;
 
 // Funcao para inicializar a variavel de requisicao para o servidor
 function configureBrowserRequest(xmlhttp){
@@ -12,7 +13,7 @@ function configureBrowserRequest(xmlhttp){
 
 function init(){
 	refreshSideInfo();
-	setInterval(function(){refreshSideInfo()}, 10000);
+	setInterval(function(){refreshSideInfo()}, 3000);
 }
 
 // Funcao que pergunta ao servidor o IP do host e retorna o mesmo
@@ -23,9 +24,6 @@ function getHostIP(){
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200){
 			document.getElementById("host-ip").innerHTML = client.responseText;
-		}
-		else{
-			document.getElementById("host-ip").innerHTML = "-";
 		}
 	}
 	
@@ -41,8 +39,13 @@ function getNumberOfHosts(){
 	client.send();
 	
 	client.onreadystatechange = function() {
-		if(client.readyState == 4 && client.status == 200)
+		if(client.readyState == 4 && client.status == 200){
+			if(parseInt(client.responseText) <= 2)
+				document.getElementById("n-hosts").style.color = "#f00";
+			else
+				document.getElementById("n-hosts").style.color = "#000";
 			document.getElementById("n-hosts").innerHTML = client.responseText;
+		}
 		else
 			document.getElementById("n-hosts").innerHTML = "-";
 	}
@@ -72,10 +75,10 @@ function refreshSideInfo(){
 	getHostIP();
 	getNumberOfHosts();
 	getServerStatus();
-	if(page == 3)
+	if(page == 2)
 		requestAndPutHTML("?list-users", "users-list");
-	requestAndPutHTML("?total-file", "total-files");
-	requestAndPutHTML("?total-folder", "total-folders");
+	requestAndPutHTML("?total-files", "total-files");
+	requestAndPutHTML("?total-folders", "total-folders");
 	requestAndPutHTML("?total-size", "total-size");
 }
 
@@ -92,11 +95,13 @@ function requestAndPutHTML(command, areaId){
 }
 
 function optionListUser(){
+	page = 2;
 	requestAndPutHTML("listUsers.html", "content");
 	requestAndPutHTML("?list-users", "users-list");
 }
 
 function optionListFiles(){
+	page = 1;
 	requestAndPutHTML("listFiles.html", "content");
 	requestAndPutHTML("?Rfolder=" + currPath, "file-system-body");
 }
@@ -112,13 +117,24 @@ function addFileInput(){
 	document.getElementById("file-inputs").appendChild(plusField);
 }
 
+function previousFolder(){
+	var i;
+	if(currPath == "/") return;
+	for(i = currPath.length-1; i >= 0; i--){
+		if (currPath[i] == "/")
+			break;
+	}
+	currPath = currPath.substring(0, i + 1);
+	retrieveFolder(currPath);
+}
+
 function newFolder(){
 	document.getElementById("newfolder-input").style.display = "block";
 	document.getElementById("newfolder-button").style.display = "block";
 }
 
 function addFolder(){
-	var folderPath = currPath + '' + document.getElementById("newfolder-input").value;
+	var folderPath = currPath + '/' + document.getElementById("newfolder-input").value;
 	var server;
 	server = configureBrowserRequest(server);	
 	server.onreadystatechange = function() {
@@ -131,7 +147,8 @@ function addFolder(){
 
 function retrieveFolder(folderPath){
 	currPath = folderPath;
-	requestAndPutHTML("?Rfolder=" + currPath, "file-system-body");
+	optionListFiles();
+	document.getElementById("filesystem-local").innerHTML = folderPath;
 }
 
 function updateFolder(){

@@ -106,7 +106,7 @@ void System::httpServer_dataRequest(char* cRequest) {
 
   if (request == "host-ip"){
     client->send(localAddress.toString());
-  } else if( request == "total-file" ){
+  } else if( request == "total-files" ){
     client->send(toString(FileSystem::getTotalFiles()));
   } else if( request == "total-folders" ){
     client->send(toString(FileSystem::getTotalFolders()));
@@ -135,13 +135,15 @@ void System::httpServer_dataRequest(char* cRequest) {
     }
     string tableContent;
     for(auto& kv : folder->subfolders) {
-      tableContent += "<tr><td><img src='img/folder.png'/></td><td><label onclick='retrieveFolder(";
-      tableContent += folderPath + kv.first;
-      tableContent += ")'>";
+      tableContent += "<tr><td><img src='img/folder.png'/></td><td><label onclick='retrieveFolder(\"";
+      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
+      tableContent += "\")'>";
       tableContent += kv.first.substr(1, kv.first.size());
       tableContent += "</label></td><td>";
       tableContent += kv.second.getTotalSize();
-      tableContent += "</td><td></td><td></td></tr>";
+      tableContent += "</td><td></td><td><a onclick='deleteFolder(\"";
+      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
+      tableContent += "\")'><img src='img/delete.png'/></a></td></tr>";
     }
     for(auto& kv : folder->files){
       tableContent += "<tr><td><img src='img/folder.png'/></td><td><label onclick='retrieveFile(";

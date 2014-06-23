@@ -1,7 +1,8 @@
 ﻿function submitLogin(){
 	var username = document.getElementById('input').value;
-	var server;
+	if (username == "") return;
 	
+	var server;
 	if (window.XMLHttpRequest) // code for IE7+, Firefox, Chrome, Opera, Safari
 		server = new XMLHttpRequest();
 	else // code for IE6, IE5
