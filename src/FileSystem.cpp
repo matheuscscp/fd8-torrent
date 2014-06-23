@@ -142,7 +142,7 @@ bool FileSystem::parseName(const string& name) {
   if (!name.size()) // if the name is empty
     return false;
   for (int i = 0; i < int(name.size()); i++) { // check if all chars are allowed
-    if (allowedChars.find(name[i]) != allowedChars.end())
+    if (allowedChars.find(name[i]) == allowedChars.end())
       return false;
   }
   return true;
