@@ -196,9 +196,9 @@ button#submit:active{
 				2px 1px #007E8F, 1px 2px #00B4CC;
 }
 
-.finder{
+.finder, #newfolder-input{
 	height: 100%;
-	font-size: 18px;
+	font-size: 12pt;
 	border: none;
 	outline: 0;
 }
@@ -206,20 +206,28 @@ button#submit:active{
 .delete-button{	opacity: 0.6; cursor: pointer;}
 .delete-button:hover{ opacity: 1; }
 
-.push-left{ float:left; }
+.as-table{ 
+	float: none;
+	display: table-cell !important;
+	border-collapse: collapse;
+	vertical-align: middle;
+}
 
 /* ---------------------------------------------- */
 /* ------------- File System -------------------- */
 #newfolder-input, #newfolder-button{display: none;}
+#files-utils{ display: table; }
+#folder-localization{ padding: 0 10px; color: #fff; background: #707070}
+#filesystem-local{font: DejaVu Sans Mono, monospace;}
 
 .button-filesystem{
 	background: #46e3ff;
 	border: none;
 	padding: 7px 10px;
 	font-size: 14pt;
+	cursor: pointer;
 	color: #fff;
 }
-
 
 /* ---------------------------------------------- */
 /* --------------- TABLES ----------------------- */
