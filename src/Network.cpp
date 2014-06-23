@@ -196,7 +196,7 @@ UDPSocket::~UDPSocket() {
 #ifdef _WIN32
   closesocket(sd);
 #else
-  close(sd);
+  ::close(sd);
 #endif
 }
 
@@ -210,11 +210,11 @@ void UDPSocket::send(const Address& address, const ByteQueue& data) {
   sendto(sd, (const char*)data.ptr(), data.size(), 0, (SOCKADDR*)&servaddr, sizeof(SOCKADDR_IN));
 #else
   sockaddr_in servaddr;
-  memset(&servaddr, 0, sizeof(sockaddr_ir));
+  memset(&servaddr, 0, sizeof(sockaddr_in));
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = address.ip;
   servaddr.sin_port = address.port;
-  sendto(sd, data.ptr(), data.size(), 0, &servaddr, sizeof(sockaddr_in));
+  sendto(sd, data.ptr(), data.size(), 0, (const sockaddr*)&servaddr, sizeof(sockaddr_in));
 #endif
 }
 
@@ -290,9 +290,9 @@ void TCPConnection::send(const void* data, size_t maxlen) {
 
 void TCPConnection::send(const string& data, bool withoutNullTermination) {
   if (sd) {
-    SDLNet_TCP_Send(TCPsocket(sd), (const void*)data.c_str(), data.size());
-    if (!withoutNullTermination)
-      SDLNet_TCP_Send(TCPsocket(sd), (const void*)"\0", 1);
+    ByteQueue tmp;
+    tmp.push(data, withoutNullTermination);
+    SDLNet_TCP_Send(TCPsocket(sd), (const void*)tmp.ptr(), tmp.size());
   }
 }
 

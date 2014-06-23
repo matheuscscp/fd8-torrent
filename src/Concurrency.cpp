@@ -35,8 +35,10 @@ f(f), thread(nullptr), joined(false), terminated(new bool) {
 Thread::~Thread() {
   if (!thread)
     delete terminated;
+#ifdef _WIN32
   else if (!joined)
     SDL_DetachThread((SDL_Thread*)thread);
+#endif
 }
 
 Thread::Thread(const Thread& other) :

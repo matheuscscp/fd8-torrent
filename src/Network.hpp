@@ -79,8 +79,7 @@ class TCPConnection : public TCPSocket {
 };
 
 template <> inline void TCPConnection::send<std::string>(std::string data) {
-  send((const void*)data.c_str(), data.size());
-  send(char('\0'));
+  send(data, false);
 }
 
 template <> inline std::string TCPConnection::recv<std::string>() {
