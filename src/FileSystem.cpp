@@ -19,6 +19,12 @@ FileSystem::Folder FileSystem::rootFolder;
 uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
 
+void FileSystem::File::erase() {
+  char tmp[20];
+  sprintf(tmp, "www/files/%08x", id);
+  remove(tmp);
+}
+
 uint32_t FileSystem::Folder::getTotalFolders() {
   uint32_t total = subfolders.size();
   for (auto& kv : subfolders)
@@ -96,6 +102,13 @@ FileSystem::File* FileSystem::Folder::findFile_(const string& subPath, Folder** 
     return nullptr;
   }
   return parentFolder->second.findFile_(brokenPath.second, parent); // recursive call
+}
+
+void FileSystem::Folder::eraseFiles() {
+  for (auto& kv : subfolders)
+    kv.second.eraseFiles();
+  for (auto& kv : files)
+    kv.second.erase();
 }
 
 void FileSystem::init(uint32_t localIP) {
@@ -188,9 +201,9 @@ bool FileSystem::deleteFolder(const string& fullPath) {
   Folder* folder = rootFolder.findFolder(fullPath, &parent);
   if (!parent || !folder) // if parent of folder doesn't exist
     return false;
+  folder->eraseFiles();
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   parent->subfolders.erase(brokenPath.second);
-  //TODO remove files in this peer
   return false;
 }
 

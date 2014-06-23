@@ -26,20 +26,26 @@ class FileSystem {
         uint32_t peer1;
         uint32_t peer2;
         std::string author;
+        
+        void erase();
     };
     
     struct Folder {
       public:
         std::map<std::string, Folder> subfolders;
         std::map<std::string, File> files;
+        
         uint32_t getTotalFolders();
         uint32_t getTotalFiles();
         uint64_t getTotalSize();
+        
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
         File* findFile(const std::string& subPath, Folder** parent = nullptr);
       private:
         Folder* findFolder_(const std::string& subPath, Folder** parent);
         File* findFile_(const std::string& subPath, Folder** parent);
+      public:
+        void eraseFiles();
     };
   private:
     static Folder rootFolder;
