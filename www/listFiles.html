@@ -1,20 +1,37 @@
-<div id="new-file" class="add-form">
-	<h2>Novo Arquivo</h2>
-	<div id="file-inputs"><input type="file" name="files[]"></div>
-
-	<button onclick="addFileInput()">+</button>
-	<button onclick="submitFilesButtonClicked()">Enviar</button>
-	<span id="form-message"></span>
+<div class="utils-bar" id="user-search">
+	<button id="upload-button" class="push-left" onclick="newFile()">Novo Arquivo</button>
+	<button id=newfolder-button" class="push-left" onclick="newFolder()">Nova Pasta</button>
+	<input class="push-left" type="text" placeholder="Nome para a pasta" id="newfolder-input">
+	<div class="search-bar push-left">
+		<img src="img/lupa.png" />
+		<input type="text" class="finder" placeholder="Buscar pasta ou arquivo..." autofocus>
+	</div>
 </div>
 
-<table class="search-bar" id="user-search">
-	<tr>
-		<td class="img-td"><img src="img/lupa.png" /></td>
-		<td><input type="text" class="finder" placeholder="Buscar pasta ou arquivo..." autofocus></td>
-	</tr>
-	<tr>
-		<td>Pasta Teste</td>
-	</tr>
+<table class="file-explorer table" id="file-system">
+	<thead>
+		<tr>
+			<th></th>
+			<th>Nome</th>
+			<th>Tamanho</th>
+			<th>Autor</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><img src="img/folder.png"/></td>
+			<td>Pasta teste</td>
+			<td>923874829 bytes</td>
+			<td>Autor 1</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><img src="img/fileimg.png"/></td>
+			<td><a>Arquivo teste</a></td>
+			<td>9340 bytes</td>
+			<td>Autor 2</td>
+			<td><a><img src="img/download.png"/></a></td>
+		</tr>
+	</tbody>
 </table>
-
-<table class="file-explorer table">

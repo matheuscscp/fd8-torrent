@@ -74,6 +74,9 @@ function refreshSideInfo(){
 	getServerStatus();
 	if(page == 3)
 		requestAndPutHTML("?Rlist-users", "users-list");
+	requestAndPutHTML("?Rtotal-file", "total-files");
+	requestAndPutHTML("?Rtotal-folder", "total-folders");
+	requestAndPutHTML("?Rtotal-size", "total-size");
 }
 
 function requestAndPutHTML(command, areaId){
@@ -107,6 +110,10 @@ function addFileInput(){
 	plusField.setAttribute('type', 'file');
 	plusField.setAttribute('name', 'files[]');
 	document.getElementById("file-inputs").appendChild(plusField);
+}
+
+function newFolder(){
+	document.getElementById("newfolder-input").style.display = "block";
 }
 
 function submitFilesButtonClicked(){

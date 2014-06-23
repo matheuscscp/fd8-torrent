@@ -108,6 +108,13 @@ static void dataRequest(char* cRequest, const string& hostIP, map<uint32_t, User
 
   if (request == "host-ip"){
     client->send(hostIP.c_str(), hostIP.size() + 1);
+  } else if( request == "total-file" ){
+    client->send(toString(FileSystem::getTotalFiles()));
+  } else if( request == "total-folders" ){
+    client->send(toString(FileSystem::getTotalFolders()));
+  } else if( request == "total-size" ){
+    string totalFiles = toString(FileSystem::getTotalSize());
+    client->send(totalFiles);
   } else if( request == "n-hosts" ){
     char tmp[10];
     sprintf(tmp, "%d", users.size());

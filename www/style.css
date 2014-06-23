@@ -7,8 +7,15 @@ ul, ul li{ list-style: none; }
     src: url(cursiva.ttf) format("truetype");
 }
 
+#wrapper{
+	min-height: 100%;
+	overflow-x: hidden;
+	position: relative;
+}
+
 #header{
-	width: 100%;	
+	min-width: 100%;	
+	overflow: hidden;
 	background: url("img/brickwall.png") repeat;
 }
 
@@ -24,7 +31,7 @@ ul, ul li{ list-style: none; }
 	margin-left: 60px;
 }
 
-#logo img{width: 600px;}
+#logo img{width: 300px;}
 
 #group-info{
 	float: right;
@@ -35,14 +42,15 @@ ul, ul li{ list-style: none; }
 .group-member{ padding: 5px; overflow: auto;}
 .member-info{ float: left; padding: 10px 10px 10px 10px}
 .member-photo{ float: left;}
-.member-photo img{ border-radius: 100%; width: 100px;}
+.member-photo img{ border-radius: 100%; width: 60px;}
 
 #menu-principal{
-	width: 81.9%;
+	width: 100%;
 	background-color: #000;
 	color: #fff;
+	padding-left: 15%;
 	overflow: hidden;
-	padding-left: 18.1%;
+	clear: both;
 }
 
 #menu-principal ul{
@@ -74,49 +82,44 @@ ul, ul li{ list-style: none; }
 #menuop-host{ background: #00a118; }
 #menuop-presentation{ background: #F5E900; }
 
-#middle{
+#main{
+	position: relative;
+	padding-bottom: 40px;
 	overflow: auto;
+	width: 100%;
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
 }
 
 #submenu{
 	width: 15%;
-	height: 53%;
-	position: absolute;
-	padding: 25px;
 	color: white;
+	float: left;
 	background: url(img/tweed.png) repeat;
+}
+
+#content{
+	overflow-y: scroll;
+	width: 85%;
+	float: left;
 }
 
 #submenu ul{
 	list-style: none;
+	margin: 20px 15px;
 }
 
 #submenu ul li:nth-child(odd){
 	padding: 2px;
-	font-size: 28px;
+	font-size: 15pt;
 	color: #46e3ff;
 }
 
 #submenu ul li:nth-child(even){
 	padding: 5px;
-	font-size: 20px;
+	font-size: 12pt;
 }
-
-#content-wrapper{
-	position: absolute;
-	overflow: auto;
-	display: table;
-	width: 82%;
-	left: 18.1%;
-}
-
-#content-header{
-	overflow: auto;
-	font-size: 20px;
-	color: #fff;
-}
-
-#content-header-offset{ margin: 5px 0px 5px 0px }
 
 #add-button{
 	cursor: pointer;
@@ -126,22 +129,17 @@ ul, ul li{ list-style: none; }
 	padding: 3px 8px 5px 8px;
 }
 
-#content{
-	overflow-y: scroll;
-	overflow-x: hidden;
-}
-
 #footer {
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	height: 10%;
-	overflow: auto;
+	height: 40px;
+	overflow: hidden;
 	background: #000;
 	color: #fff;
 	text-align: center;
 }
-#footer-msg { padding-top: 25px; font-size: 25px; font-family: "cursiva";}
+#footer-msg { font-size: 25px; font-family: "cursiva";}
 
 /* ---------------------------------------------- */
 /** Forms                                        **/
@@ -156,7 +154,7 @@ ul, ul li{ list-style: none; }
 .add-form h2{ font-size: 18px; }
 .add-form input{ margin-right: 20px; }
 
-button{
+button#submit{
 	border: 0;
 	outline: none;
 	background: #33E7FF;
@@ -178,7 +176,7 @@ button{
 				6px 5px #007E8F, 5px 6px #00B4CC;
 }
 
-button:hover{
+button#submit:hover{
 	transform: translate(2px, 2px);
 	-webkit-transform: translate(2px, 2px);
 	-moz-transform: translate(2px, 2px);
@@ -189,7 +187,7 @@ button:hover{
 				4px 3px #007E8F, 3px 4px #00B4CC;
 }
 
-button:active{
+button#submit:active{
 	transform: translate(4px, 4px);
 	-webkit-transform: translate(4px, 4px);
 	-moz-transform: translate(4px, 4px);
@@ -208,22 +206,31 @@ button:active{
 
 .delete-button{	opacity: 0.6; cursor: pointer;}
 .delete-button:hover{ opacity: 1; }
+
+#newfolder-input{display: none;}
+
+.push-left{ float:left; }
+
+/* ---------------------------------------------- */
+/* ------------- File System -------------------- */
+.button-file{
+	background: #46e3ff;
+}
+
+
 /* ---------------------------------------------- */
 /* --------------- TABLES ----------------------- */
 
-.search-bar{
-	border-collapse: collapse;
-	width: 100%;
+.search-bar{ border-collapse: collapse;	width: 100%; }
+.img-td{ width: 2%; }
+.table{	width: 100%; border-collapse: collapse; }
+
+#file-system thead th{
+	background: #000;
+	color: #fff;
+	text-align: left;
 }
 
-.img-td{
-	width: 2%;
-}
-
-.table{
-	width: 100%;
-	border-collapse: collapse;
-}
 
 .table tr{ transition: ease all 0.5s; }
 .table tr:nth-child(odd){ background: #cccccc; }
