@@ -204,7 +204,7 @@ bool FileSystem::deleteFolder(const string& fullPath) {
   folder->eraseFiles();
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   parent->subfolders.erase(brokenPath.second);
-  return false;
+  return true;
 }
 
 FileSystem::File* FileSystem::createFile(const string& fullPath, const ByteQueue& byteQueue) {
