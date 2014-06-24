@@ -112,6 +112,9 @@ void System::stateLogin() {
 static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip) {
   string input = string(data).substr(string(data).find("?") + 1, strlen(data));
   
+  if (!input.size())
+    return 0;
+  
   for(auto& kv : users) {
     if(kv.second.name == input){
       client->send("0", 2);
