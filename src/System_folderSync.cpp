@@ -24,11 +24,9 @@ void System::send_createFolder(const string& fullPath) {
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)
         continue;
-      Thread([=]() {
-        TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
-        conn.send(char(MTYPE_CREATE_FOLDER));
-        conn.send(fullPath);
-      }).start();
+      TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
+      conn.send(char(MTYPE_CREATE_FOLDER));
+      conn.send(fullPath);
     }
   }).start();
 }
@@ -38,12 +36,10 @@ void System::send_updateFolder(const string& fullPath, const string& newName) {
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)
         continue;
-      Thread([=]() {
-        TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
-        conn.send(char(MTYPE_UPDATE_FOLDER));
-        conn.send(fullPath);
-        conn.send(newName);
-      }).start();
+      TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
+      conn.send(char(MTYPE_UPDATE_FOLDER));
+      conn.send(fullPath);
+      conn.send(newName);
     }
   }).start();
 }
@@ -53,11 +49,9 @@ void System::send_deleteFolder(const string& fullPath) {
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)
         continue;
-      Thread([=]() {
-        TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
-        conn.send(char(MTYPE_DELETE_FOLDER));
-        conn.send(fullPath);
-      }).start();
+      TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
+      conn.send(char(MTYPE_DELETE_FOLDER));
+      conn.send(fullPath);
     }
   }).start();
 }
