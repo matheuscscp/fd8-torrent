@@ -27,25 +27,41 @@ using namespace helpers;
 
 // static variables
 static TCPConnection* client = nullptr;
+static ByteQueue fileData;
+static string fileName;
+
+static void recvFile() {
+  fileData.resize(0);
+  fileName = "";
+  //TODO
+}
 
 void System::httpServer() {
   client = httpTCPServer.accept();
   if (client == nullptr)
     return;
   
-  ByteQueue data(SIZE_HTTPSERVER_MAXBUF);
-  client->recv(data);
-  char fn[100], buftmp[100];
-  sscanf((char*)data.ptr(), "%s %s", buftmp, fn);
+  string requestLine;
+  for (char c; (c = client->recv<char>()) != '\n'; requestLine += c); // receive the request line
+  for (; requestLine[0] != ' '; requestLine = requestLine.substr(1, requestLine.size())); // remove method
+  requestLine = requestLine.substr(1, requestLine.size()); // remove space after method
+  for (; requestLine[requestLine.size() - 1] != ' '; requestLine = requestLine.substr(0, requestLine.size() - 1)); // remove http version
+  requestLine = requestLine.substr(0, requestLine.size() - 1);// remove space before http version
+  if (requestLine.find("Cfile") != string::npos)
+    recvFile();
+  else { // if the request is NOT for file upload
+    fileData.resize(SIZE_HTTPSERVER_MAXBUF);
+    client->recv(fileData); // actually, this is the request body... discarding
+  }
   
-  if (string(fn).find("?") != string::npos) {
-    httpServer_dataRequest(fn);
+  if (requestLine.find("?") != string::npos) {
+    httpServer_dataRequest(requestLine);
   } else {
-    if (string(fn) == "/")
-      strcpy(fn, "/index.html");
-    FILE* fp = fopen((string("./www") + fn).c_str(), "rb");
+    if (requestLine == "/")
+    requestLine += "/index.html";
+    FILE* fp = fopen((string("./www") + requestLine).c_str(), "rb");
     if (fp) {
-      if (string(fn).find(".html") != string::npos) {
+      if (requestLine.find(".html") != string::npos) {
         const char* header = 
           "HTTP/1.1 200 OK\r\n"
           "Connection: close\r\r"
@@ -54,7 +70,7 @@ void System::httpServer() {
         ;
         client->send(header, strlen(header));
       }
-      else if (string(fn).find(".css") != string::npos) {
+      else if (requestLine.find(".css") != string::npos) {
         const char* header = 
           "HTTP/1.1 200 OK\r\n"
           "Connection: close\r\r"
@@ -63,7 +79,7 @@ void System::httpServer() {
         ;
         client->send(header, strlen(header));
       }
-      else if (string(fn).find(".js") != string::npos) {
+      else if (requestLine.find(".js") != string::npos) {
         const char* header = 
           "HTTP/1.1 200 OK\r\n"
           "Connection: close\r\r"
@@ -100,8 +116,8 @@ void System::httpServer() {
   client = nullptr;
 }
 
-void System::httpServer_dataRequest(char* cRequest) {
-  string request = string(cRequest).substr(string(cRequest).find("?") + 1, strlen(cRequest));
+void System::httpServer_dataRequest(const string& cRequest) {
+  string request = cRequest.substr(cRequest.find("?") + 1, cRequest.size());
   if (request == "host-ip"){
     client->send(localAddress.toString());
   } else if( request == "total-files" ){

@@ -62,9 +62,9 @@ class System {
     void executeProtocol();
     void listen();
     void detectFailure();
-
+    
     void httpServer();
-    void httpServer_dataRequest(char* cRequest);
+    void httpServer_dataRequest(const std::string& cRequest);
     
     // folder synchronization
     void send_createFolder(const std::string& fullPath);
