@@ -75,6 +75,18 @@ FileSystem::File* FileSystem::Folder::findFile(const string& subPath, Folder** p
   return findFile_(subPath, parent);
 }
 
+FileSystem::Folder* FileSystem::Folder::findFirstBottomUp(const string& subPath, string& foundPath) {
+  if (!parsePath(subPath)) { // if the path is invalid
+    foundPath = "";
+    return nullptr;
+  }
+  Folder* folder = findFirstBottomUp_(subPath, foundPath);
+  // removing duplicated '/'
+  if (foundPath.size() > 2 && foundPath[0] == '/' && foundPath[1] == '/')
+    foundPath = foundPath.substr(1, foundPath.size());
+  return folder;
+}
+
 void FileSystem::Folder::serialize(ByteQueue& data) {
   data.push(uint32_t(subfolders.size()));
   for (auto& kv : subfolders) {
@@ -137,6 +149,23 @@ FileSystem::File* FileSystem::Folder::findFile_(const string& subPath, Folder** 
     return nullptr;
   }
   return parentFolder->second.findFile_(brokenPath.second, parent); // recursive call
+}
+
+FileSystem::Folder* FileSystem::Folder::findFirstBottomUp_(const string& subPath, string& foundPath) {
+  pair<string, string> brokenPath = extractFirst(subPath, '/');
+  if (brokenPath.second == "") { // if subPath is a folder name
+    auto folder = subfolders.find(brokenPath.first);
+    if (folder == subfolders.end()) // if the folder was not found
+      return this;
+    foundPath += brokenPath.first;
+    return &folder->second;
+  }
+  auto parentFolder = subfolders.find(brokenPath.first);
+  if (parentFolder == subfolders.end()) // if a parent folder was not found
+    return this;
+  foundPath += brokenPath.first;
+  // recursive call
+  return parentFolder->second.findFirstBottomUp_(brokenPath.second, foundPath);
 }
 
 void FileSystem::Folder::eraseFiles() {
@@ -216,10 +245,11 @@ FileSystem::Folder* FileSystem::createFolder(const string& fullPath) {
   return &parent->subfolders[brokenPath.second];
 }
 
-FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath) {
-  if (fullPath == "/")
+FileSystem::Folder* FileSystem::retrieveFolder(const string& fullPath, string& foundPath) {
+  foundPath = "/";
+  if (fullPath == "/") // returning root folder
     return &rootFolder;
-  return rootFolder.findFolder(fullPath);
+  return rootFolder.findFirstBottomUp(fullPath, foundPath);
 }
 
 FileSystem::Folder* FileSystem::updateFolder(const string& fullPath, const string& newName) {

@@ -44,12 +44,14 @@ class FileSystem {
         
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
         File* findFile(const std::string& subPath, Folder** parent = nullptr);
+        Folder* findFirstBottomUp(const std::string& subPath, std::string& foundPath);
         
         void serialize(helpers::ByteQueue& data);
         void deserialize(helpers::ByteQueue& data);
       private:
         Folder* findFolder_(const std::string& subPath, Folder** parent);
         File* findFile_(const std::string& subPath, Folder** parent);
+        Folder* findFirstBottomUp_(const std::string& subPath, std::string& foundPath);
       public:
         void eraseFiles();
     };
@@ -67,7 +69,7 @@ class FileSystem {
     static bool parsePath(const std::string& path);
     
     static Folder* createFolder(const std::string& fullPath);
-    static Folder* retrieveFolder(const std::string& fullPath);
+    static Folder* retrieveFolder(const std::string& fullPath, std::string& foundPath);
     static Folder* updateFolder(const std::string& fullPath, const std::string& newName);
     static bool deleteFolder(const std::string& fullPath);
     

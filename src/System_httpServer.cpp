@@ -129,7 +129,8 @@ void System::httpServer_dataRequest(char* cRequest) {
     }
   } else if( request.find("Rfolder") != string::npos ){
     string folderPath = string(request).substr(string(request).find("=") + 1, request.size());
-    FileSystem::Folder* folder = FileSystem::retrieveFolder(folderPath);
+    string foundPath;
+    FileSystem::Folder* folder = FileSystem::retrieveFolder(folderPath, foundPath);
     if (!folder){
       client->send("0");
       return;
