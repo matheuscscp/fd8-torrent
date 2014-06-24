@@ -208,7 +208,7 @@ button#submit:active{
 
 .as-table{ 
 	float: none;
-	display: table-cell !important;
+	display: table-cell;
 	border-collapse: collapse;
 	vertical-align: middle;
 }
@@ -227,6 +227,48 @@ button#submit:active{
 	font-size: 14pt;
 	cursor: pointer;
 	color: #fff;
+}
+
+/* ---------------------------------------------- */
+/* --------------- Pop-Up ----------------------- */
+#pop-back{
+	left: 0;
+	top: 0;
+	background: rgba(0, 0, 0, 0.5);
+	width: 100%;
+	height: 100%;
+	z-index: 99;
+	float: left;
+    position: absolute;
+	display: none;
+}
+
+#pop-container{
+	float: left;
+    position: relative;
+    left: 50%;
+	top: 30%;
+}
+
+#popup{
+	border: 2px solid #46e3ff;
+	width: auto;
+	float: left;
+    position: relative;
+    left: -50%;
+	top: -30%;
+}
+
+#pop-header{
+	background: #46e3ff;
+	color: #fff;
+	font-size: 14pt;
+	padding: 2px 5px;
+}
+
+#pop-content{
+	padding: 15px;
+	background: #fff;
 }
 
 /* ---------------------------------------------- */

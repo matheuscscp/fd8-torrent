@@ -148,7 +148,7 @@ void System::httpServer_dataRequest(char* cRequest) {
       tableContent += kv.first.substr(1, kv.first.size());
       tableContent += "</label></td><td>";
       tableContent += kv.second.getTotalSize();
-      tableContent += "</td><td></td><td><a onclick='deleteFolder(\"";
+      tableContent += "</td><td></td><td><a><img src='img/edit.png'/></a><a onclick='deleteFolder(\"";
       tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
       tableContent += "\")'><img src='img/delete.png'/></a></td></tr>";
     }

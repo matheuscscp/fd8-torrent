@@ -88,7 +88,8 @@ function requestAndPutHTML(command, areaId){
 	server.onreadystatechange = function() {
 		if(server.readyState == 4 && server.status == 200){
 			document.getElementById(areaId).innerHTML = server.responseText;
-			document.getElementById("filesystem-local").innerHTML = currPath;
+			if (page == 1)
+				document.getElementById("filesystem-local").innerHTML = currPath;
 		}
 	}
 	server.open("POST", command, true);
@@ -141,8 +142,8 @@ function previousFolder(){
 }
 
 function newFolder(){
-	document.getElementById("newfolder-input").style.display = "block";
-	document.getElementById("newfolder-button").style.display = "block";
+	document.getElementById("newfolder-input").style.display = "table-cell";
+	document.getElementById("newfolder-button").style.display = "table-cell";
 }
 
 function addFolder(){
