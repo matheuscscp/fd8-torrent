@@ -1,6 +1,8 @@
 // variavel global para indicar a pagina que o sistema se encontra
 var currPath = '/';
 var page = 1;
+var folderToEdit = '';
+var folderFormAction;
 
 // Funcao para inicializar a variavel de requisicao para o servidor
 function configureBrowserRequest(xmlhttp){
@@ -14,6 +16,7 @@ function configureBrowserRequest(xmlhttp){
 function init(){
 	refreshSideInfo();
 	setInterval(function(){refreshSideInfo()}, 3000);
+	optionListFiles();
 }
 
 // Funcao que pergunta ao servidor o IP do host e retorna o mesmo
@@ -119,11 +122,7 @@ function optionListFiles(){
 	requestAndPutHTML("?Rfolder=" + currPath, "file-system-body");
 }
 
-function optionUploadFile(){
-	requestAndPutHTML("uploadFile.html", "content");
-}
-
-function addFileInput(){
+function addFile(){
 	var plusField = document.createElement("input");
 	plusField.setAttribute('type', 'file');
 	plusField.setAttribute('name', 'files[]');
@@ -141,17 +140,34 @@ function previousFolder(){
 	retrieveFolder(currPath);
 }
 
+// --------------------------------------------------------------
+// ------------- FOLDER CRUD ------------------------------------
+
+function formFolderAction(){
+	if (folderFormAction == 1)
+		addFolder();
+	else if (folderFormAction == 2)
+		updateFolder();
+}
+
 function newFolder(){
-	document.getElementById("newfolder-input").style.display = "table-cell";
-	document.getElementById("newfolder-button").style.display = "table-cell";
+	var input = document.getElementById("folderform-input");
+	var button = document.getElementById("folderform-button");
+
+	folderFormAction = 1;
+	
+	button.style.display = "table-cell";
+	button.innerHTML = "Criar";
+	input.style.display = "table-cell";
+	input.placeholder = "Nome da nova pasta";
 }
 
 function addFolder(){
 	var folderPath;
 	if(currPath == "/")
-		folderPath = currPath + document.getElementById("newfolder-input").value;
+		folderPath = currPath + document.getElementById("folderform-input").value;
 	else
-		folderPath = currPath + "/" + document.getElementById("newfolder-input").value;
+		folderPath = currPath + "/" + document.getElementById("folderform-input").value;
 	var server;
 	server = configureBrowserRequest(server);	
 	server.onreadystatechange = function() {
@@ -167,15 +183,32 @@ function retrieveFolder(folderPath){
 	optionListFiles();
 }
 
+function editFolder( oldName ){
+	var input = document.getElementById("folderform-input");
+	var button = document.getElementById("folderform-button");
+	
+	folderFormAction = 2;
+	folderToEdit = oldName;
+	
+	button.style.display = "table-cell";
+	button.innerHTML = "Editar";
+	input.style.display = "table-cell";
+	input.placeholder = "Novo nome da pasta";
+}
+
 function updateFolder(){
-	var folderPath = currPath + '' + document.getElementById("newfolder-input").value;
+	if(currPath == "/")
+		folderPath = currPath + folderToEdit;
+	else
+		folderPath = currPath + "/" + folderToEdit;
+	var newName = document.getElementById("folderform-input").value;
 	var server;
 	server = configureBrowserRequest(server);	
 	server.onreadystatechange = function() {
 		if(server.readyState == 4 && server.status == 200)
 			optionListFiles();
 	}
-	server.open("POST", "?Ufolder=" + folderPath + "&new=" + newName, true);
+	server.open("POST", "?Ufolder=" + folderPath + "?&" + newName, true);
 	server.send();
 }
 
@@ -189,6 +222,9 @@ function deleteFolder(folderPath){
 	server.open("POST", "?Dfolder=" + folderPath, true);
 	server.send();
 }
+
+// --------------------------------------------------------------
+// --------------- FILE CRUD ------------------------------------
 
 function submitFilesButtonClicked(){
 	var fileSelectors = document.getElementsByName("files[]");

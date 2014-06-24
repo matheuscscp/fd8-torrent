@@ -120,7 +120,7 @@ void System::httpServer_dataRequest(char* cRequest) {
   } else if( request == "server-state" ){
     client->send("On", 3);
   } else if( request.find("Cfolder") != string::npos ){
-    string tmp = string(request).substr(string(request).find("=") + 1, request.size());
+    string tmp = request.substr(request.find("=") + 1, request.size());
     if(!FileSystem::createFolder(tmp)){
       client->send("0");
     } else {
@@ -128,12 +128,13 @@ void System::httpServer_dataRequest(char* cRequest) {
       send_createFolder(tmp);
     }
   } else if( request.find("RfolderPath") != string::npos ){
-    string folderPath = string(request).substr(string(request).find("=") + 1, request.size());
+    string folderPath = request.substr(request.find("=") + 1, request.size());
     string foundPath;
     FileSystem::retrieveFolder(folderPath, foundPath);
     client->send(foundPath, true);
   } else if( request.find("Rfolder") != string::npos ){
-    string folderPath = string(request).substr(string(request).find("=") + 1, request.size());
+
+    string folderPath = request.substr(request.find("=") + 1, request.size());
     string foundPath;
     FileSystem::Folder* folder = FileSystem::retrieveFolder(folderPath, foundPath);
     if (!folder){
@@ -148,7 +149,9 @@ void System::httpServer_dataRequest(char* cRequest) {
       tableContent += kv.first.substr(1, kv.first.size());
       tableContent += "</label></td><td>";
       tableContent += kv.second.getTotalSize();
-      tableContent += "</td><td></td><td><a><img src='img/edit.png'/></a><a onclick='deleteFolder(\"";
+      tableContent += "</td><td></td><td><a onclick='editFolder(\"";
+      tableContent += kv.first.substr(1, kv.first.size());
+      tableContent += "\")'><img src='img/edit.png'/></a><a onclick='deleteFolder(\"";
       tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
       tableContent += "\")'><img src='img/delete.png'/></a></td></tr>";
     }
@@ -165,7 +168,18 @@ void System::httpServer_dataRequest(char* cRequest) {
       tableContent += "><img src='img/download.png'/></a></td></tr>";
     }
     client->send(tableContent.c_str(), tableContent.size());
+
   } else if( request.find("Ufolder") != string::npos ){
+    string data = request.substr(request.find("=") + 1, request.size());
+    string oldPath = data.substr(0, data.find("?&"));
+    string newName = data.substr(data.find("?&") + 2, data.size());
+    printf("\n\noldPath: %s\nNew: %s\n\n", oldPath.c_str(), newName.c_str());
+    fflush(stdout);
+    if(!FileSystem::updateFolder(oldPath, newName))
+      client->send("0");
+    else
+      client->send("1");
+
   } else if( request.find("Dfolder") != string::npos ){
     string tmp = string(request).substr(string(request).find("=") + 1, request.size());
     if(!FileSystem::deleteFolder(tmp)){
@@ -174,6 +188,7 @@ void System::httpServer_dataRequest(char* cRequest) {
       client->send("1");
       send_deleteFolder(tmp);
     }
+
   } else if( request.find("Cfile") != string::npos ){
   } else if( request.find("Rfile") != string::npos ){
   } else if( request.find("Ufile") != string::npos ){

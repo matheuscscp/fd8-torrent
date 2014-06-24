@@ -196,8 +196,7 @@ button#submit:active{
 				2px 1px #007E8F, 1px 2px #00B4CC;
 }
 
-.finder, #newfolder-input{
-	height: 100%;
+.finder, #folderform-input{
 	font-size: 12pt;
 	border: none;
 	outline: 0;
@@ -215,7 +214,7 @@ button#submit:active{
 
 /* ---------------------------------------------- */
 /* ------------- File System -------------------- */
-#newfolder-input, #newfolder-button{display: none;}
+#folderform-input, #folderform-button{display: none;}
 #files-utils{ display: table; }
 #folder-localization{ padding: 0 10px; color: #fff; background: #707070}
 #filesystem-local{font: DejaVu Sans Mono, monospace;}
@@ -227,6 +226,16 @@ button#submit:active{
 	font-size: 14pt;
 	cursor: pointer;
 	color: #fff;
+	transition: ease all 0.5s;
+	outline: none;
+}
+
+.button-filesystem:active{ background: #009cb8;}
+
+.button-filesystem:hover{
+	webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+	-moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+	box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 /* ---------------------------------------------- */
@@ -283,6 +292,9 @@ button#submit:active{
 	color: #fff;
 	text-align: left;
 }
+
+#file-system tbody tr td label, #file-system tbody tr td a{ cursor: pointer }
+#file-system tbody tr td label:hover{	font-weight: bold; }
 
 .table tr{ transition: ease all 0.5s; }
 .table tr:nth-child(odd){ background: #cccccc; }
