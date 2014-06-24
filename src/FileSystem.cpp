@@ -209,7 +209,7 @@ void FileSystem::init(uint32_t localIP) {//FIXME
   //system("mkdir www/files");
 #endif
   FileSystem::localIP = localIP;
-  nextID = 0;
+  nextID = 1;
   storedFiles.clear();
 }
 
@@ -324,7 +324,15 @@ FileSystem::File* FileSystem::createFile(const string& fullPath, const ByteQueue
 }
 
 FileSystem::File* FileSystem::createFile(const string& fullPath, ByteQueue& info) {
-  return nullptr;//TODO
+  Folder* parent;
+  File* file = rootFolder.findFile(fullPath, &parent);
+  if (!parent || file) // if parent folder was not found or the file exist
+    return nullptr;
+  pair<string, string> brokenPath = extractLast(fullPath, '/');
+  file = &parent->files[brokenPath.second];
+  file->deserialize(info);
+  nextID++;
+  return file;
 }
 
 FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
