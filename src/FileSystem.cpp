@@ -113,6 +113,13 @@ void FileSystem::Folder::deserialize(ByteQueue& data) {
   }
 }
 
+void FileSystem::Folder::eraseFiles() {
+  for (auto& kv : subfolders)
+    kv.second.eraseFiles();
+  for (auto& kv : files)
+    kv.second.erase();
+}
+
 FileSystem::Folder* FileSystem::Folder::findFolder_(const string& subPath, Folder** parent) {
   pair<string, string> brokenPath = extractFirst(subPath, '/');
   if (brokenPath.second == "") { // if subPath is a folder name
@@ -166,13 +173,6 @@ FileSystem::Folder* FileSystem::Folder::findFirstBottomUp_(const string& subPath
   foundPath += brokenPath.first;
   // recursive call
   return parentFolder->second.findFirstBottomUp_(brokenPath.second, foundPath);
-}
-
-void FileSystem::Folder::eraseFiles() {
-  for (auto& kv : subfolders)
-    kv.second.eraseFiles();
-  for (auto& kv : files)
-    kv.second.erase();
 }
 
 void FileSystem::init(uint32_t localIP) {//FIXME

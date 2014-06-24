@@ -48,12 +48,12 @@ class FileSystem {
         
         void serialize(helpers::ByteQueue& data);
         void deserialize(helpers::ByteQueue& data);
+        
+        void eraseFiles();
       private:
         Folder* findFolder_(const std::string& subPath, Folder** parent);
         File* findFile_(const std::string& subPath, Folder** parent);
         Folder* findFirstBottomUp_(const std::string& subPath, std::string& foundPath);
-      public:
-        void eraseFiles();
     };
   private:
     static Folder rootFolder;
