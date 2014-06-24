@@ -16,8 +16,8 @@ using namespace concurrency;
 void System::changeToIdle() {
   state = STATE_IDLE;
   httpThread = Thread([this]() {
-    while (this->state == STATE_IDLE) {
-      this->httpServer();
+    while (state == STATE_IDLE) {
+      httpServer();
       Thread::sleep(MS_SLEEP);
     }
   });
