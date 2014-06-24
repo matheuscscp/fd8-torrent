@@ -20,7 +20,7 @@ using namespace network;
 using namespace fd8protocol;
 
 void System::send_createFolder(const string& fullPath) {
-  Thread([&]() {
+  Thread([this, fullPath]() {
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)
         continue;
@@ -32,7 +32,7 @@ void System::send_createFolder(const string& fullPath) {
 }
 
 void System::send_updateFolder(const string& fullPath, const string& newName) {
-  Thread([&]() {
+  Thread([this, fullPath, newName]() {
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)
         continue;
@@ -45,7 +45,7 @@ void System::send_updateFolder(const string& fullPath, const string& newName) {
 }
 
 void System::send_deleteFolder(const string& fullPath) {
-  Thread([&]() {
+  Thread([this, fullPath]() {
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)
         continue;
