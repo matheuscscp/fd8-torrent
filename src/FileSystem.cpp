@@ -76,12 +76,12 @@ FileSystem::File* FileSystem::Folder::findFile(const string& subPath, Folder** p
 }
 
 void FileSystem::Folder::serialize(ByteQueue& data) {
-  data.push(subfolders.size());
+  data.push(uint32_t(subfolders.size()));
   for (auto& kv : subfolders) {
     data.push(kv.first);
     kv.second.serialize(data);
   }
-  data.push(files.size());
+  data.push(uint32_t(files.size()));
   for (auto& kv : files) {
     data.push(kv.first);
     kv.second.serialize(data);
@@ -89,13 +89,13 @@ void FileSystem::Folder::serialize(ByteQueue& data) {
 }
 
 void FileSystem::Folder::deserialize(ByteQueue& data) {
-  size_t subf_size = data.pop<size_t>();
-  for (size_t i = 0; i < subf_size; i++) {
+  uint32_t subf_size = data.pop<uint32_t>();
+  for (uint32_t i = 0; i < subf_size; i++) {
     string key = data.pop<string>();
     subfolders[key].deserialize(data);
   }
-  size_t files_size = data.pop<size_t>();
-  for (size_t i = 0; i < files_size; i++) {
+  uint32_t files_size = data.pop<uint32_t>();
+  for (uint32_t i = 0; i < files_size; i++) {
     string key = data.pop<string>();
     files[key].deserialize(data);
   }
