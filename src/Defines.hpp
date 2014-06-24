@@ -9,17 +9,18 @@
 #define DEFINE_HPP_
 
 // network addresses
-#define IP_MAIN               "224.69.69.69"
-#define TCPUDP_MAIN           "6969"
-#define TCP_HTTPSERVER        "8080"
+#define IP_MAIN                 "224.69.69.69"
+#define TCPUDP_MAIN             "6969"
+#define TCP_HTTPSERVER          "8080"
 
 // sizes
-#define SIZE_MULTICAST_MAXLEN 0x1000
+#define SIZE_MULTICAST_MAXLEN   0x1000
+#define SIZE_HTTPSERVER_MAXBUF  0x1000
 
 // times
-#define MS_INITTIMER          3000
-#define MS_SLEEP              20
-#define MS_DETECTFAILURE      3000
-#define MS_SPEAK              1000
+#define MS_INITTIMER            3000
+#define MS_SLEEP                20
+#define MS_DETECTFAILURE        3000
+#define MS_SPEAK                1000
 
 #endif /* DEFINE_HPP_ */

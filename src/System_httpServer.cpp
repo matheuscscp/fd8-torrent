@@ -20,9 +20,6 @@
 #include "Helpers.hpp"
 #include "FileSystem.hpp"
 
-// FIXME: esse define eh zoado, tem que tirar
-#define SIZE_HTTPSERVER_MAXBUF 0x1000
-
 using namespace std;
 using namespace concurrency;
 using namespace network;
@@ -35,16 +32,12 @@ void System::httpServer() {
   client = httpTCPServer.accept();
   if (client == nullptr)
     return;
-
+  
   ByteQueue data(SIZE_HTTPSERVER_MAXBUF);
   client->recv(data);
-  data.push(char('\0'));
-  printf("total bytes request: %d\n%s\n", data.size() - 1, (char*)data.ptr());
-  fflush(stdout);
-  
   char fn[100], buftmp[100];
   sscanf((char*)data.ptr(), "%s %s", buftmp, fn);
-
+  
   if (string(fn).find("?") != string::npos) {
     httpServer_dataRequest(fn);
   } else {
@@ -92,7 +85,13 @@ void System::httpServer() {
       fclose(fp);
     }
     else {
-      const char* msg = "<html><body>Pagina nao encontrada.</body></html>";
+      const char* msg =
+        "HTTP/1.1 200 OK\r\n"
+        "Connection: close\r\r"
+        "Content-Type: text/html\r\n"
+        "\r\n"
+        "<html><body>Pagina nao encontrada.</body></html>"
+      ;
       client->send(msg, strlen(msg) + 1);
     }
   }
@@ -103,7 +102,6 @@ void System::httpServer() {
 
 void System::httpServer_dataRequest(char* cRequest) {
   string request = string(cRequest).substr(string(cRequest).find("?") + 1, strlen(cRequest));
-
   if (request == "host-ip"){
     client->send(localAddress.toString());
   } else if( request == "total-files" ){
@@ -133,7 +131,6 @@ void System::httpServer_dataRequest(char* cRequest) {
     FileSystem::retrieveFolder(folderPath, foundPath);
     client->send(foundPath, true);
   } else if( request.find("Rfolder") != string::npos ){
-
     string folderPath = request.substr(request.find("=") + 1, request.size());
     string foundPath;
     FileSystem::Folder* folder = FileSystem::retrieveFolder(folderPath, foundPath);
@@ -168,18 +165,16 @@ void System::httpServer_dataRequest(char* cRequest) {
       tableContent += "><img src='img/download.png'/></a></td></tr>";
     }
     client->send(tableContent.c_str(), tableContent.size());
-
   } else if( request.find("Ufolder") != string::npos ){
     string data = request.substr(request.find("=") + 1, request.size());
     string oldPath = data.substr(0, data.find("?&"));
     string newName = data.substr(data.find("?&") + 2, data.size());
-    printf("\n\noldPath: %s\nNew: %s\n\n", oldPath.c_str(), newName.c_str());
-    fflush(stdout);
     if(!FileSystem::updateFolder(oldPath, newName))
       client->send("0");
-    else
+    else {
       client->send("1");
-
+      send_updateFolder(oldPath, newName);
+    }
   } else if( request.find("Dfolder") != string::npos ){
     string tmp = string(request).substr(string(request).find("=") + 1, request.size());
     if(!FileSystem::deleteFolder(tmp)){
@@ -188,7 +183,6 @@ void System::httpServer_dataRequest(char* cRequest) {
       client->send("1");
       send_deleteFolder(tmp);
     }
-
   } else if( request.find("Cfile") != string::npos ){
   } else if( request.find("Rfile") != string::npos ){
   } else if( request.find("Ufile") != string::npos ){
