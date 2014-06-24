@@ -10,7 +10,6 @@
 
 // standard
 #include <cstdlib>
-#include <set>
 
 using namespace std;
 using namespace helpers;
@@ -18,6 +17,7 @@ using namespace helpers;
 FileSystem::Folder FileSystem::rootFolder;
 uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
+set<uint32_t> FileSystem::storedFiles;
 
 void FileSystem::File::serialize(ByteQueue& data) {
   data.push((const void*)this, 16).push(author);
@@ -26,6 +26,27 @@ void FileSystem::File::serialize(ByteQueue& data) {
 void FileSystem::File::deserialize(ByteQueue& data) {
   data.pop((void*)this, 16);
   author = data.pop<string>();
+}
+
+ByteQueue FileSystem::File::read() {
+  ByteQueue data;
+  if (storedFiles.find(id) != storedFiles.end()) { // if the file is stored here
+    data.resize(size);
+    char tmp[25];
+    sprintf(tmp, "www/files/%08x", id);
+    FILE* fp = fopen(tmp, "rb");
+    fread(data.ptr(), size, 1, fp);
+    fclose(fp);
+  }
+  return data;
+}
+
+void FileSystem::File::write(const ByteQueue& data) {
+  char tmp[25];
+  sprintf(tmp, "www/files/%08x", id);
+  FILE* fp = fopen(tmp, "wb");
+  fwrite(data.ptr(), data.size(), 1, fp);
+  fclose(fp);
 }
 
 void FileSystem::File::erase() {
@@ -136,7 +157,8 @@ FileSystem::Folder* FileSystem::Folder::findFolder_(const string& subPath, Folde
       *parent = nullptr;
     return nullptr;
   }
-  return parentFolder->second.findFolder_(brokenPath.second, parent); // recursive call
+  // recursive call
+  return parentFolder->second.findFolder_(brokenPath.second, parent);
 }
 
 FileSystem::File* FileSystem::Folder::findFile_(const string& subPath, Folder** parent) {
@@ -155,7 +177,8 @@ FileSystem::File* FileSystem::Folder::findFile_(const string& subPath, Folder** 
       *parent = nullptr;
     return nullptr;
   }
-  return parentFolder->second.findFile_(brokenPath.second, parent); // recursive call
+  // recursive call
+  return parentFolder->second.findFile_(brokenPath.second, parent);
 }
 
 FileSystem::Folder* FileSystem::Folder::findFirstBottomUp_(const string& subPath, string& foundPath) {
@@ -187,6 +210,7 @@ void FileSystem::init(uint32_t localIP) {//FIXME
 #endif
   FileSystem::localIP = localIP;
   nextID = 0;
+  storedFiles.clear();
 }
 
 ByteQueue FileSystem::serialize() {
@@ -282,8 +306,21 @@ bool FileSystem::deleteFolder(const string& fullPath) {
   return true;
 }
 
-FileSystem::File* FileSystem::createFile(const string& fullPath, const ByteQueue& byteQueue) {
-  return nullptr;//TODO
+FileSystem::File* FileSystem::createFile(const string& fullPath, const ByteQueue& data, const string& author) {
+  Folder* parent;
+  File* file = rootFolder.findFile(fullPath, &parent);
+  if (!parent || file) // if parent folder was not found or the file exist
+    return nullptr;
+  pair<string, string> brokenPath = extractLast(fullPath, '/');
+  file = &parent->files[brokenPath.second];
+  file->id = nextID++;
+  file->size = data.size();
+  file->peer1 = localIP;
+  file->peer2 = 0;
+  file->author = author;
+  file->write(data);
+  storedFiles.insert(file->id);
+  return file;
 }
 
 FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
@@ -291,11 +328,32 @@ FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
 }
 
 FileSystem::File* FileSystem::updateFile(const string& fullPath, const string& newName) {
-  return nullptr;//TODO
+  if (!parseName(newName)) // if the new name is invalid
+    return nullptr;
+  Folder* parent;
+  File* file = rootFolder.findFile(fullPath, &parent);
+  if (!parent || !file) // if the parent folder or the file don't exist
+    return nullptr;
+  string newNameWithSlash = string("/") + newName;
+  // if the new file already exist
+  if (parent->files.find(newNameWithSlash) != parent->files.end())
+    return nullptr;
+  File* newFile = &parent->files[newNameWithSlash];
+  *newFile = *file;
+  pair<string, string> brokenPath = extractLast(fullPath, '/');
+  parent->files.erase(brokenPath.second);
+  return newFile;
 }
 
 bool FileSystem::deleteFile(const string& fullPath) {
-  return false;//TODO
+  Folder* parent;
+  File* file = rootFolder.findFile(fullPath, &parent);
+  if (!parent || !file) // if the parent folder or the file don't exist
+    return false;
+  file->erase();
+  pair<string, string> brokenPath = extractLast(fullPath, '/');
+  parent->files.erase(brokenPath.second);
+  return true;
 }
 
 uint32_t FileSystem::getTotalFolders() {
