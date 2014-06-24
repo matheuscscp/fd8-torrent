@@ -131,7 +131,7 @@ void System::httpServer_dataRequest(char* cRequest) {
     string folderPath = string(request).substr(string(request).find("=") + 1, request.size());
     string foundPath;
     FileSystem::retrieveFolder(folderPath, foundPath);
-    client->send(foundPath);
+    client->send(foundPath, true);
   } else if( request.find("Rfolder") != string::npos ){
     string folderPath = string(request).substr(string(request).find("=") + 1, request.size());
     string foundPath;
