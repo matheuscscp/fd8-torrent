@@ -323,6 +323,10 @@ FileSystem::File* FileSystem::createFile(const string& fullPath, const ByteQueue
   return file;
 }
 
+FileSystem::File* FileSystem::createFile(const string& fullPath, ByteQueue& info) {
+  return nullptr;//TODO
+}
+
 FileSystem::File* FileSystem::retrieveFile(const string& fullPath) {
   return rootFolder.findFile(fullPath);
 }

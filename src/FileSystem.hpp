@@ -79,6 +79,7 @@ class FileSystem {
     static bool deleteFolder(const std::string& fullPath);
     
     static File* createFile(const std::string& fullPath, const helpers::ByteQueue& data, const std::string& author);
+    static File* createFile(const std::string& fullPath, helpers::ByteQueue& info);
     static File* retrieveFile(const std::string& fullPath);
     static File* updateFile(const std::string& fullPath, const std::string& newName);
     static bool deleteFile(const std::string& fullPath);

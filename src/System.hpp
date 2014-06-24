@@ -78,7 +78,7 @@ class System {
     void send_createFile(const std::string& fullPath, const helpers::ByteQueue& info);
     void send_updateFile(const std::string& fullPath, const std::string& newName);
     void send_deleteFile(const std::string& fullPath);
-    void recv_createFile(const std::string& fullPath, const helpers::ByteQueue& info);
+    void recv_createFile(const std::string& fullPath, helpers::ByteQueue& info);
     void recv_updateFile(const std::string& fullPath, const std::string& newName);
     void recv_deleteFile(const std::string& fullPath);
 };

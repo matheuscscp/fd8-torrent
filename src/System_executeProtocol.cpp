@@ -56,6 +56,26 @@ void System::executeProtocol() {
       recv_deleteFolder(peer->recv<string>());
       break;
       
+    case fd8protocol::MTYPE_CREATE_FILE:
+      {
+        string fullPath = peer->recv<string>();
+        ByteQueue info(peer->recv<uint32_t>());
+        peer->recv(info);
+        recv_createFile(fullPath, info);
+      }
+      break;
+      
+    case fd8protocol::MTYPE_UPDATE_FILE:
+      {
+        string fullPath = peer->recv<string>();
+        recv_updateFile(fullPath, peer->recv<string>());
+      }
+      break;
+      
+    case fd8protocol::MTYPE_DELETE_FILE:
+      recv_deleteFile(peer->recv<string>());
+      break;
+      
     default:
       break;
   }
