@@ -84,7 +84,7 @@ function refreshSideInfo(){
 
 function requestAndPutHTML(command, areaId){
 	var server;
-	server = configureBrowserRequest(server);	
+	server = configureBrowserRequest(server);
 	server.onreadystatechange = function() {
 		if(server.readyState == 4 && server.status == 200){
 			document.getElementById(areaId).innerHTML = server.responseText;
@@ -104,6 +104,17 @@ function optionListUser(){
 function optionListFiles(){
 	page = 1;
 	requestAndPutHTML("listFiles.html", "content");
+	// get a VALID current path from server
+	{
+		var server;
+		server = configureBrowserRequest(server);
+		server.onreadystatechange = function() {
+			if(server.readyState == 4 && server.status == 200)
+				currPath = server.responseText;
+		}
+		server.open("POST", "?RfolderPath=" + currPath, false);
+		server.send();
+	}
 	requestAndPutHTML("?Rfolder=" + currPath, "file-system-body");
 }
 
