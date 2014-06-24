@@ -31,7 +31,7 @@ namespace network {
 
 void init() {
   if (SDLNet_Init()) {
-    fprintf((_iobuf*)stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
+    fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
     exit(0);
   }
 }
