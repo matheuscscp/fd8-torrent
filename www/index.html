@@ -14,7 +14,10 @@
 	<div id="pop-back">
 		<div id="pop-container">
 			<div id="popup">
-				<div id="pop-header">TITULO</div>
+				<div id="pop-header">
+					<span id="pop-header-title">TITULO</span>
+					<a id="pop-close" onclick="closePopUp()">X</a>
+				</div>
 				<div id="pop-content">OIE</div>
 			</div>
 		</div>
@@ -53,8 +56,9 @@
 		
 		<div id="menu-principal">
 			<ul>
-				<li onclick="optionListFiles()" id="menuop-user"><img src="img/file.png"/>Listagem</li>
-				<li onclick="optionListUser()" id="menuop-file"><img src="img/user.png"/>Usuários</li>
+				<li onclick="optionListFiles(this)" id="menuop-user"><img src="img/file.png"/>Listagem</li>
+				<li onclick="optionListUser(this)" id="menuop-file"><img src="img/user.png"/>Usuários</li>
+				<li onclick="logout()"><img src="img/logout.png"/>Logout</li>
 			</ul>
 		</div>
 		
@@ -62,19 +66,23 @@
 
 	<div id="main">
 		<div id="submenu">
+			<ul id="folder-info">
+				<li class="bigblue">Pasta</li>
+				<li><img src="img/folder-white.png"/> Subpastas: <span id="folder-tfiles">-</span></li>
+				<li><img src="img/file-white.png"/> Arquivos: <span id="folder-tfolders">-</span></li>
+				<li><img src="img/bytes.png"/> <span id="fold-tsize">-</span> bytes</li>
+			</ul>
+			<hr id="separator">
 			<ul>
-				<li>Seu IP</li>
-				<li id="host-ip">xxx.xxx.xxx.xxx</li>
-				<li>Hosts na Rede</li>
-				<li id="n-hosts">-</li>
-				<li>Status do par</li>
-				<li id="server-status">On</li>
-				<li>Total de Arquivos</li>
-				<li id="total-files">-</li>
-				<li>Total de Pastas</li>
-				<li id="total-folders">-</li>
-				<li>Tamanho total</li>
-				<li id="total-size">-</li>
+				<li class="bigblue">Sistema</li>
+				<li><img src="img/user.png"/> Usuários: <span id="n-hosts">-</span></li>
+				<li><img src="img/folder-white.png"/> Pastas: <span id="total-files">-</span></li>
+				<li><img src="img/file-white.png"/> Arquivos: <span id="total-folders">-</span></li>
+				<li><img src="img/bytes.png"/> <span id="total-size">-</span> bytes</li>
+				<li class="bigblue">Usuário</li>
+				<li>Nome: <span id="username"></span></li>
+				<li>IP: <span id="host-ip">xxx.xxx.xxx.xxx</span></li>
+				<li>Estado: <span id="server-status">-</span></li>
 			</ul>
 		</div>
 					

@@ -26,9 +26,6 @@ ul, ul li{ list-style: none; }
 
 #logo{
 	float: left;
-	text-align: center;
-	width: 600px;
-	margin-left: 60px;
 }
 
 #logo img{width: 300px;}
@@ -77,10 +74,13 @@ ul, ul li{ list-style: none; }
 	border-right: none;
 }
 
-#menuop-user{ background: #f00; }
-#menuop-file{ background: #00f; }
-#menuop-host{ background: #00a118; }
-#menuop-presentation{ background: #F5E900; }
+#menu-principal ul li:hover{
+	-webkit-box-shadow: inset 0 1px 4px rgba(1, 1, 1, 0.6);
+	-moz-box-shadow: inset 0 1px 4px rgba(1, 1, 1, 0.6);
+	box-shadow: inset 0 1px 4px rgba(1, 1, 1, 0.6);
+}
+#menu-principal ul li:active{ background: #ccc;}
+
 
 #main{
 	position: relative;
@@ -92,15 +92,17 @@ ul, ul li{ list-style: none; }
 	height: 100%;
 }
 
+/* =============== SUBMENU ================== */
+
 #submenu{
 	width: 15%;
 	color: white;
 	float: left;
-	background: url(img/tweed.png) repeat;
+	background: #000;
 }
 
 #content{
-	overflow-y: scroll;
+	overflow-y: auto;
 	width: 85%;
 	float: left;
 }
@@ -110,15 +112,16 @@ ul, ul li{ list-style: none; }
 	margin: 20px 15px;
 }
 
-#submenu ul li:nth-child(odd){
+#submenu ul li{ padding: 2px; font-size: 10pt;}
+#submenu ul li img{ width: 15px;}
+#submenu ul li.bigblue{
 	padding: 2px;
 	font-size: 15pt;
 	color: #46e3ff;
 }
 
-#submenu ul li:nth-child(even){
-	padding: 5px;
-	font-size: 12pt;
+#submenu #separator{
+	border-color: #46e3ff;
 }
 
 #add-button{
@@ -130,13 +133,14 @@ ul, ul li{ list-style: none; }
 }
 
 #footer {
+	background-color: #000;
+	color: #fff;
+	width: 100%;
+	height: 100%;
+	max-height: 40px;
 	position: absolute;
 	bottom: 0;
-	width: 100%;
-	height: 40px;
-	overflow: hidden;
-	background: #000;
-	color: #fff;
+	left: 0;
 	text-align: center;
 }
 #footer-msg { font-size: 25px; font-family: "cursiva";}
@@ -154,7 +158,7 @@ ul, ul li{ list-style: none; }
 .add-form h2{ font-size: 18px; }
 .add-form input{ margin-right: 20px; }
 
-button#submit{
+button.submit{
 	border: 0;
 	outline: none;
 	background: #33E7FF;
@@ -176,7 +180,7 @@ button#submit{
 				6px 5px #007E8F, 5px 6px #00B4CC;
 }
 
-button#submit:hover{
+button.submit:hover{
 	transform: translate(2px, 2px);
 	-webkit-transform: translate(2px, 2px);
 	-moz-transform: translate(2px, 2px);
@@ -187,7 +191,7 @@ button#submit:hover{
 				4px 3px #007E8F, 3px 4px #00B4CC;
 }
 
-button#submit:active{
+button.submit:active{
 	transform: translate(4px, 4px);
 	-webkit-transform: translate(4px, 4px);
 	-moz-transform: translate(4px, 4px);
@@ -233,7 +237,7 @@ button#submit:active{
 .button-filesystem:active{ background: #009cb8;}
 
 .button-filesystem:hover{
-	webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+	-webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
 	-moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
 	box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
 }
@@ -278,6 +282,17 @@ button#submit:active{
 #pop-content{
 	padding: 15px;
 	background: #fff;
+}
+
+#pop-close{
+	padding: 0 5px;
+	float: right;
+	cursor: pointer;
+}
+
+#pop-close:hover{
+	background: #fff;
+	color: #46e3ff;
 }
 
 /* ---------------------------------------------- */

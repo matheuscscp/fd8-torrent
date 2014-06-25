@@ -75,14 +75,14 @@ function getServerStatus(){
 
 // Funcao para atualizar as informacoes na barra lateral do sistema
 function refreshSideInfo(){
-	getHostIP();
-	getNumberOfHosts();
-	getServerStatus();
-	if(page == 2)
-		requestAndPutHTML("?list-users", "users-list");
-	requestAndPutHTML("?total-files", "total-files");
-	requestAndPutHTML("?total-folders", "total-folders");
-	requestAndPutHTML("?total-size", "total-size");
+	//getHostIP();
+	//getNumberOfHosts();
+	//getServerStatus();
+	//if(page == 2)
+	//	requestAndPutHTML("?list-users", "users-list");
+	//requestAndPutHTML("?total-files", "total-files");
+	//requestAndPutHTML("?total-folders", "total-folders");
+	//requestAndPutHTML("?total-size", "total-size");
 }
 
 function requestAndPutHTML(command, areaId){
@@ -226,26 +226,60 @@ function deleteFolder(folderPath){
 // --------------------------------------------------------------
 // --------------- FILE CRUD ------------------------------------
 
-function submitFilesButtonClicked(){
-	var fileSelectors = document.getElementsByName("files[]");
-	var formMsg = document.getElementById("form-message");
+function showPopUpAndPrint(html){
+	document.getElementById('pop-content').innerHTML = html;
+	document.getElementById('pop-header-title').value = "";
+	document.getElementById('pop-back').style.display = 'block';
+}
+
+function closePopUp(){
+	document.getElementById('pop-content').innerHTML = "";
+	document.getElementById('pop-back').style.display = 'none';
+}
+
+function addFile(){
+	var html = '<input id="file-input" type="file"><br>';
+	html	+= '<input id="use-other" type="checkbox"> <label>Usar este nome:</label> <input id="other-name" type="text"><br>';
+	html	+= '<button class="submit" onclick="createFile()">Enviar</button>';
+	showPopUpAndPrint(html);
+}
+
+function getExtention(fileName){
+	var extention = "";
+	var j = 0;
+	for (var i = fileName.length; fileName[i] != '.'; i--){
+		if(fileName[i])
+			extention += fileName[i];
+	}
+	if(j < 5)
+		return '.' + extention.split("").reverse().join("");
+	else
+		return "";
+}
+
+function createFile(){
+	var fileSelector = document.getElementById("file-input");
+	var fileName = fileSelector.files[0].name;
+	var extention = getExtention(fileName);
+	var checkbox = document.getElementById("use-other");
+	if(checkbox.checked){
+		fileName = document.getElementById("other-name").value + extention;
+	}
+	fileName = currPath + fileName;
+	
 	var formData = new FormData();
 	var client;
-	
 	client = configureBrowserRequest(client);
-	
-	for(var i = 0; i < fileSelectors.length; i++){
-		var fileSelector = fileSelectors[i];
-		var fileName = fileSelector.files[0].name;
-		
-		if( fileName ){	
-			formData.append("upload", fileSelector.files[0]);
-			
-			client.open("post", "/upload", true);
-			client.setRequestHeader("Content-Type", "multipart/form-data");
-			client.setRequestHeader("Tamanho", fileSelector.files[0].size);
-			client.setRequestHeader("Nome", fileName);
-			client.send(formData);
+	if( fileName ){	
+		formData.append("upload", fileSelector.files[0]);
+		client.open("post", "?Cfile=" + currPath, true);
+		client.setRequestHeader("Content-Type", "multipart/form-data");
+		client.setRequestHeader("Tamanho", fileSelector.files[0].size);
+		client.send(formData);
+		client.onreadystatechange = function() {
+			if(client.readyState == 4 && client.status == 200)
+				closePopUp();
+				optionListFiles();
 		}
 	}
 }

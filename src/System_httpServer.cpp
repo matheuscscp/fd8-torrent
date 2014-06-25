@@ -28,12 +28,31 @@ using namespace helpers;
 // static variables
 static TCPConnection* client = nullptr;
 static ByteQueue fileData;
-static string fileName;
 
 static void recvFile() {
   fileData.resize(0);
-  fileName = "";
-  //TODO
+  string tmp;
+
+  while(true){
+    tmp = "";
+    for (char c; (c = client->recv<char>()) != '\n'; tmp += c);
+    if(tmp.find("Tamanho") != string::npos){
+      fileData.resize(fromString<int>(tmp.substr(tmp.find(":") + 1, tmp.size() - 2).c_str()));
+    } else if (tmp == "\r"){
+      break;
+    }
+  }
+  while(true){
+    tmp = "";
+    for (char c; (c = client->recv<char>()) != '\n'; tmp += c);
+    if (tmp == "\r"){
+      break;
+    }
+  }
+  client->recv(fileData);
+  client->recv<char>();
+  client->recv<char>();
+  for (char c; (c = client->recv<char>()) != '\n';);
 }
 
 void System::httpServer() {
@@ -42,6 +61,7 @@ void System::httpServer() {
     return;
   
   string requestLine;
+
   for (char c; (c = client->recv<char>()) != '\n'; requestLine += c); // receive the request line
   for (; requestLine[0] != ' '; requestLine = requestLine.substr(1, requestLine.size())); // remove method
   requestLine = requestLine.substr(1, requestLine.size()); // remove space after method
@@ -122,6 +142,8 @@ void System::httpServer_dataRequest(const string& cRequest) {
     client->send(localAddress.toString());
   } else if( request == "total-files" ){
     client->send(toString(FileSystem::getTotalFiles()));
+  } else if( request == "username" ){
+    client->send(users[localAddress.ip].name);
   } else if( request == "total-folders" ){
     client->send(toString(FileSystem::getTotalFolders()));
   } else if( request == "total-size" ){
@@ -200,6 +222,12 @@ void System::httpServer_dataRequest(const string& cRequest) {
       send_deleteFolder(tmp);
     }
   } else if( request.find("Cfile") != string::npos ){
+    string fullPath = request.substr(request.find("=") + 1, request.size());
+    if(!FileSystem::createFile(fullPath, fileData, users[localAddress.ip].name)){
+      client->send("0");
+    } else {
+      client->send("1");
+    }
   } else if( request.find("Rfile") != string::npos ){
   } else if( request.find("Ufile") != string::npos ){
   } else if( request.find("Dfile") != string::npos ){
