@@ -13,7 +13,7 @@
 			
 			if(parseInt(server.response) == 0){
 				var campoMsg = document.getElementById('msg');
-				campoMsg.innerHTML = "Este usuário já existe no sistema!";
+				campoMsg.innerHTML = "Não foi possível efetuar login!";
 				campoMsg.style.color = '#f00';
 			}
 			else {

@@ -123,12 +123,12 @@ static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip) {
   
   for(auto& kv : users) {
     if(kv.second.name == input){
-      client->send("0", 2);
+      client->send(string("0"), true);
       return 0;
     }
   }
   
   users[ip] = User(input);
-  client->send("1", 2);
+  client->send(string("1"), true);
   return 1;
 }
