@@ -19,6 +19,19 @@ function init(){
 	optionListFiles();
 }
 
+function logout() {
+	var client;
+	client = configureBrowserRequest(client);	
+	client.onreadystatechange = function() {
+		if(client.readyState == 4 && client.status == 200){
+			if (parseInt(client.responseText) == 1)
+				window.location.href = "/";
+		}
+	}
+	client.open("POST", "?logout", true);
+	client.send();
+}
+
 // Funcao que pergunta ao servidor o IP do host e retorna o mesmo
 function getHostIP(){
 	var client;

@@ -63,7 +63,7 @@ bool System::running() {
 }
 
 System::System() :
-state(STATE_INIT),
+state(STATE_NONE),
 localAddress(Address::local()),
 multicastAddress(IP_MAIN, TCPUDP_MAIN),
 mainUDPSocket(multicastAddress, SIZE_MULTICAST_MAXLEN),
@@ -71,19 +71,18 @@ mainTCPServer(TCPUDP_MAIN),
 httpTCPServer(TCP_HTTPSERVER),
 httpThread([]() {})
 {
-  FileSystem::init(localAddress.ip);
-  initTimer.start();
+  changeToLogin();
 }
 
 System::~System() {
-  state = STATE_INIT;
+  state = STATE_NONE;
   httpThread.join();
 }
 
 void System::run() {
   while (started) {
     switch (state) {
-      case STATE_INIT:  stateInit();  break;
+      case STATE_NONE:                break;
       case STATE_LOGIN: stateLogin(); break;
       case STATE_IDLE:  stateIdle();  break;
     }

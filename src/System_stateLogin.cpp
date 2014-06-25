@@ -32,16 +32,22 @@ static TCPConnection* client = nullptr;
 static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip);
 
 void System::changeToLogin() {
+  users.clear();
+  FileSystem::init(localAddress.ip);
   state = STATE_LOGIN;
 }
 
 void System::stateLogin() {
+  requestSystemState();
+  
   client = httpTCPServer.accept();
   if (client == nullptr)
     return;
   
   ByteQueue data(SIZE_HTTPSERVER_MAXBUF);
   client->recv(data);
+  if (!data.size()) // for dumb requests
+    return;
   
   char fn[100], buftmp[100];
   sscanf((char*)data.ptr(), "%s %s", buftmp, fn);

@@ -17,7 +17,7 @@
 				campoMsg.style.color = '#f00';
 			}
 			else {
-				window.location.href = "/index.html";
+				window.location.href = "/";
 			}
 		}
 	}

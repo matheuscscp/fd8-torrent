@@ -25,7 +25,7 @@ class System {
     static bool initialized;
     
     enum State {
-      STATE_INIT,
+      STATE_NONE,
       STATE_LOGIN,
       STATE_IDLE
     };
@@ -37,7 +37,6 @@ class System {
     network::UDPSocket mainUDPSocket;
     network::TCPServer mainTCPServer;
     network::TCPServer httpTCPServer;
-    helpers::Timer initTimer;
     concurrency::Thread httpThread;
   public:
     static bool start();
@@ -49,8 +48,6 @@ class System {
     ~System();
     
     void run();
-    
-    void stateInit();
     
     void changeToLogin();
     void stateLogin();
@@ -65,6 +62,10 @@ class System {
     
     void httpServer();
     void httpServer_dataRequest(const std::string& cRequest);
+    
+    // initial synchronization
+    void requestSystemState();
+    void respondSystemState(network::TCPConnection* peer);
     
     // folder synchronization
     void send_createFolder(const std::string& fullPath);

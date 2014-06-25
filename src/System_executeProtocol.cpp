@@ -26,19 +26,7 @@ void System::executeProtocol() {
   char request = peer->recv<char>();
   switch (request) {
     case fd8protocol::MTYPE_SYNC:
-      // send user table
-      peer->send(uint32_t(users.size()));
-      for (auto& kv : users) {
-        peer->send(kv.first);
-        peer->send(kv.second.name);
-      }
-      
-      // send file system
-      {
-        ByteQueue data = FileSystem::serialize();
-        peer->send(uint32_t(data.size()));
-        peer->send(data);
-      }
+      respondSystemState(peer);
       break;
       
     case fd8protocol::MTYPE_CREATE_FOLDER:

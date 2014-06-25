@@ -84,7 +84,7 @@ void System::httpServer() {
     httpServer_dataRequest(requestLine);
   } else {
     if (requestLine == "/")
-    requestLine += "/index.html";
+      requestLine += "/index.html";
     FILE* fp = fopen((string("./www") + requestLine).c_str(), "rb");
     if (fp) {
       if (requestLine.find(".html") != string::npos) {
@@ -144,7 +144,10 @@ void System::httpServer() {
 
 void System::httpServer_dataRequest(const string& cRequest) {
   string request = cRequest.substr(cRequest.find("?") + 1, cRequest.size());
-  if (request == "host-ip"){
+  if (request == "logout"){
+    client->send(string("1"), true);
+    changeToLogin();
+  } else if (request == "host-ip"){
     client->send(localAddress.toString());
   } else if( request == "total-files" ){
     client->send(toString(FileSystem::getTotalFiles()));
