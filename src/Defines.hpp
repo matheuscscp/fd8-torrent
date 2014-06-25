@@ -15,7 +15,8 @@
 
 // sizes
 #define SIZE_MULTICAST_MAXLEN   0x1000
-#define SIZE_HTTPSERVER_MAXBUF  0x1000
+#define SIZE_HTTPSERVER_MAXLEN  0x1000
+#define SIZE_FILEUPLOAD_MAXLEN  0x4000
 
 // times
 #define MS_INITTIMER            3000

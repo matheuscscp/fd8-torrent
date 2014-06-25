@@ -44,7 +44,7 @@ void System::stateLogin() {
   if (client == nullptr)
     return;
   
-  ByteQueue data(SIZE_HTTPSERVER_MAXBUF);
+  ByteQueue data(SIZE_HTTPSERVER_MAXLEN);
   client->recv(data);
   if (!data.size()) // for dumb requests
     return;

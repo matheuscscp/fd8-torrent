@@ -30,14 +30,14 @@ static TCPConnection* client = nullptr;
 static ByteQueue fileData;
 
 static void recvFile() {
-  fileData.resize(0);
-  string tmp;
+  size_t fileSize;
   
+  string tmp;
   while(true){
     tmp = "";
     for (char c; (c = client->recv<char>()) != '\n'; tmp += c);
     if(tmp.find("Tamanho") != string::npos){
-      fileData.resize(fromString<int>(tmp.substr(tmp.find(":") + 1, tmp.size() - 2).c_str()));
+      fileSize = fromString<size_t>(tmp.substr(tmp.find(":") + 1, tmp.size() - 2).c_str());
     } else if (tmp == "\r"){
       break;
     }
@@ -49,7 +49,19 @@ static void recvFile() {
       break;
     }
   }
-  client->recv(fileData);
+  
+  size_t bytesRecvd = 0;
+  ByteQueue buf;
+  fileData.resize(0);
+  while (bytesRecvd < fileSize) {
+    size_t diff = fileSize - bytesRecvd;
+    buf.resize(SIZE_FILEUPLOAD_MAXLEN < diff ? SIZE_FILEUPLOAD_MAXLEN : diff);
+    client->recv(buf);
+    bytesRecvd += buf.size();
+    fileData.push(buf.ptr(), buf.size());
+  }
+  printf("Tamanho: %d\n", bytesRecvd);
+  fflush(stdout);
   client->recv<char>();
   client->recv<char>();
   for (char c; (c = client->recv<char>()) != '\n';);
@@ -76,7 +88,7 @@ void System::httpServer() {
   if (requestLine.find("Cfile") != string::npos)
     recvFile();
   else { // if the request is NOT for file upload
-    fileData.resize(SIZE_HTTPSERVER_MAXBUF);
+    fileData.resize(SIZE_HTTPSERVER_MAXLEN);
     client->recv(fileData); // actually, this is the request body... discarding
   }
   
