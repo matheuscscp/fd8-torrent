@@ -82,6 +82,9 @@ function refreshSideInfo(){
 	requestAndPutHTML("?total-folders", "total-folders");
 	requestAndPutHTML("?total-size", "total-size");
 	requestAndPutHTML("?username", "username");
+	requestAndPutHTML("?folder-tfolders=" + currPath, "folder-tfolders");
+	requestAndPutHTML("?folder-tfiles=" + currPath, "folder-tfiles");
+	requestAndPutHTML("?folder-tsize=" + currPath, "folder-tsize");
 }
 
 function requestAndPutHTML(command, areaId){

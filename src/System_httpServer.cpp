@@ -158,6 +158,21 @@ void System::httpServer_dataRequest(const string& cRequest) {
     client->send(toString(users.size()));
   } else if( request == "server-state" ){
     client->send("1");
+  } else if( request.find("folder-tfolders") != string::npos ){
+    string tmp;
+    FileSystem::Folder* folder = FileSystem::retrieveFolder(request.substr(request.find("=") + 1, request.size()), tmp);
+    if (folder)
+      client->send(toString(folder->getTotalFolders()));
+  } else if( request.find("folder-tfiles") != string::npos ){
+    string tmp;
+    FileSystem::Folder* folder = FileSystem::retrieveFolder(request.substr(request.find("=") + 1, request.size()), tmp);
+    if (folder)
+      client->send(toString(folder->getTotalFiles()));
+  } else if( request.find("folder-tsize") != string::npos ){
+    string tmp;
+    FileSystem::Folder* folder = FileSystem::retrieveFolder(request.substr(request.find("=") + 1, request.size()), tmp);
+    if (folder)
+      client->send(toString(folder->getTotalSize()));
   } else if( request.find("Cfolder") != string::npos ){
     string tmp = request.substr(request.find("=") + 1, request.size());
     if(!FileSystem::createFolder(tmp)){
