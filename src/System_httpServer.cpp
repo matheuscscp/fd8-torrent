@@ -203,7 +203,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
       tableContent += "</td><td>";
       tableContent += kv.second.author;
       tableContent += "</td><td><a onclick='editFile(\"";
-      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
+      tableContent += kv.first.substr(1, kv.first.size());
       tableContent += "\")'><img src='img/edit.png'/></a><a onclick='deleteFile(\"";
       tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
       tableContent += "\")'><img src='img/delete.png'/></a><a";

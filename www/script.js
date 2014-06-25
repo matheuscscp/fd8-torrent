@@ -140,6 +140,8 @@ function formFolderAction(){
 		addFolder();
 	else if (folderFormAction == 2)
 		updateFolder();
+	else if (folderFormAction == 3)
+		updateFile();
 }
 
 function newFolder(){
@@ -251,10 +253,9 @@ function addFile(){
 function getExtension(fileName){
 	var extension = "";
 	var i;
-	for (i = fileName.length-1; i >= 0 && fileName[i] != '.'; i--){
+	for (i = fileName.length-1; i >= 0 && fileName[i] != '.'; i--)
 		extension = fileName[i] + extension;
-	}
-	if (i < 0)
+	if (i < 0 || extension.length > 4)
 		return "";
 	return "." + extension;
 }
@@ -263,7 +264,9 @@ function createFile(){
 	var fileSelector = document.getElementById("file-input");
 	var fileName = fileSelector.files[0].name;
 	if(document.getElementById("use-other").checked){
-		fileName = document.getElementById("other-name").value + getExtension(fileName);
+		fileName = document.getElementById("other-name").value;
+		if (getExtension(fileName) == "")
+			fileName = fileName + getExtension(fileSelector.files[0].name);
 	}
 	fileName = currPath + (currPath != "/" ? "/" : "") + fileName;
 
@@ -288,6 +291,41 @@ function createFile(){
 			}
 		}
 	}
+}
+
+function editFile( oldName ){
+	var input = document.getElementById("folderform-input");
+	var button = document.getElementById("folderform-button");
+	
+	folderFormAction = 3;
+	folderToEdit = oldName;
+	
+	button.style.display = "table-cell";
+	button.innerHTML = "Editar";
+	input.style.display = "table-cell";
+	input.placeholder = "Novo nome do arquivo";
+}
+
+function updateFile(){
+	if(currPath == "/")
+		filePath = currPath + folderToEdit;
+	else
+		filePath = currPath + "/" + folderToEdit;
+	var newName = document.getElementById("folderform-input").value;
+	if (getExtension(newName) == "")
+		newName = newName + getExtension(filePath);
+	var server;
+	server = configureBrowserRequest(server);	
+	server.onreadystatechange = function() {
+		if(server.readyState == 4 && server.status == 200) {
+			if (parseInt(server.responseText) == 1)
+				optionListFiles();
+			else
+				alert('Não foi possível atualizar o nome do arquivo!');
+		}
+	}
+	server.open("POST", "?Ufile=" + filePath + "?&" + newName, true);
+	server.send();
 }
 
 function deleteFile(filePath) {
