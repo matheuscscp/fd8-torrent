@@ -206,8 +206,19 @@ void System::httpServer_dataRequest(const string& cRequest) {
       tableContent += kv.first.substr(1, kv.first.size());
       tableContent += "\")'><img src='img/edit.png'/></a><a onclick='deleteFile(\"";
       tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
-      tableContent += "\")'><img src='img/delete.png'/></a><a";
-      tableContent += "><img src='img/download.png'/></a></td></tr>";
+      tableContent += "\")'><img src='img/delete.png'/></a><a href=\"http://";
+      tableContent += Address(kv.second.peer1, Address("", TCP_HTTPSERVER).port).toString();
+      tableContent += "/?Rfile=";
+      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
+      tableContent += "\" download=\"";
+      tableContent += kv.first.substr(1, kv.first.size());
+      tableContent += "\"><img src='img/download.png'/></a><a href=\"http://";
+      tableContent += Address(kv.second.peer2, Address("", TCP_HTTPSERVER).port).toString();
+      tableContent += "/?Rfile=";
+      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
+      tableContent += "\" download=\"";
+      tableContent += kv.first.substr(1, kv.first.size());
+      tableContent += "\"><img src='img/download.png'/></a></td></tr>";
     }
     client->send(tableContent);
   } else if( request.find("Ufolder") != string::npos ){
@@ -240,7 +251,9 @@ void System::httpServer_dataRequest(const string& cRequest) {
       send_createFile(fullPath, info);
     }
   } else if( request.find("Rfile") != string::npos ){
-    //TODO
+    FileSystem::File* file = FileSystem::retrieveFile(string(request).substr(string(request).find("=") + 1, request.size()));
+    if (file)
+      client->send(file->read());
   } else if( request.find("Ufile") != string::npos ){
     string data = request.substr(request.find("=") + 1, request.size());
     string oldPath = data.substr(0, data.find("?&"));
