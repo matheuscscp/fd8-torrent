@@ -266,13 +266,13 @@ function createFile(){
 		fileName = document.getElementById("other-name").value + extention;
 	}
 	fileName = currPath + fileName;
-	
+	alert(fileName); return;
 	var formData = new FormData();
 	var client;
 	client = configureBrowserRequest(client);
 	if( fileName ){	
 		formData.append("upload", fileSelector.files[0]);
-		client.open("post", "?Cfile=" + currPath, true);
+		client.open("post", "?Cfile=" + fileName, true);
 		client.setRequestHeader("Content-Type", "multipart/form-data");
 		client.setRequestHeader("Tamanho", fileSelector.files[0].size);
 		client.send(formData);
