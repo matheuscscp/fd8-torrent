@@ -265,7 +265,7 @@ function createFile(){
 	if(checkbox.checked){
 		fileName = document.getElementById("other-name").value + extention;
 	}
-	fileName = currPath + fileName;
+	fileName = currPath + (currPath != "/" ? "/" : "") + fileName;
 
 	var formData = new FormData();
 	var client;
