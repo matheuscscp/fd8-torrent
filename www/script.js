@@ -223,7 +223,7 @@ function deleteFolder(folderPath){
 				alert('Não foi possível apagar a pasta!');
 		}
 	}
-	server.open("POST", "?Dfolder=" + folderPath, true);
+	server.open("POST", "?Dfolder=" + currPath + (currPath == "/" ? "" : "/") + folderPath, true);
 	server.send();
 }
 

@@ -32,7 +32,7 @@ static ByteQueue fileData;
 static void recvFile() {
   fileData.resize(0);
   string tmp;
-
+  
   while(true){
     tmp = "";
     for (char c; (c = client->recv<char>()) != '\n'; tmp += c);
@@ -190,7 +190,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
       tableContent += "</td><td></td><td><a onclick='editFolder(\"";
       tableContent += kv.first.substr(1, kv.first.size());
       tableContent += "\")'><img src='img/edit.png'/></a><a onclick='deleteFolder(\"";
-      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
+      tableContent += kv.first.substr(1, kv.first.size());
       tableContent += "\")'><img src='img/delete.png'/></a></td></tr>";
     }
     for(auto& kv : folder->files){
@@ -225,7 +225,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
     if(!FileSystem::deleteFolder(tmp)){
       client->send("0");
     } else {
-      client->send("1");
+      client->send(string("1"), true);
       send_deleteFolder(tmp);
     }
   } else if( request.find("Cfile") != string::npos ){
