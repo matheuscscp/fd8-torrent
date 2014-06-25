@@ -233,7 +233,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
     if(!FileSystem::createFile(fullPath, fileData, users[localAddress.ip].name)){
       client->send("0");
     } else {
-      client->send("1");
+      client->send("1", true);
     }
   } else if( request.find("Ufile") != string::npos ){
     string data = request.substr(request.find("=") + 1, request.size());

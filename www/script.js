@@ -15,7 +15,7 @@ function configureBrowserRequest(xmlhttp){
 
 function init(){
 	refreshSideInfo();
-	setInterval(function(){refreshSideInfo()}, 3000);
+	setInterval(function(){refreshSideInfo()}, 2000);
 	optionListFiles();
 }
 
@@ -49,8 +49,6 @@ function getNumberOfHosts(){
 				document.getElementById("n-hosts").style.color = "#000";
 			document.getElementById("n-hosts").innerHTML = client.responseText;
 		}
-		else
-			document.getElementById("n-hosts").innerHTML = "-";
 	}
 	
 	client.open("POST", "?n-hosts", true);
@@ -75,14 +73,15 @@ function getServerStatus(){
 
 // Funcao para atualizar as informacoes na barra lateral do sistema
 function refreshSideInfo(){
-	//getHostIP();
-	//getNumberOfHosts();
-	//getServerStatus();
-	//if(page == 2)
-	//	requestAndPutHTML("?list-users", "users-list");
-	//requestAndPutHTML("?total-files", "total-files");
-	//requestAndPutHTML("?total-folders", "total-folders");
-	//requestAndPutHTML("?total-size", "total-size");
+	getHostIP();
+	getNumberOfHosts();
+	getServerStatus();
+	if(page == 2)
+		requestAndPutHTML("?list-users", "users-list");
+	requestAndPutHTML("?total-files", "total-files");
+	requestAndPutHTML("?total-folders", "total-folders");
+	requestAndPutHTML("?total-size", "total-size");
+	requestAndPutHTML("?username", "username");
 }
 
 function requestAndPutHTML(command, areaId){
@@ -120,13 +119,6 @@ function optionListFiles(){
 		server.send();
 	}
 	requestAndPutHTML("?Rfolder=" + currPath, "file-system-body");
-}
-
-function addFile(){
-	var plusField = document.createElement("input");
-	plusField.setAttribute('type', 'file');
-	plusField.setAttribute('name', 'files[]');
-	document.getElementById("file-inputs").appendChild(plusField);
 }
 
 function previousFolder(){
@@ -241,29 +233,26 @@ function addFile(){
 	var html = '<input id="file-input" type="file"><br>';
 	html	+= '<input id="use-other" type="checkbox"> <label>Usar este nome:</label> <input id="other-name" type="text"><br>';
 	html	+= '<button class="submit" onclick="createFile()">Enviar</button>';
+	html	+= '<span id="file-upload-warning"></span>';
 	showPopUpAndPrint(html);
 }
 
-function getExtention(fileName){
-	var extention = "";
-	var j = 0;
-	for (var i = fileName.length; fileName[i] != '.'; i--){
-		if(fileName[i])
-			extention += fileName[i];
+function getExtension(fileName){
+	var extension = "";
+	var i;
+	for (i = fileName.length-1; i >= 0 && fileName[i] != '.'; i--){
+		extension = fileName[i] + extension;
 	}
-	if(j < 5)
-		return '.' + extention.split("").reverse().join("");
-	else
+	if (i < 0)
 		return "";
+	return "." + extension;
 }
 
 function createFile(){
 	var fileSelector = document.getElementById("file-input");
 	var fileName = fileSelector.files[0].name;
-	var extention = getExtention(fileName);
-	var checkbox = document.getElementById("use-other");
-	if(checkbox.checked){
-		fileName = document.getElementById("other-name").value + extention;
+	if(document.getElementById("use-other").checked){
+		fileName = document.getElementById("other-name").value + getExtension(fileName);
 	}
 	fileName = currPath + (currPath != "/" ? "/" : "") + fileName;
 
@@ -277,9 +266,17 @@ function createFile(){
 		client.setRequestHeader("Tamanho", fileSelector.files[0].size);
 		client.send(formData);
 		client.onreadystatechange = function() {
-			if(client.readyState == 4 && client.status == 200)
-				closePopUp();
-				optionListFiles();
+			if(client.readyState == 4 && client.status == 200) {
+				if (parseInt(client.responseText) == 1) {
+					closePopUp();
+					optionListFiles();
+				}
+				else {
+					msg = document.getElementById('file-upload-warning');
+					msg.innerHTML = 'Não foi possível subir o arquivo!';
+					msg.style.color = '#f00';
+				}
+			}
 		}
 	}
 }
