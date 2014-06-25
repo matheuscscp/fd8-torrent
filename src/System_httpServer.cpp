@@ -61,8 +61,9 @@ void System::httpServer() {
     return;
   
   string requestLine;
-
+  
   for (char c; (c = client->recv<char>()) != '\n'; requestLine += c); // receive the request line
+  if (!requestLine.size()) return; // for dumb requests
   for (; requestLine[0] != ' '; requestLine = requestLine.substr(1, requestLine.size())); // remove method
   requestLine = requestLine.substr(1, requestLine.size()); // remove space after method
   for (; requestLine[requestLine.size() - 1] != ' '; requestLine = requestLine.substr(0, requestLine.size() - 1)); // remove http version
