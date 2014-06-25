@@ -66,10 +66,10 @@ function getServerStatus(){
 	
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200) {
-			document.getElementById("server-status").innerHTML = "On";
+			document.getElementById("server-status").innerHTML = "Conectado";
 		}
 		else
-			document.getElementById("server-status").innerHTML = "Off";
+			document.getElementById("server-status").innerHTML = "Desconectado";
 	}
 }
 
