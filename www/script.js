@@ -266,7 +266,7 @@ function createFile(){
 		fileName = document.getElementById("other-name").value + extention;
 	}
 	fileName = currPath + fileName;
-	alert(fileName); return;
+
 	var formData = new FormData();
 	var client;
 	client = configureBrowserRequest(client);

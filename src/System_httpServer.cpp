@@ -191,7 +191,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
       tableContent += "\")'><img src='img/delete.png'/></a></td></tr>";
     }
     for(auto& kv : folder->files){
-      tableContent += "<tr><td><img src='img/folder.png'/></td><td><label onclick='retrieveFile(";
+      tableContent += "<tr><td><img src='img/fileimg.png'/></td><td><label onclick='retrieveFile(";
       tableContent += folderPath + kv.first;
       tableContent += ")'>";
       tableContent += kv.first.substr(1, kv.first.size());
@@ -199,7 +199,11 @@ void System::httpServer_dataRequest(const string& cRequest) {
       tableContent += kv.second.size;
       tableContent += "</td><td>";
       tableContent += kv.second.author;
-      tableContent += "</td><td><a";
+      tableContent += "</td><td><a onclick='editFile(\"";
+      tableContent += folderPath + kv.first;
+      tableContent += "\")'><img src='img/edit.png'/></a><a onclick='deleteFile(\"";
+      tableContent += folderPath + kv.first;
+      tableContent += "\")'><img src='img/delete.png'/></a><a";
       tableContent += "><img src='img/download.png'/></a></td></tr>";
     }
     client->send(tableContent.c_str(), tableContent.size());
@@ -230,7 +234,22 @@ void System::httpServer_dataRequest(const string& cRequest) {
     }
   } else if( request.find("Rfile") != string::npos ){
   } else if( request.find("Ufile") != string::npos ){
+    string data = request.substr(request.find("=") + 1, request.size());
+    string oldPath = data.substr(0, data.find("?&"));
+    string newName = data.substr(data.find("?&") + 2, data.size());
+    if(!FileSystem::updateFile(oldPath, newName))
+      client->send("0");
+    else {
+      client->send("1");
+      send_updateFolder(oldPath, newName);
+    }
   } else if( request.find("Dfile") != string::npos ){
+    string fullPath = string(request).substr(string(request).find("=") + 1, request.size());
+    if(!FileSystem::deleteFile(fullPath)){
+      client->send("0");
+    } else {
+      client->send("1");
+    }
   } else if( request.find("detail-file") != string::npos ){
     string fullPath = string(request).substr(string(request).find("=") + 1, request.size());
     FileSystem::File* file = FileSystem::retrieveFile(fullPath);
