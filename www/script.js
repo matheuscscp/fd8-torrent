@@ -163,8 +163,12 @@ function addFolder(){
 	var server;
 	server = configureBrowserRequest(server);	
 	server.onreadystatechange = function() {
-		if(server.readyState == 4 && server.status == 200)
-			optionListFiles();
+		if(server.readyState == 4 && server.status == 200) {
+			if (parseInt(server.responseText) == 1)
+				optionListFiles();
+			else
+				alert('Não foi possível criar a pasta!');
+		}
 	}
 	server.open("POST", "?Cfolder=" + folderPath, true);
 	server.send();
@@ -197,8 +201,12 @@ function updateFolder(){
 	var server;
 	server = configureBrowserRequest(server);	
 	server.onreadystatechange = function() {
-		if(server.readyState == 4 && server.status == 200)
-			optionListFiles();
+		if(server.readyState == 4 && server.status == 200) {
+			if (parseInt(server.responseText) == 1)
+				optionListFiles();
+			else
+				alert('Não foi possível atualizar o nome da pasta!');
+		}
 	}
 	server.open("POST", "?Ufolder=" + folderPath + "?&" + newName, true);
 	server.send();
@@ -208,8 +216,12 @@ function deleteFolder(folderPath){
 	var server;
 	server = configureBrowserRequest(server);	
 	server.onreadystatechange = function() {
-		if(server.readyState == 4 && server.status == 200)
-			optionListFiles();
+		if(server.readyState == 4 && server.status == 200) {
+			if (parseInt(server.responseText) == 1)
+				optionListFiles();
+			else
+				alert('Não foi possível apagar a pasta!');
+		}
 	}
 	server.open("POST", "?Dfolder=" + folderPath, true);
 	server.send();
@@ -218,9 +230,9 @@ function deleteFolder(folderPath){
 // --------------------------------------------------------------
 // --------------- FILE CRUD ------------------------------------
 
-function showPopUpAndPrint(html){
+function showPopUpAndPrint(html, title){
 	document.getElementById('pop-content').innerHTML = html;
-	document.getElementById('pop-header-title').value = "";
+	document.getElementById('pop-header-title').innerHTML = title;
 	document.getElementById('pop-back').style.display = 'block';
 }
 
@@ -233,8 +245,7 @@ function addFile(){
 	var html = '<input id="file-input" type="file"><br>';
 	html	+= '<input id="use-other" type="checkbox"> <label>Usar este nome:</label> <input id="other-name" type="text"><br>';
 	html	+= '<button class="submit" onclick="createFile()">Enviar</button>';
-	html	+= '<span id="file-upload-warning"></span>';
-	showPopUpAndPrint(html);
+	showPopUpAndPrint(html, 'Adicionar arquivo');
 }
 
 function getExtension(fileName){
@@ -272,11 +283,24 @@ function createFile(){
 					optionListFiles();
 				}
 				else {
-					msg = document.getElementById('file-upload-warning');
-					msg.innerHTML = 'Não foi possível subir o arquivo!';
-					msg.style.color = '#f00';
+					alert('Não foi possível subir o arquivo!');
 				}
 			}
 		}
 	}
+}
+
+function deleteFile(filePath) {
+	var server;
+	server = configureBrowserRequest(server);	
+	server.onreadystatechange = function() {
+		if(server.readyState == 4 && server.status == 200) {
+			if (parseInt(server.responseText) == 1)
+				optionListFiles();
+			else
+				alert('Não foi possível apagar o arquivo!');
+		}
+	}
+	server.open("POST", "?Dfile=" + filePath, true);
+	server.send();
 }

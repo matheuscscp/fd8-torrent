@@ -163,7 +163,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
     if(!FileSystem::createFolder(tmp)){
       client->send("0");
     } else {
-      client->send("1");
+      client->send(string("1"), true);
       send_createFolder(tmp);
     }
   } else if( request.find("RfolderPath") != string::npos ){
@@ -195,7 +195,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
     }
     for(auto& kv : folder->files){
       tableContent += "<tr><td><img src='img/fileimg.png'/></td><td><label onclick='retrieveFile(";
-      tableContent += folderPath + kv.first;
+      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
       tableContent += ")'>";
       tableContent += kv.first.substr(1, kv.first.size());
       tableContent += "</label></td><td>";
@@ -203,9 +203,9 @@ void System::httpServer_dataRequest(const string& cRequest) {
       tableContent += "</td><td>";
       tableContent += kv.second.author;
       tableContent += "</td><td><a onclick='editFile(\"";
-      tableContent += folderPath + kv.first;
+      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
       tableContent += "\")'><img src='img/edit.png'/></a><a onclick='deleteFile(\"";
-      tableContent += folderPath + kv.first;
+      tableContent += (folderPath == "/") ? kv.first : folderPath + kv.first;
       tableContent += "\")'><img src='img/delete.png'/></a><a";
       tableContent += "><img src='img/download.png'/></a></td></tr>";
     }
@@ -217,7 +217,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
     if(!FileSystem::updateFolder(oldPath, newName))
       client->send("0");
     else {
-      client->send("1");
+      client->send(string("1"), true);
       send_updateFolder(oldPath, newName);
     }
   } else if( request.find("Dfolder") != string::npos ){
@@ -230,11 +230,17 @@ void System::httpServer_dataRequest(const string& cRequest) {
     }
   } else if( request.find("Cfile") != string::npos ){
     string fullPath = request.substr(request.find("=") + 1, request.size());
-    if(!FileSystem::createFile(fullPath, fileData, users[localAddress.ip].name)){
+    FileSystem::File* file = FileSystem::createFile(fullPath, fileData, users[localAddress.ip].name);
+    if(!file){
       client->send("0");
     } else {
-      client->send("1", true);
+      client->send(string("1"), true);
+      ByteQueue info;
+      file->serialize(info);
+      send_createFile(fullPath, info);
     }
+  } else if( request.find("Rfile") != string::npos ){
+    //TODO
   } else if( request.find("Ufile") != string::npos ){
     string data = request.substr(request.find("=") + 1, request.size());
     string oldPath = data.substr(0, data.find("?&"));
@@ -242,15 +248,16 @@ void System::httpServer_dataRequest(const string& cRequest) {
     if(!FileSystem::updateFile(oldPath, newName))
       client->send("0");
     else {
-      client->send("1");
-      send_updateFolder(oldPath, newName);
+      client->send(string("1"), true);
+      send_updateFile(oldPath, newName);
     }
   } else if( request.find("Dfile") != string::npos ){
     string fullPath = string(request).substr(string(request).find("=") + 1, request.size());
     if(!FileSystem::deleteFile(fullPath)){
       client->send("0");
     } else {
-      client->send("1");
+      client->send(string("1"), true);
+      send_deleteFile(fullPath);
     }
   } else if( request == "list-users" ){
     string tableContent;
