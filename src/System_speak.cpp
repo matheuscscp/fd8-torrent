@@ -8,9 +8,6 @@
 // this
 #include "System.hpp"
 
-// standard
-#include <vector>
-
 // local
 #include "Defines.hpp"
 
