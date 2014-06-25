@@ -60,8 +60,6 @@ static void recvFile() {
     bytesRecvd += buf.size();
     fileData.push(buf.ptr(), buf.size());
   }
-  printf("Tamanho: %d\n", bytesRecvd);
-  fflush(stdout);
   client->recv<char>();
   client->recv<char>();
   for (char c; (c = client->recv<char>()) != '\n';);
