@@ -83,9 +83,8 @@ System::~System() {
 }
 
 void System::run() {
-  while (started) {
+  while (started && state != STATE_NONE) {
     switch (state) {
-      case STATE_NONE:                break;
       case STATE_LOGIN: stateLogin(); break;
       case STATE_IDLE:  stateIdle();  break;
     }
