@@ -20,7 +20,7 @@
 
 class FileSystem {
   public:
-    struct File {
+    class File {
       public:
         uint32_t id;
         uint32_t size;
@@ -36,7 +36,7 @@ class FileSystem {
         void erase();
     };
     
-    struct Folder {
+    class Folder {
       public:
         std::map<std::string, Folder> subfolders;
         std::map<std::string, File> files;

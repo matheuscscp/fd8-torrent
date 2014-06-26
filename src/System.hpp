@@ -16,13 +16,20 @@
 #include "Concurrency.hpp"
 #include "Helpers.hpp"
 #include "Network.hpp"
-#include "User.hpp"
 
 class System {
   private:
     static concurrency::Thread* thread;
     static bool started;
     static bool initialized;
+    
+    class User {
+      public:
+        std::string name;
+        helpers::Timer timer;
+        User();
+        User(const std::string& name);
+    };
     
     enum State {
       STATE_NONE,

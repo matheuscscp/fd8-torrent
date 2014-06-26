@@ -19,12 +19,13 @@ namespace concurrency {
 // class Thread;
 // =============================================================================
 
-struct ThreadInfo {
-  function<void()> f;
-  bool* terminated;
-  ThreadInfo(const function<void()>& f, bool* terminated) :
-  f(f), terminated(terminated) {}
-  ~ThreadInfo() { delete terminated; }
+class ThreadInfo {
+  public:
+    function<void()> f;
+    bool* terminated;
+    ThreadInfo(const function<void()>& f, bool* terminated) :
+    f(f), terminated(terminated) {}
+    ~ThreadInfo() { delete terminated; }
 };
 
 Thread::Thread(const function<void()>& f) :

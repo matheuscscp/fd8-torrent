@@ -20,6 +20,14 @@ Thread* System::thread = nullptr;
 bool System::started = false;
 bool System::initialized = false;
 
+System::User::User() {
+  
+}
+
+System::User::User(const string& name) : name(name) {
+  
+}
+
 bool System::start() {
   if (started | initialized)
     return false;

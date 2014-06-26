@@ -23,19 +23,20 @@ namespace network {
 void init();
 void close();
 
-struct Address {
-  uint32_t ip;
-  uint16_t port;
-  
-  Address(uint32_t ip = 0, uint16_t port = 0);
-  Address(const std::string& ip, const std::string& port = "");
-  static Address local();
-  
-  std::string toString() const;
-  static uint32_t ntohl(uint32_t ip);
-  static uint32_t htonl(uint32_t ip);
-  static uint16_t ntohs(uint16_t port);
-  static uint16_t htons(uint16_t port);
+class Address {
+  public:
+    uint32_t ip;
+    uint16_t port;
+    
+    Address(uint32_t ip = 0, uint16_t port = 0);
+    Address(const std::string& ip, const std::string& port = "");
+    static Address local();
+    
+    std::string toString() const;
+    static uint32_t ntohl(uint32_t ip);
+    static uint32_t htonl(uint32_t ip);
+    static uint16_t ntohs(uint16_t port);
+    static uint16_t htons(uint16_t port);
 };
 
 class UDPSocket {
