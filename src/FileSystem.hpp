@@ -33,8 +33,6 @@ class FileSystem {
         void serialize(helpers::ByteQueue& data);
         void deserialize(helpers::ByteQueue& data);
         
-        helpers::ByteQueue read();
-        
         void erase();
     };
     
@@ -88,8 +86,6 @@ class FileSystem {
     static uint32_t getTotalFolders();
     static uint32_t getTotalFiles();
     static uint64_t getTotalSize();
-    
-    static helpers::ByteQueue readFile(FILE* fp);
 };
 
 #endif /* FILESYSTEM_HPP_ */

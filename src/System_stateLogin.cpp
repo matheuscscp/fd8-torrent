@@ -96,7 +96,7 @@ void System::stateLogin() {
         ;
         client->send(header, strlen(header));
       }
-      client->send(FileSystem::readFile(fp));
+      client->send(fp);
       fclose(fp);
     }
     else {

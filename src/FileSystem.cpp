@@ -40,19 +40,6 @@ void FileSystem::File::deserialize(ByteQueue& data) {
   author = data.pop<string>();
 }
 
-ByteQueue FileSystem::File::read() {
-  ByteQueue data;
-  if (storedFiles.find(id) != storedFiles.end()) { // if the file is stored here
-    data.resize(size);
-    char tmp[25];
-    sprintf(tmp, "www/files/%08x", id);
-    FILE* fp = fopen(tmp, "rb");
-    fread(data.ptr(), size, 1, fp);
-    fclose(fp);
-  }
-  return data;
-}
-
 void FileSystem::File::erase() {
   char tmp[25];
   sprintf(tmp, "www/files/%08x", id);
@@ -378,13 +365,4 @@ uint32_t FileSystem::getTotalFiles() {
 
 uint64_t FileSystem::getTotalSize() {
   return rootFolder.getTotalSize();
-}
-
-ByteQueue FileSystem::readFile(FILE* fp) {
-  fseek(fp, 0, SEEK_END);
-  size_t size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-  ByteQueue data(size);
-  fread(data.ptr(), size, 1, fp);
-  return data;
 }

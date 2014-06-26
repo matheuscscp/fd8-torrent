@@ -54,7 +54,7 @@ static void recvFile() {
   FILE* fp = fopen("www/files/tmp", "wb");
   while (bytesRecvd < fileSize) {
     size_t diff = fileSize - bytesRecvd;
-    buf.resize(SIZE_FILEUPLOAD_MAXLEN < diff ? SIZE_FILEUPLOAD_MAXLEN : diff);
+    buf.resize(SIZE_FILEBUFFER_MAXLEN < diff ? SIZE_FILEBUFFER_MAXLEN : diff);
     client->recv(buf);
     bytesRecvd += buf.size();
     fwrite(buf.ptr(), buf.size(), 1, fp);
@@ -133,7 +133,7 @@ void System::httpServer() {
         ;
         client->send(header, strlen(header));
       }
-      client->send(FileSystem::readFile(fp));
+      client->send(fp);
       fclose(fp);
     }
     else {
@@ -280,8 +280,13 @@ void System::httpServer_dataRequest(const string& cRequest) {
     }
   } else if( request.find("Rfile") != string::npos ){
     FileSystem::File* file = FileSystem::retrieveFile(string(request).substr(string(request).find("=") + 1, request.size()));
-    if (file)
-      client->send(file->read());
+    if (file) {
+      char tmp[25];
+      sprintf(tmp, "www/files/%08x", file->id);
+      FILE* fp = fopen(tmp, "rb");
+      client->send(fp);
+      fclose(fp);
+    }
   } else if( request.find("Ufile") != string::npos ){
     string data = request.substr(request.find("=") + 1, request.size());
     string oldPath = data.substr(0, data.find("?&"));

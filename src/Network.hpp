@@ -12,9 +12,11 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <cstdio>
 
 // local
 #include "Helpers.hpp"
+#include "Defines.hpp"
 
 namespace network {
 
@@ -92,6 +94,11 @@ class TCPConnection : public TCPSocket {
 
 template <> inline void TCPConnection::send<std::string>(std::string data) {
   send(data, false);
+}
+
+template <> inline void TCPConnection::send<FILE*>(FILE* data) {
+  char buf[SIZE_FILEBUFFER_MAXLEN];
+  for (size_t readBytes = 0; (readBytes = fread(buf, 1, SIZE_FILEBUFFER_MAXLEN, data)) > 0; send(buf, readBytes));
 }
 
 template <> inline std::string TCPConnection::recv<std::string>() {
