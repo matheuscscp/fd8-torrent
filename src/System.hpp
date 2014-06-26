@@ -61,6 +61,9 @@ class System {
     void listen();
     void detectFailure();
     
+    void loginHttpServer();
+    void loginHttpServer_loginAttempt(const std::string& data);
+    
     void httpServer();
     void httpServer_dataRequest(const std::string& cRequest);
     
