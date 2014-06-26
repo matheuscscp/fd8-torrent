@@ -148,7 +148,8 @@ void System::httpServer() {
     }
   }
   
-  delete client;
+  if (client)
+    delete client;
   client = nullptr;
 }
 
@@ -284,8 +285,20 @@ void System::httpServer_dataRequest(const string& cRequest) {
       char tmp[25];
       sprintf(tmp, "www/files/%08x", file->id);
       FILE* fp = fopen(tmp, "rb");
-      client->send(fp);
-      fclose(fp);
+      if (!fp)
+        return;
+      TCPConnection* tmpConn = client;
+      client = nullptr;
+      Thread([fp, tmpConn, this]() {
+        char buf[SIZE_FILEBUFFER_MAXLEN];
+        for (
+          size_t readBytes;
+          (readBytes = fread(buf, 1, SIZE_FILEBUFFER_MAXLEN, fp)) > 0 && state == STATE_IDLE;
+          tmpConn->send(buf, readBytes)
+        );
+        delete tmpConn;
+        fclose(fp);
+      }).start();
     }
   } else if( request.find("Ufile") != string::npos ){
     string data = request.substr(request.find("=") + 1, request.size());
