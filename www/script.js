@@ -116,6 +116,8 @@ function requestAndPutHTML(command, areaId){
 
 function optionListUser(){
 	page = 2;
+	document.getElementById("separator").style.display = 'none';
+	document.getElementById("folder-info").style.display = 'none';
 	requestAndPutHTML("listUsers.html", "content");
 	requestAndPutHTML("?list-users", "users-list");
 }
@@ -123,6 +125,8 @@ function optionListUser(){
 function optionListFiles(){
 	page = 1;
 	requestAndPutHTML("listFiles.html", "content");
+	document.getElementById("separator").style.display = 'block';
+  document.getElementById("folder-info").style.display = 'block';
 	// get a VALID current path from server
 	{
 		var server;
