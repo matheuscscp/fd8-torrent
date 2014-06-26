@@ -10,6 +10,7 @@
 
 // local
 #include "Defines.hpp"
+#include "FileSystem.hpp"
 
 using namespace concurrency;
 
