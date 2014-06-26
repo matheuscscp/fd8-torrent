@@ -71,12 +71,16 @@ void System::httpServer() {
     return;
   
   string requestLine;
-  
   // check dumb requests
   {
     char c;
-    if (!client->recv(&c, 1)) return;
-    else requestLine += c;
+    if (!client->recv(&c, 1)) {
+      delete client;
+      client = nullptr;
+      return;
+    }
+    else
+      requestLine += c;
   }
   for (char c; (c = client->recv<char>()) != '\n'; requestLine += c); // receive the request line
   for (; requestLine[0] != ' '; requestLine = requestLine.substr(1, requestLine.size())); // remove method
@@ -85,16 +89,16 @@ void System::httpServer() {
   requestLine = requestLine.substr(0, requestLine.size() - 1);// remove space before http version
   if (requestLine.find("Cfile") != string::npos)
     recvFile();
-  else { // if the request is NOT for file upload
+  else { // discarding the rest of the request
     ByteQueue tmp(SIZE_HTTPSERVER_MAXLEN);
-    client->recv(tmp); // actually, this is the request body... discarding
+    client->recv(tmp);
   }
   
   if (requestLine.find("?") != string::npos) {
     httpServer_dataRequest(requestLine);
   } else {
-    if (requestLine == "/")
-      requestLine += "/index.html";
+    if (requestLine == "/" || requestLine == "/login.html")
+      requestLine = "/index.html";
     FILE* fp = fopen((string("./www") + requestLine).c_str(), "rb");
     if (fp) {
       if (requestLine.find(".html") != string::npos) {

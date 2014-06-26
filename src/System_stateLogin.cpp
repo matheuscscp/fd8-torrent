@@ -29,7 +29,7 @@ using namespace helpers;
 static TCPConnection* client = nullptr;
 
 // static functions
-static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip);
+static int loginAttempt(const string& data, map<uint32_t, User>& users, uint32_t ip);
 
 void System::changeToLogin() {
   users.clear();
@@ -44,23 +44,38 @@ void System::stateLogin() {
   if (client == nullptr)
     return;
   
-  ByteQueue data(SIZE_HTTPSERVER_MAXLEN);
-  client->recv(data);
-  if (!data.size()) // for dumb requests
-    return;
+  string requestLine;
+  // check dumb requests
+  {
+    char c;
+    if (!client->recv(&c, 1)) {
+      delete client;
+      client = nullptr;
+      return;
+    }
+    else
+      requestLine += c;
+  }
+  for (char c; (c = client->recv<char>()) != '\n'; requestLine += c); // receive the request line
+  for (; requestLine[0] != ' '; requestLine = requestLine.substr(1, requestLine.size())); // remove method
+  requestLine = requestLine.substr(1, requestLine.size()); // remove space after method
+  for (; requestLine[requestLine.size() - 1] != ' '; requestLine = requestLine.substr(0, requestLine.size() - 1)); // remove http version
+  requestLine = requestLine.substr(0, requestLine.size() - 1);// remove space before http version
+  { // discarding the rest of the request
+    ByteQueue tmp(SIZE_HTTPSERVER_MAXLEN);
+    client->recv(tmp);
+  }
   
-  char fn[100], buftmp[100];
-  sscanf((char*)data.ptr(), "%s %s", buftmp, fn);
-  if (fn[1] == '?') {
-    if(loginAttempt(fn, users, localAddress.ip))
+  if (requestLine.find("?") != string::npos) {
+    if(loginAttempt(requestLine, users, localAddress.ip))
       changeToIdle();
   }
   else {
-    if (string(fn) == "/")
-      strcpy(fn, "/login.html");
-    FILE* fp = fopen((string("./www") + fn).c_str(), "rb");
+    if (requestLine == "/" || requestLine == "/index.html")
+      requestLine = "/login.html";
+    FILE* fp = fopen((string("./www") + requestLine).c_str(), "rb");
     if (fp) {
-      if (string(fn).find(".html") != string::npos) {
+      if (requestLine.find(".html") != string::npos) {
         const char* header =
           "HTTP/1.1 200 OK\r\n"
           "Connection: close\r\r"
@@ -69,7 +84,7 @@ void System::stateLogin() {
         ;
         client->send(header, strlen(header));
       }
-      else if (string(fn).find(".css") != string::npos) {
+      else if (requestLine.find(".css") != string::npos) {
         const char* header =
           "HTTP/1.1 200 OK\r\n"
           "Connection: close\r\r"
@@ -78,7 +93,7 @@ void System::stateLogin() {
         ;
         client->send(header, strlen(header));
       }
-      else if (string(fn).find(".js") != string::npos) {
+      else if (requestLine.find(".js") != string::npos) {
         const char* header =
           "HTTP/1.1 200 OK\r\n"
           "Connection: close\r\r"
@@ -115,8 +130,8 @@ void System::stateLogin() {
   client = nullptr;
 }
 
-static int loginAttempt(char* data, map<uint32_t, User>& users, uint32_t ip) {
-  string input = string(data).substr(string(data).find("?") + 1, strlen(data));
+static int loginAttempt(const string& data, map<uint32_t, User>& users, uint32_t ip) {
+  string input = data.substr(data.find("?") + 1, data.size());
   
   if (!input.size())
     return 0;
