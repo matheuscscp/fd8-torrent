@@ -24,8 +24,10 @@ FileSystem::File::File() : id(nextID++), size(0), peer1(localIP), peer2(0) {
   sprintf(tmp, "www/files/%08x", id);
   rename("www/files/tmp", tmp);
   FILE* fp = fopen(tmp, "rb");
-  fseek(fp, 0, SEEK_END);
-  size = ftell(fp);
+  if (fp) {
+    fseek(fp, 0, SEEK_END);
+    size = ftell(fp);
+  }
   fclose(fp);
 }
 
@@ -311,8 +313,10 @@ bool FileSystem::deleteFolder(const string& fullPath) {
 FileSystem::File* FileSystem::createFile(const string& fullPath, const string& author) {
   Folder* parent;
   File* file = rootFolder.findFile(fullPath, &parent);
-  if (!parent || file) // if parent folder was not found or the file exist
+  if (!parent || file) { // if parent folder was not found or the file exist
+    remove("www/files/tmp");
     return nullptr;
+  }
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   file = &parent->files[brokenPath.second];
   file->author = author;
@@ -323,14 +327,11 @@ FileSystem::File* FileSystem::createFile(const string& fullPath, const string& a
 FileSystem::File* FileSystem::createFile(const string& fullPath, ByteQueue& info) {
   Folder* parent;
   File* file = rootFolder.findFile(fullPath, &parent);
-  if (!parent || file) { // if parent folder was not found or the file exist
-    remove("www/files/tmp");
+  if (!parent || file) // if parent folder was not found or the file exist
     return nullptr;
-  }
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   file = &parent->files[brokenPath.second];
   file->deserialize(info);
-  nextID++;
   return file;
 }
 
