@@ -37,7 +37,7 @@ class System {
       STATE_IDLE
     };
     
-    State state;
+    State state, newState;
     std::map<uint32_t, User> users;
     network::Address localAddress;
     network::Address multicastAddress;
@@ -56,6 +56,7 @@ class System {
     ~System();
     
     void run();
+    void change();
     
     void changeToLogin();
     void stateLogin();

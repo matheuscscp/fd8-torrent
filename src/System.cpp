@@ -72,6 +72,7 @@ bool System::running() {
 
 System::System() :
 state(STATE_NONE),
+newState(STATE_LOGIN),
 localAddress(Address::local()),
 multicastAddress(IP_MAIN, TCPUDP_MAIN),
 mainUDPSocket(multicastAddress, SIZE_MULTICAST_MAXLEN),
@@ -80,7 +81,7 @@ httpTCPServer(TCP_HTTPSERVER),
 httpThread([]() {}),
 downloadsRemaining(0)
 {
-  changeToLogin();
+  
 }
 
 System::~System() {
@@ -95,8 +96,20 @@ void System::run() {
     switch (state) {
       case STATE_LOGIN: stateLogin(); break;
       case STATE_IDLE:  stateIdle();  break;
-      default:                        return;
+      default:                        break;
     }
+    if (newState != state)
+      change();
     Thread::sleep(MS_SLEEP);
+  }
+}
+
+void System::change() {
+  httpThread.join();
+  state = newState;
+  switch (newState) {
+    case STATE_LOGIN: changeToLogin();  break;
+    case STATE_IDLE:  changeToIdle();   break;
+    default:                            break;
   }
 }

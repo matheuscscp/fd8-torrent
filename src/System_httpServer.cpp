@@ -161,7 +161,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
   string request = cRequest.substr(cRequest.find("?") + 1, cRequest.size());
   if (request == "logout"){
     client->send(string("1"), true);
-    changeToLogin();
+    newState = STATE_LOGIN;
   } else if (request == "host-ip"){
     client->send(localAddress.toString());
   } else if( request == "total-files" ){

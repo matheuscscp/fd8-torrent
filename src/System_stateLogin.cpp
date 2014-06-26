@@ -10,14 +10,22 @@
 
 // local
 #include "FileSystem.hpp"
+#include "Defines.hpp"
+
+using namespace concurrency;
 
 void System::changeToLogin() {
   users.clear();
   FileSystem::init(localAddress.ip);
-  state = STATE_LOGIN;
+  httpThread = Thread([this]() {
+    while (state == newState) {
+      loginHttpServer();
+      Thread::sleep(MS_SLEEP);
+    }
+  });
+  httpThread.start();
 }
 
 void System::stateLogin() {
   requestSystemState();
-  loginHttpServer();
 }

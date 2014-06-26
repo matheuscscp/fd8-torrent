@@ -16,7 +16,6 @@ using namespace helpers;
 static TCPConnection* client = nullptr;
 
 void System::loginHttpServer() {
-  
   client = httpTCPServer.accept();
   if (client == nullptr)
     return;
@@ -121,5 +120,5 @@ void System::loginHttpServer_loginAttempt(const string& data) {
   
   users[localAddress.ip] = User(input);
   client->send(string("1"), true);
-  changeToIdle();
+  newState = STATE_IDLE;
 }
