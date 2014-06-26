@@ -38,6 +38,7 @@ class System {
     network::TCPServer mainTCPServer;
     network::TCPServer httpTCPServer;
     concurrency::Thread httpThread;
+    uint32_t downloadsRemaining;
   public:
     static bool start();
     static void stop(bool wait = false);

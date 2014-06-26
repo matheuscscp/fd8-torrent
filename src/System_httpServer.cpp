@@ -290,6 +290,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
       TCPConnection* tmpConn = client;
       client = nullptr;
       Thread([fp, tmpConn, this]() {
+        downloadsRemaining++;
         char buf[SIZE_FILEBUFFER_MAXLEN];
         for (
           size_t readBytes;
@@ -298,6 +299,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
         );
         delete tmpConn;
         fclose(fp);
+        downloadsRemaining--;
       }).start();
     }
   } else if( request.find("Ufile") != string::npos ){
