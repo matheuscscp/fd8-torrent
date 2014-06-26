@@ -14,6 +14,7 @@
 using namespace concurrency;
 
 void System::changeToIdle() {
+  requestSystemState();
   httpThread = Thread([this]() {
     while (state == newState) {
       httpServer();

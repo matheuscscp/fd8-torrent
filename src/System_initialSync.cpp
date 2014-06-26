@@ -18,43 +18,26 @@ using namespace fd8protocol;
 using namespace helpers;
 
 void System::requestSystemState() {
-  Address addr;
-  if (!mainUDPSocket.recv(addr).size()) return;
+  // first, find someone to send the system state
+  uint32_t ip = 0;
+  for (auto& kv : users) {
+    if (kv.first != localAddress.ip) {
+      ip = kv.first;
+      break;
+    }
+  }
+  if (!ip) // no one found, then return
+    return;
   
-  // open connection with the peer
-  TCPConnection conn(Address(addr.ip, Address("", TCPUDP_MAIN).port));
-  
+  TCPConnection conn(Address(ip, Address("", TCPUDP_MAIN).port));
   conn.send(char(MTYPE_SYNC));
-  
-  // receive user table
-  uint32_t userAmount = conn.recv<uint32_t>();
-  for (uint32_t i = 0; i < userAmount; i++) {
-    uint32_t ip = conn.recv<uint32_t>();
-    users[ip] = User(conn.recv<string>());
-  }
-  
-  // receive file system
-  {
-    ByteQueue data(conn.recv<uint32_t>());
-    conn.recv(data);
-    FileSystem::deserialize(data);
-  }
-  
-  changeToLogin();
+  ByteQueue data(conn.recv<uint32_t>());
+  conn.recv(data);
+  FileSystem::deserialize(data);
 }
 
 void System::respondSystemState(TCPConnection* peer) {
-  // send user table
-  peer->send(uint32_t(users.size()));
-  for (auto& kv : users) {
-    peer->send(kv.first);
-    peer->send(kv.second.name);
-  }
-  
-  // send file system
-  {
-    ByteQueue data = FileSystem::serialize();
-    peer->send(uint32_t(data.size()));
-    peer->send(data);
-  }
+  ByteQueue data = FileSystem::serialize();
+  peer->send(uint32_t(data.size()));
+  peer->send(data);
 }
