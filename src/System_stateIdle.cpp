@@ -14,6 +14,7 @@
 using namespace concurrency;
 
 void System::changeToIdle() {
+  FileSystem::init(localAddress.ip);
   requestSystemState();
   httpThread = Thread([this]() {
     while (state == newState) {
