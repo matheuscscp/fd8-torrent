@@ -83,10 +83,11 @@ System::~System() {
 }
 
 void System::run() {
-  while (started && state != STATE_NONE) {
+  while (started) {
     switch (state) {
       case STATE_LOGIN: stateLogin(); break;
       case STATE_IDLE:  stateIdle();  break;
+      default:                        return;
     }
     Thread::sleep(MS_SLEEP);
   }
