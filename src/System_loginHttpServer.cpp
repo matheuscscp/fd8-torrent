@@ -106,10 +106,17 @@ void System::loginHttpServer() {
 }
 
 void System::loginHttpServer_loginAttempt(const string& data) {
+  if (loginSyncTimer.time() < MS_LOGINSYNC) {
+    client->send(string("2"), true);
+    return;
+  }
+  
   string input = data.substr(data.find("?") + 1, data.size());
   
-  if (!input.size())
+  if (!input.size()) {
+    client->send(string("0"), true);
     return;
+  }
   
   for(auto& kv : users) {
     if(kv.second.name == input){

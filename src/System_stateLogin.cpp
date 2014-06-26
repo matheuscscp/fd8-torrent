@@ -15,8 +15,8 @@
 using namespace concurrency;
 
 void System::changeToLogin() {
-  users.clear();
-  FileSystem::init(localAddress.ip);
+  users.erase(localAddress.ip);
+  loginSyncTimer.start();
   httpThread = Thread([this]() {
     while (state == newState) {
       loginHttpServer();
@@ -27,5 +27,6 @@ void System::changeToLogin() {
 }
 
 void System::stateLogin() {
-  requestSystemState();
+  listen();
+  detectFailure();
 }

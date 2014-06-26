@@ -56,11 +56,13 @@ function getNumberOfHosts(){
 	
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200){
-			if(parseInt(client.responseText) <= 2)
+			if(parseInt(client.responseText) <= 2) {
 				document.getElementById("n-hosts").style.color = "#f00";
-			else
-				document.getElementById("n-hosts").style.color = "#000";
-			document.getElementById("n-hosts").innerHTML = client.responseText;
+				document.getElementById("n-hosts").innerHTML = "<strong>" + client.responseText + "</strong>";
+			} else {
+				document.getElementById("n-hosts").style.color = "#fff";
+				document.getElementById("n-hosts").innerHTML = client.responseText;
+			}
 		}
 	}
 	

@@ -23,5 +23,6 @@
 #define MS_SLEEP                20
 #define MS_DETECTFAILURE        3000
 #define MS_SPEAK                1000
+#define MS_LOGINSYNC            2000
 
 #endif /* DEFINE_HPP_ */

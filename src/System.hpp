@@ -44,6 +44,7 @@ class System {
     network::UDPSocket mainUDPSocket;
     network::TCPServer mainTCPServer;
     network::TCPServer httpTCPServer;
+    helpers::Timer loginSyncTimer;
     concurrency::Thread httpThread;
     uint32_t downloadsRemaining;
   public:
