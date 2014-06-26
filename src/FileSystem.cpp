@@ -27,8 +27,8 @@ FileSystem::File::File() : id(nextID++), size(0), peer1(localIP), peer2(0) {
   if (fp) {
     fseek(fp, 0, SEEK_END);
     size = ftell(fp);
+    fclose(fp);
   }
-  fclose(fp);
 }
 
 void FileSystem::File::serialize(ByteQueue& data) {
