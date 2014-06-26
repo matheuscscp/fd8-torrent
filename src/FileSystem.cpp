@@ -19,6 +19,16 @@ uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
 set<uint32_t> FileSystem::storedFiles;
 
+FileSystem::File::File() : id(nextID++), size(0), peer1(localIP), peer2(0) {
+  char tmp[25];
+  sprintf(tmp, "www/files/%08x", id);
+  rename("www/files/tmp", tmp);
+  FILE* fp = fopen(tmp, "rb");
+  fseek(fp, 0, SEEK_END);
+  size = ftell(fp);
+  fclose(fp);
+}
+
 void FileSystem::File::serialize(ByteQueue& data) {
   data.push((const void*)this, 16).push(author);
 }
@@ -39,14 +49,6 @@ ByteQueue FileSystem::File::read() {
     fclose(fp);
   }
   return data;
-}
-
-void FileSystem::File::write(const ByteQueue& data) {
-  char tmp[25];
-  sprintf(tmp, "www/files/%08x", id);
-  FILE* fp = fopen(tmp, "wb");
-  fwrite(data.ptr(), data.size(), 1, fp);
-  fclose(fp);
 }
 
 void FileSystem::File::erase() {
@@ -306,19 +308,14 @@ bool FileSystem::deleteFolder(const string& fullPath) {
   return true;
 }
 
-FileSystem::File* FileSystem::createFile(const string& fullPath, const ByteQueue& data, const string& author) {
+FileSystem::File* FileSystem::createFile(const string& fullPath, const string& author) {
   Folder* parent;
   File* file = rootFolder.findFile(fullPath, &parent);
   if (!parent || file) // if parent folder was not found or the file exist
     return nullptr;
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   file = &parent->files[brokenPath.second];
-  file->id = nextID++;
-  file->size = data.size();
-  file->peer1 = localIP;
-  file->peer2 = 0;
   file->author = author;
-  file->write(data);
   storedFiles.insert(file->id);
   return file;
 }
@@ -326,8 +323,10 @@ FileSystem::File* FileSystem::createFile(const string& fullPath, const ByteQueue
 FileSystem::File* FileSystem::createFile(const string& fullPath, ByteQueue& info) {
   Folder* parent;
   File* file = rootFolder.findFile(fullPath, &parent);
-  if (!parent || file) // if parent folder was not found or the file exist
+  if (!parent || file) { // if parent folder was not found or the file exist
+    remove("www/files/tmp");
     return nullptr;
+  }
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   file = &parent->files[brokenPath.second];
   file->deserialize(info);

@@ -27,7 +27,6 @@ using namespace helpers;
 
 // static variables
 static TCPConnection* client = nullptr;
-static ByteQueue fileData;
 
 static void recvFile() {
   size_t fileSize;
@@ -52,14 +51,15 @@ static void recvFile() {
   
   size_t bytesRecvd = 0;
   ByteQueue buf;
-  fileData.resize(0);
+  FILE* fp = fopen("www/files/tmp", "wb");
   while (bytesRecvd < fileSize) {
     size_t diff = fileSize - bytesRecvd;
     buf.resize(SIZE_FILEUPLOAD_MAXLEN < diff ? SIZE_FILEUPLOAD_MAXLEN : diff);
     client->recv(buf);
     bytesRecvd += buf.size();
-    fileData.push(buf.ptr(), buf.size());
+    fwrite(buf.ptr(), buf.size(), 1, fp);
   }
+  fclose(fp);
   client->recv<char>();
   client->recv<char>();
   for (char c; (c = client->recv<char>()) != '\n';);
@@ -86,8 +86,8 @@ void System::httpServer() {
   if (requestLine.find("Cfile") != string::npos)
     recvFile();
   else { // if the request is NOT for file upload
-    fileData.resize(SIZE_HTTPSERVER_MAXLEN);
-    client->recv(fileData); // actually, this is the request body... discarding
+    ByteQueue tmp(SIZE_HTTPSERVER_MAXLEN);
+    client->recv(tmp); // actually, this is the request body... discarding
   }
   
   if (requestLine.find("?") != string::npos) {
@@ -269,7 +269,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
     }
   } else if( request.find("Cfile") != string::npos ){
     string fullPath = request.substr(request.find("=") + 1, request.size());
-    FileSystem::File* file = FileSystem::createFile(fullPath, fileData, users[localAddress.ip].name);
+    FileSystem::File* file = FileSystem::createFile(fullPath, users[localAddress.ip].name);
     if(!file){
       client->send("0");
     } else {

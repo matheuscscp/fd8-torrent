@@ -28,11 +28,12 @@ class FileSystem {
         uint32_t peer2;
         std::string author;
         
+        File();
+        
         void serialize(helpers::ByteQueue& data);
         void deserialize(helpers::ByteQueue& data);
         
         helpers::ByteQueue read();
-        void write(const helpers::ByteQueue& data);
         
         void erase();
     };
@@ -78,7 +79,7 @@ class FileSystem {
     static Folder* updateFolder(const std::string& fullPath, const std::string& newName);
     static bool deleteFolder(const std::string& fullPath);
     
-    static File* createFile(const std::string& fullPath, const helpers::ByteQueue& data, const std::string& author);
+    static File* createFile(const std::string& fullPath, const std::string& author);
     static File* createFile(const std::string& fullPath, helpers::ByteQueue& info);
     static File* retrieveFile(const std::string& fullPath);
     static File* updateFile(const std::string& fullPath, const std::string& newName);
