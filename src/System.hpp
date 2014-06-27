@@ -16,6 +16,7 @@
 #include "Concurrency.hpp"
 #include "Helpers.hpp"
 #include "Network.hpp"
+#include "FileSystem.hpp"
 
 class System {
   private:
@@ -95,6 +96,7 @@ class System {
     void recv_createFile(const std::string& fullPath, helpers::ByteQueue& info);
     void recv_updateFile(const std::string& fullPath, const std::string& newName);
     void recv_deleteFile(const std::string& fullPath);
+    void send_fileDuplications(const std::list<FileSystem::DuplicationCommand>& cmds);
 };
 
 #endif /* SYSTEM_HPP_ */

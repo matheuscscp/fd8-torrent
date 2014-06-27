@@ -75,29 +75,7 @@ void System::executeProtocol() {
           cmds.push_back(tmp);
         }
         FileSystem::receiveDuplications(cmds);
-        for(auto& cmd : cmds){
-          if(cmd.srcPeer == localAddress.ip){
-            Thread([this, cmd]() {
-              char tmp[25];
-              char buf[SIZE_FILEBUFFER_MAXLEN];
-              TCPConnection conn(Address(cmd.dstPeer, Address("", TCPUDP_MAIN).port));
-              sprintf(tmp, "www/files/%08x", cmd.fileID);
-              FILE* fp = fopen(tmp, "rb");
-              fseek(fp, 0, SEEK_END);
-              conn.send(char(fd8protocol::MTYPE_FILE));
-              conn.send(uint32_t(cmd.fileID));
-              conn.send(uint32_t(ftell(fp)));
-              fclose(fp);
-              fp = fopen(tmp, "rb");
-              for (
-                size_t readBytes;
-                (readBytes = fread(buf, 1, SIZE_FILEBUFFER_MAXLEN, fp)) > 0 && state == STATE_IDLE;
-                conn.send(buf, readBytes)
-              );
-              fclose(fp);
-            }).start();
-          }
-        }
+        send_fileDuplications(cmds);
       }
       break;
 
