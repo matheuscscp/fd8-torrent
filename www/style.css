@@ -97,15 +97,17 @@ ul, ul li{ list-style: none; }
 
 #submenu{
 	width: 15%;
+	position: fixed;
 	color: white;
-	float: left;
 	background: #000;
+	height: 100%;
 }
 
 #content{
 	overflow-y: auto;
 	width: 85%;
-	float: left;
+	position: fixed;
+	left: 15%;
 }
 
 #submenu ul{
