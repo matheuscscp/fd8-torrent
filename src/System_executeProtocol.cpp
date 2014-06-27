@@ -64,6 +64,19 @@ void System::executeProtocol() {
       recv_deleteFile(peer->recv<string>());
       break;
       
+    case fd8protocol::MTYPE_DUPLICATION:
+      {
+        list<FileSystem::DuplicationCommand> cmds;
+        uint32_t cmds_size = peer->recv<uint32_t>();
+        for(uint32_t i = 0; i < cmds_size; i++){
+          FileSystem::DuplicationCommand tmp(0, 0, 0);
+          peer->recv(&tmp, 12);
+          cmds.push_back(tmp);
+        }
+        FileSystem::receiveDuplications(cmds);
+      }
+      break;
+
     default:
       break;
   }

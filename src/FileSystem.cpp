@@ -127,6 +127,19 @@ FileSystem::Folder* FileSystem::Folder::findFirstBottomUp(const string& subPath,
   return folder;
 }
 
+FileSystem::File* FileSystem::Folder::findFile(uint32_t fileID){
+  for(auto& kv : files){
+    if(kv.second.id == fileID)
+      return &kv.second;
+  }
+  for (auto& kv : subfolders) {
+    File* file = kv.second.findFile(fileID);
+    if (file)
+      return file;
+  }
+  return nullptr;
+}
+
 void FileSystem::Folder::serialize(ByteQueue& data) {
   data.push(uint32_t(subfolders.size()));
   for (auto& kv : subfolders) {
@@ -450,4 +463,14 @@ list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint3
   }
   
   return cmds;
+}
+
+void FileSystem::receiveDuplications(const list<FileSystem::DuplicationCommand>& cmds) {
+  for(auto& cmd : cmds){
+    File* file = rootFolder.findFile(cmd.fileID);
+    if(file->peer1 == cmd.srcPeer)
+      file->peer2 = cmd.dstPeer;
+    else
+      file->peer1 = cmd.dstPeer;
+  }
 }

@@ -15,7 +15,7 @@ function configureBrowserRequest(xmlhttp){
 
 function init(){
 	refreshSideInfo();
-	setInterval(function(){refreshSideInfo()}, 2000);
+	setInterval(function(){refreshSideInfo()}, 3000);
 	optionListFiles();
 }
 
@@ -152,6 +152,18 @@ function previousFolder(){
 	}
 	currPath = currPath.substring(0, i <= 0 ? i + 1 : i);
 	retrieveFolder(currPath);
+}
+
+function searchOnTable(inputId, tableId){
+	var table = document.getElementById(tableId);
+	var tableHead = table.rows[0];
+	var key = new Array();
+	var tdTxt = new Array();
+	
+	for (var i = 0; i < tableHead.cells.length; i++){}
+	for (var j = 0; j < table.rows.length; i++){
+	
+	}
 }
 
 // --------------------------------------------------------------

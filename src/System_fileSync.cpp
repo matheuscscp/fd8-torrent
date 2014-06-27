@@ -36,9 +36,16 @@ void System::send_createFile(const string& fullPath, const ByteQueue& info) {
     }
     
     list<FileSystem::DuplicationCommand> cmds = FileSystem::calculateDuplications(peers);
-    for (auto& cmd : cmds)
-      printf("%d %d %d\n", cmd.fileID, cmd.srcPeer, cmd.dstPeer);
-    fflush(stdout);
+    for (auto& kv : users){
+      if (kv.first == localAddress.ip)
+        continue;
+      TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
+      conn.send(char(MTYPE_DUPLICATION));
+      conn.send(uint32_t(cmds.size()));
+      for (auto& cmd : cmds){
+        conn.send(&cmd, 12);
+      }
+    }
   }).start();
 }
 

@@ -53,6 +53,7 @@ class FileSystem {
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
         File* findFile(const std::string& subPath, Folder** parent = nullptr);
         Folder* findFirstBottomUp(const std::string& subPath, std::string& foundPath);
+        File* findFile(uint32_t fileID);
         
         void serialize(helpers::ByteQueue& data);
         void deserialize(helpers::ByteQueue& data);
@@ -101,6 +102,7 @@ class FileSystem {
     static uint64_t getTotalSize();
     
     static std::list<DuplicationCommand> calculateDuplications(std::set<uint32_t>& peers);
+    static void receiveDuplications(const std::list<DuplicationCommand>& cmds);
 };
 
 #endif /* FILESYSTEM_HPP_ */
