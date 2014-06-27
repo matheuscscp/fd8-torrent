@@ -459,6 +459,7 @@ list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint3
       pair<uint32_t, uint32_t>& theFile = filesPeers[fileID];
       theFile.second = minimalPeer->first;            // updating filesPeers
       cmds.push_back(DuplicationCommand(fileID, theFile.first, theFile.second));
+      rootFolder.findFile(fileID)->peer2 = theFile.second; // updating the file system of this host
     }
   }
   
