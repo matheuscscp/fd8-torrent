@@ -431,7 +431,7 @@ list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint3
     // searching file to duplicate in the minimal peer
     auto fileToDup = toDup.end();
     for (auto fileIt = toDup.begin(); fileIt != toDup.end(); fileIt++) {
-      if (minimalPeer->second.find(*fileIt) != minimalPeer->second.end()) {
+      if (minimalPeer->second.find(*fileIt) == minimalPeer->second.end()) {
         fileToDup = fileIt;
         break;
       }
