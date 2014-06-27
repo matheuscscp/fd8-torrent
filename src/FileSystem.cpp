@@ -69,6 +69,34 @@ uint64_t FileSystem::Folder::getTotalSize() {
   return total;
 }
 
+void FileSystem::Folder::getPeersFiles(map<uint32_t, set<uint32_t>>& peersFiles) {
+  for (auto& kv : subfolders)
+    kv.second.getPeersFiles(peersFiles);
+  for (auto& kv : files) {
+    // checking if someone went offline
+    if (peersFiles.find(kv.second.peer1) == peersFiles.end()) {
+      kv.second.peer1 = kv.second.peer2;
+      kv.second.peer2 = 0;
+    }
+    else if (peersFiles.find(kv.second.peer2) == peersFiles.end())
+      kv.second.peer2 = 0;
+    
+    peersFiles[kv.second.peer1].insert(kv.second.id);
+    if (kv.second.peer2)
+      peersFiles[kv.second.peer2].insert(kv.second.id);
+  }
+}
+
+void FileSystem::Folder::getFilesPeers(map<uint32_t, pair<uint32_t, uint32_t>>& filesPeers) {
+  for (auto& kv : subfolders)
+    kv.second.getFilesPeers(filesPeers);
+  for (auto& kv : files) {
+    pair<uint32_t, uint32_t>& file = filesPeers[kv.second.id];
+    file.first = kv.second.peer1;
+    file.second = kv.second.peer2;
+  }
+}
+
 FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath, Folder** parent) {
   if (!parsePath(subPath)) { // if the path is invalid
     if (parent) // if the parent folder was requested
@@ -187,6 +215,11 @@ FileSystem::Folder* FileSystem::Folder::findFirstBottomUp_(const string& subPath
   foundPath += brokenPath.first;
   // recursive call
   return parentFolder->second.findFirstBottomUp_(brokenPath.second, foundPath);
+}
+
+FileSystem::DuplicationCommand::DuplicationCommand(uint32_t fileID, uint32_t srcPeer, uint32_t dstPeer) :
+fileID(fileID), srcPeer(srcPeer), dstPeer(dstPeer) {
+  
 }
 
 void FileSystem::init(uint32_t localIP) {
@@ -365,4 +398,56 @@ uint32_t FileSystem::getTotalFiles() {
 
 uint64_t FileSystem::getTotalSize() {
   return rootFolder.getTotalSize();
+}
+
+list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint32_t>& peers) {
+  list<DuplicationCommand> cmds;
+  
+  // get files of each peer
+  map<uint32_t, set<uint32_t>> peersFiles;
+  for (auto& peer : peers)
+    peersFiles[peer];
+  rootFolder.getPeersFiles(peersFiles);
+  
+  // get the two peers of each file
+  map<uint32_t, pair<uint32_t, uint32_t>> filesPeers;
+  set<uint32_t> toDup;
+  rootFolder.getFilesPeers(filesPeers);
+  for (auto& kv : filesPeers) {
+    if (!kv.second.second)
+      toDup.insert(kv.first);
+  }
+  
+  while (toDup.size()) {
+    // find the peer with least files in fileCount
+    auto minimalPeer = peersFiles.end();
+    for (auto peerIt = peersFiles.begin(); peerIt != peersFiles.end(); peerIt++) {
+      if (minimalPeer == peersFiles.end())
+        minimalPeer = peerIt;
+      else if (peerIt->second.size() < minimalPeer->second.size())
+        minimalPeer = peerIt;
+    }
+    
+    // searching file to duplicate in the minimal peer
+    auto fileToDup = toDup.end();
+    for (auto fileIt = toDup.begin(); fileIt != toDup.end(); fileIt++) {
+      if (minimalPeer->second.find(*fileIt) != minimalPeer->second.end()) {
+        fileToDup = fileIt;
+        break;
+      }
+    }
+    
+    if (fileToDup == toDup.end()) // if the peer already have all the toDup files
+      peersFiles.erase(minimalPeer);
+    else { // 
+      uint32_t fileID = *fileToDup;
+      toDup.erase(fileToDup);                         // updating toDup (removing fileToDup from toDup set)
+      minimalPeer->second.insert(fileID);             // updating peersFiles
+      pair<uint32_t, uint32_t>& theFile = filesPeers[fileID];
+      theFile.second = minimalPeer->first;            // updating filesPeers
+      cmds.push_back(DuplicationCommand(fileID, theFile.first, theFile.second));
+    }
+  }
+  
+  return cmds;
 }

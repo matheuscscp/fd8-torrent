@@ -14,6 +14,8 @@
 #include <map>
 #include <set>
 #include <cstdio>
+#include <list>
+#include <set>
 
 // local
 #include "Helpers.hpp"
@@ -45,6 +47,9 @@ class FileSystem {
         uint32_t getTotalFiles();
         uint64_t getTotalSize();
         
+        void getPeersFiles(std::map<uint32_t, std::set<uint32_t>>& peersFiles);
+        void getFilesPeers(std::map<uint32_t, std::pair<uint32_t, uint32_t>>& filesPeers);
+        
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
         File* findFile(const std::string& subPath, Folder** parent = nullptr);
         Folder* findFirstBottomUp(const std::string& subPath, std::string& foundPath);
@@ -57,6 +62,14 @@ class FileSystem {
         Folder* findFolder_(const std::string& subPath, Folder** parent);
         File* findFile_(const std::string& subPath, Folder** parent);
         Folder* findFirstBottomUp_(const std::string& subPath, std::string& foundPath);
+    };
+    
+    class DuplicationCommand {
+      public:
+        uint32_t fileID;
+        uint32_t srcPeer;
+        uint32_t dstPeer;
+        DuplicationCommand(uint32_t fileID, uint32_t srcPeer, uint32_t dstPeer);
     };
   private:
     static Folder rootFolder;
@@ -86,6 +99,8 @@ class FileSystem {
     static uint32_t getTotalFolders();
     static uint32_t getTotalFiles();
     static uint64_t getTotalSize();
+    
+    static std::list<DuplicationCommand> calculateDuplications(std::set<uint32_t>& peers);
 };
 
 #endif /* FILESYSTEM_HPP_ */

@@ -21,7 +21,11 @@ using namespace fd8protocol;
 
 void System::send_createFile(const string& fullPath, const ByteQueue& info) {
   Thread([this, fullPath, info]() {
+    set<uint32_t> peers;
+    
     for (auto& kv : users) {
+      peers.insert(kv.first);
+      
       if (kv.first == localAddress.ip)
         continue;
       TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
@@ -30,6 +34,11 @@ void System::send_createFile(const string& fullPath, const ByteQueue& info) {
       conn.send(uint32_t(info.size()));
       conn.send(info);
     }
+    
+    list<FileSystem::DuplicationCommand> cmds = FileSystem::calculateDuplications(peers);
+    for (auto& cmd : cmds)
+      printf("%d %d %d\n", cmd.fileID, cmd.srcPeer, cmd.dstPeer);
+    fflush(stdout);
   }).start();
 }
 
