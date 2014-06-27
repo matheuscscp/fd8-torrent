@@ -469,9 +469,7 @@ list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint3
 void FileSystem::receiveDuplications(const list<FileSystem::DuplicationCommand>& cmds) {
   for(auto& cmd : cmds){
     File* file = rootFolder.findFile(cmd.fileID);
-    if(file->peer1 == cmd.srcPeer)
-      file->peer2 = cmd.dstPeer;
-    else
-      file->peer1 = cmd.dstPeer;
+    file->peer1 = cmd.srcPeer;
+    file->peer2 = cmd.dstPeer;
   }
 }
