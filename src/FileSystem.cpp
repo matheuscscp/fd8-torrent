@@ -416,6 +416,9 @@ uint64_t FileSystem::getTotalSize() {
 list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint32_t>& peers) {
   list<DuplicationCommand> cmds;
   
+  if (peers.size() == 1)
+    return cmds;
+  
   // get files of each peer
   map<uint32_t, set<uint32_t>> peersFiles;
   for (auto& peer : peers)
