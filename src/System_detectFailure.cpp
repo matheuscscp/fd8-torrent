@@ -31,9 +31,9 @@ void System::detectFailure() {
   if (state == STATE_LOGIN)
     return;
   
-  uint32_t designatedPeer = 0xFFFFFFFF;
+  uint32_t designatedPeer = 0;
   for (auto& kv : users) {
-    if (kv.first < designatedPeer)
+    if (kv.first > designatedPeer)
       designatedPeer = kv.first;
   }
   if (designatedPeer == localAddress.ip) {
