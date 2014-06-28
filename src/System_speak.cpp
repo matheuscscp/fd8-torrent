@@ -21,6 +21,7 @@ void System::speak() {
   if (!timer.counting())
     timer.start();
   if (timer.time() > MS_SPEAK) {
+    mainUDPSocket.send(broadcastAddress, ByteQueue().push(users[localAddress.ip].name));
     mainUDPSocket.send(multicastAddress, ByteQueue().push(users[localAddress.ip].name));
     timer.start();
   }

@@ -74,6 +74,7 @@ System::System() :
 state(STATE_NONE),
 newState(STATE_LOGIN),
 localAddress(Address::local()),
+broadcastAddress("255.255.255.255", TCPUDP_MAIN),
 multicastAddress(IP_MAIN, TCPUDP_MAIN),
 mainUDPSocket(multicastAddress, SIZE_MULTICAST_MAXLEN),
 mainTCPServer(TCPUDP_MAIN),

@@ -41,6 +41,7 @@ class System {
     State state, newState;
     std::map<uint32_t, User> users;
     network::Address localAddress;
+    network::Address broadcastAddress;
     network::Address multicastAddress;
     network::UDPSocket mainUDPSocket;
     network::TCPServer mainTCPServer;
