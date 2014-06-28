@@ -146,7 +146,7 @@ UDPSocket::UDPSocket(const string& port, size_t maxlen) : maxlen(maxlen) {
   Address nport("", port);
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
-  int optval = 1;
+  ULONG optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
   SOCKADDR_IN addr;
   addr.sin_family = AF_INET;
