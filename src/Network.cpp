@@ -63,8 +63,16 @@ Address::Address(const string& ip, const string& port) : ip(0), port(0) {
 Address Address::local() {
   IPaddress addrs[100];
   int total = SDLNet_GetLocalAddresses(addrs, 100);
+  if (!total) {
+    fprintf(stderr, "No network interface was found\n");
+    exit(0);
+  }
   int i;
   for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
+  if (i == total) {
+    fprintf(stderr, "No network interface was found\n");
+    exit(0);
+  }
   IPaddress addr;
   SDLNet_ResolveHost(&addr, SDLNet_ResolveIP(&addrs[i]), 0);
   return Address(addr.host, 0);
