@@ -123,8 +123,9 @@ uint16_t Address::htons(uint16_t port) {
 UDPSocket::UDPSocket(size_t maxlen) : maxlen(maxlen) {
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
-  int optval = 1;
+  ULONG optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
+  setsockopt(sd, SOL_SOCKET, SO_BROADCAST, (char*)&optval, sizeof(ULONG));
   SOCKADDR_IN addr;
   addr.sin_family = AF_INET;
   addr.sin_port = 0;
@@ -134,6 +135,7 @@ UDPSocket::UDPSocket(size_t maxlen) : maxlen(maxlen) {
   sd = socket(AF_INET, SOCK_DGRAM, 0);
   int optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(int));
+  setsockopt(sd, SOL_SOCKET, SO_BROADCAST, (char*)&optval, sizeof(int));
   sockaddr_in addr;
   addr.sin_family = AF_INET;
   addr.sin_port = 0;
@@ -148,6 +150,7 @@ UDPSocket::UDPSocket(const string& port, size_t maxlen) : maxlen(maxlen) {
   sd = socket(AF_INET, SOCK_DGRAM, 0);
   ULONG optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
+  setsockopt(sd, SOL_SOCKET, SO_BROADCAST, (char*)&optval, sizeof(ULONG));
   SOCKADDR_IN addr;
   addr.sin_family = AF_INET;
   addr.sin_port = nport.port;
@@ -157,6 +160,7 @@ UDPSocket::UDPSocket(const string& port, size_t maxlen) : maxlen(maxlen) {
   sd = socket(AF_INET, SOCK_DGRAM, 0);
   int optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(int));
+  setsockopt(sd, SOL_SOCKET, SO_BROADCAST, (char*)&optval, sizeof(int));
   sockaddr_in addr;
   addr.sin_family = AF_INET;
   addr.sin_port = nport.port;
@@ -168,8 +172,9 @@ UDPSocket::UDPSocket(const string& port, size_t maxlen) : maxlen(maxlen) {
 UDPSocket::UDPSocket(const Address& multicastAddress, size_t maxlen) : maxlen(maxlen) {
 #ifdef _WIN32
   sd = socket(AF_INET, SOCK_DGRAM, 0);
-  int optval = 1;
+  ULONG optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(ULONG));
+  setsockopt(sd, SOL_SOCKET, SO_BROADCAST, (char*)&optval, sizeof(ULONG));
   ip_mreq mreq;
   mreq.imr_multiaddr.S_un.S_addr = multicastAddress.ip;
   mreq.imr_interface.S_un.S_addr = Address::local().ip;
@@ -183,6 +188,7 @@ UDPSocket::UDPSocket(const Address& multicastAddress, size_t maxlen) : maxlen(ma
   sd = socket(AF_INET, SOCK_DGRAM, 0);
   int optval = 1;
   setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(int));
+  setsockopt(sd, SOL_SOCKET, SO_BROADCAST, (char*)&optval, sizeof(int));
   ip_mreq mreq;
   mreq.imr_multiaddr.s_addr = multicastAddress.ip;
   mreq.imr_interface.s_addr = Address::local().ip;
