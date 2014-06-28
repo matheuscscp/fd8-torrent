@@ -70,7 +70,7 @@ Address Address::local() {
   int i;
   for (i = 0; i < total && addrs[i].host == 0x0100007F; ++i);
   if (i == total) {
-    fprintf(stderr, "No network interface was found\n");
+    fprintf(stderr, "Only loopback interfaces were found\n");
     exit(0);
   }
   IPaddress addr;
