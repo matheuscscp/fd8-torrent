@@ -415,6 +415,7 @@ FileSystem::File* FileSystem::createFile(const string& fullPath, ByteQueue& info
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   file = &parent->files[brokenPath.second];
   file->deserialize(info);
+  nextID = file->id + 1;
   return file;
 }
 
