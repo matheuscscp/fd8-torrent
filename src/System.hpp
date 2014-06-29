@@ -97,7 +97,7 @@ class System {
     void recv_createFile(const std::string& fullPath, helpers::ByteQueue& info);
     void recv_updateFile(const std::string& fullPath, const std::string& newName);
     void recv_deleteFile(const std::string& fullPath);
-    void send_fileDuplications(const std::list<FileSystem::DuplicationCommand>& cmds);
+    void send_fileDuplications(const std::list<FileSystem::Command*>& cmds);
 };
 
 #endif /* SYSTEM_HPP_ */

@@ -35,19 +35,21 @@ void System::send_createFile(const string& fullPath, const ByteQueue& info) {
       conn.send(info);
     }
     
-    list<FileSystem::DuplicationCommand> cmds = FileSystem::calculateDuplications(peers);
-    for (auto& kv : users){
+    list<FileSystem::Command*> cmds = FileSystem::calculateDuplications(peers);
+    ByteQueue data = FileSystem::Command::serialize(cmds);
+    for (auto& kv : users) {
       if (kv.first == localAddress.ip)
         continue;
       TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
-      conn.send(char(MTYPE_DUPLICATION));
-      conn.send(uint32_t(cmds.size()));
-      for (auto& cmd : cmds){
-        conn.send(&cmd, 12);
-      }
+      conn.send(char(MTYPE_COMMANDS));
+      conn.send(uint32_t(data.size()));
+      conn.send(data);
     }
     
     send_fileDuplications(cmds);
+    
+    for (auto& cmd : cmds)
+      delete cmd;
   }).start();
 }
 
@@ -88,18 +90,19 @@ void System::recv_deleteFile(const string& fullPath) {
   FileSystem::deleteFile(fullPath);
 }
 
-void System::send_fileDuplications(const list<FileSystem::DuplicationCommand>& cmds) {
-  for(auto& cmd : cmds){
-    if(cmd.srcPeer == localAddress.ip){
-      Thread([this, cmd]() {
+void System::send_fileDuplications(const list<FileSystem::Command*>& cmds) {
+  for (auto& cmd : cmds) {
+    if(cmd->type() == MTYPE_CMD_DUPLICATION && ((FileSystem::DuplicationCommand*)cmd)->srcPeer == localAddress.ip) {
+      FileSystem::DuplicationCommand dupCmd = *((FileSystem::DuplicationCommand*)cmd);
+      Thread([this, dupCmd]() {
         char tmp[25];
         char buf[SIZE_FILEBUFFER_MAXLEN];
-        TCPConnection conn(Address(cmd.dstPeer, Address("", TCPUDP_MAIN).port));
-        sprintf(tmp, "www/files/%08x", cmd.fileID);
+        TCPConnection conn(Address(dupCmd.dstPeer, Address("", TCPUDP_MAIN).port));
+        sprintf(tmp, "www/files/%08x", dupCmd.fileID);
         FILE* fp = fopen(tmp, "rb");
         fseek(fp, 0, SEEK_END);
         conn.send(char(fd8protocol::MTYPE_FILE));
-        conn.send(uint32_t(cmd.fileID));
+        conn.send(uint32_t(dupCmd.fileID));
         conn.send(uint32_t(ftell(fp)));
         fclose(fp);
         fp = fopen(tmp, "rb");

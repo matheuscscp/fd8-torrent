@@ -65,12 +65,31 @@ class FileSystem {
         Folder* findFirstBottomUp_(const std::string& subPath, std::string& foundPath);
     };
     
-    class DuplicationCommand {
+    class Command {
+      public:
+        static helpers::ByteQueue serialize(const std::list<Command*>& cmds);
+        static std::list<Command*> deserialize(helpers::ByteQueue& data);
+        
+        virtual ~Command();
+        
+        void serialize(helpers::ByteQueue& data);
+      protected:
+        virtual void serialize_(helpers::ByteQueue& data) = 0;
+      public:
+        virtual char type() = 0;
+    };
+    
+    class DuplicationCommand : public Command {
       public:
         uint32_t fileID;
         uint32_t srcPeer;
         uint32_t dstPeer;
+        DuplicationCommand(helpers::ByteQueue& data);
         DuplicationCommand(uint32_t fileID, uint32_t srcPeer, uint32_t dstPeer);
+      private:
+        void serialize_(helpers::ByteQueue& data);
+      public:
+        char type();
     };
   private:
     static Folder rootFolder;
@@ -101,8 +120,8 @@ class FileSystem {
     static uint32_t getTotalFiles();
     static uint64_t getTotalSize();
     
-    static std::list<DuplicationCommand> calculateDuplications(std::set<uint32_t>& peers);
-    static void receiveDuplications(const std::list<DuplicationCommand>& cmds);
+    static std::list<Command*> calculateDuplications(std::set<uint32_t>& peers);
+    static void processCommands(const std::list<Command*>& cmds);
 };
 
 #endif /* FILESYSTEM_HPP_ */

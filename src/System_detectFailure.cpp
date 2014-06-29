@@ -15,6 +15,7 @@
 using namespace std;
 using namespace network;
 using namespace fd8protocol;
+using namespace helpers;
 
 void System::detectFailure() {
   set<uint32_t> peers;
@@ -37,17 +38,18 @@ void System::detectFailure() {
       designatedPeer = kv.first;
   }
   if (designatedPeer == localAddress.ip) {
-    list<FileSystem::DuplicationCommand> cmds = FileSystem::calculateDuplications(peers);
+    list<FileSystem::Command*> cmds = FileSystem::calculateDuplications(peers);
+    ByteQueue data = FileSystem::Command::serialize(cmds);
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)
         continue;
       TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
-      conn.send(char(MTYPE_DUPLICATION));
-      conn.send(uint32_t(cmds.size()));
-      for (auto& cmd : cmds){
-        conn.send(&cmd, 12);
-      }
+      conn.send(char(MTYPE_COMMANDS));
+      conn.send(uint32_t(data.size()));
+      conn.send(data);
     }
     send_fileDuplications(cmds);
+    for (auto& cmd : cmds)
+      delete cmd;
   }
 }

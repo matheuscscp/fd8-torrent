@@ -11,8 +11,12 @@
 // standard
 #include <cstdlib>
 
+// local
+#include "FD8Protocol.hpp"
+
 using namespace std;
 using namespace helpers;
+using namespace fd8protocol;
 
 FileSystem::Folder FileSystem::rootFolder;
 uint32_t FileSystem::nextID;
@@ -230,9 +234,55 @@ FileSystem::Folder* FileSystem::Folder::findFirstBottomUp_(const string& subPath
   return parentFolder->second.findFirstBottomUp_(brokenPath.second, foundPath);
 }
 
+
+ByteQueue FileSystem::Command::serialize(const list<Command*>& cmds) {
+  ByteQueue data;
+  for (auto& cmd : cmds)
+    cmd->serialize(data);
+  return data;
+}
+
+list<FileSystem::Command*> FileSystem::Command::deserialize(ByteQueue& data) {
+  list<Command*> cmds;
+  while (data.size()) {
+    char mtype = data.pop<char>();
+    switch (mtype) {
+      case MTYPE_CMD_DUPLICATION:
+        cmds.push_back(new DuplicationCommand(data));
+        break;
+        
+      default:
+        break;
+    }
+  }
+  return cmds;
+}
+
+FileSystem::Command::~Command() {
+  
+}
+
+void FileSystem::Command::serialize(ByteQueue& data) {
+  data.push(type());
+  serialize_(data);
+}
+
+FileSystem::DuplicationCommand::DuplicationCommand(ByteQueue& data) :
+fileID(data.pop<uint32_t>()), srcPeer(data.pop<uint32_t>()), dstPeer(data.pop<uint32_t>()) {
+  
+}
+
 FileSystem::DuplicationCommand::DuplicationCommand(uint32_t fileID, uint32_t srcPeer, uint32_t dstPeer) :
 fileID(fileID), srcPeer(srcPeer), dstPeer(dstPeer) {
   
+}
+
+void FileSystem::DuplicationCommand::serialize_(ByteQueue& data) {
+  data.push(fileID).push(srcPeer).push(dstPeer);
+}
+
+char FileSystem::DuplicationCommand::type() {
+  return MTYPE_CMD_DUPLICATION;
 }
 
 void FileSystem::init(uint32_t localIP) {
@@ -413,8 +463,8 @@ uint64_t FileSystem::getTotalSize() {
   return rootFolder.getTotalSize();
 }
 
-list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint32_t>& peers) {
-  list<DuplicationCommand> cmds;
+list<FileSystem::Command*> FileSystem::calculateDuplications(set<uint32_t>& peers) {
+  list<Command*> cmds;
   
   if (peers.size() == 1)
     return cmds;
@@ -461,7 +511,7 @@ list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint3
       minimalPeer->second.insert(fileID);             // updating peersFiles
       pair<uint32_t, uint32_t>& theFile = filesPeers[fileID];
       theFile.second = minimalPeer->first;            // updating filesPeers
-      cmds.push_back(DuplicationCommand(fileID, theFile.first, theFile.second));
+      cmds.push_back(new DuplicationCommand(fileID, theFile.first, theFile.second));
       rootFolder.findFile(fileID)->peer2 = theFile.second; // updating the file system of this host
     }
   }
@@ -469,10 +519,19 @@ list<FileSystem::DuplicationCommand> FileSystem::calculateDuplications(set<uint3
   return cmds;
 }
 
-void FileSystem::receiveDuplications(const list<FileSystem::DuplicationCommand>& cmds) {
-  for(auto& cmd : cmds){
-    File* file = rootFolder.findFile(cmd.fileID);
-    file->peer1 = cmd.srcPeer;
-    file->peer2 = cmd.dstPeer;
+void FileSystem::processCommands(const list<Command*>& cmds) {
+  for (auto& cmd : cmds) {
+    switch (cmd->type()) {
+      case MTYPE_CMD_DUPLICATION: {
+        DuplicationCommand& dupCmd = *((DuplicationCommand*)cmd);
+        File* file = rootFolder.findFile(dupCmd.fileID);
+        file->peer1 = dupCmd.srcPeer;
+        file->peer2 = dupCmd.dstPeer;
+        break;
+      }
+      
+      default:
+        break;
+    }
   }
 }
