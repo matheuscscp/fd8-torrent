@@ -23,7 +23,7 @@ uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
 set<uint32_t> FileSystem::storedFiles;
 
-FileSystem::File::File() : id(0), size(0), peer1(localIP), peer2(0) {
+FileSystem::File::File() : id(nextID), size(0), peer1(localIP), peer2(0) {
   char tmp[25];
   sprintf(tmp, "www/files/%08x", id);
   rename("www/files/tmp", tmp);
@@ -404,8 +404,8 @@ FileSystem::File* FileSystem::createFile(const string& fullPath, const string& a
   }
   pair<string, string> brokenPath = extractLast(fullPath, '/');
   file = &parent->files[brokenPath.second];
-  file->id = nextID++;
   file->author = author;
+  nextID++;
   storedFiles.insert(file->id);
   return file;
 }
