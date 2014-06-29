@@ -21,7 +21,6 @@ enum {
   MTYPE_COMMANDS,
   MTYPE_CMD_DUPLICATION,
   MTYPE_FILE
-  
 };
 
 } // namespace fd8protocol
