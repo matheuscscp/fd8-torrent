@@ -302,11 +302,13 @@ void FileSystem::init(uint32_t localIP) {
 
 ByteQueue FileSystem::serialize() {
   ByteQueue data;
+  data.push(nextID);
   rootFolder.serialize(data);
   return data;
 }
 
 void FileSystem::deserialize(ByteQueue& data) {
+  nextID = data.pop<uint32_t>();
   rootFolder.deserialize(data);
 }
 
