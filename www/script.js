@@ -44,11 +44,12 @@ function getNumberOfHosts(){
 	
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200){
+
 			if(parseInt(client.responseText) != currUsers){
 				currUsers = parseInt(client.responseText);
 				if(page == 2)
 					requestAndPutHTML("?list-users", "users-list-body");
-			}			
+			}				
 			if(parseInt(client.responseText) <= 2) {
 				document.getElementById("n-hosts").style.color = "#f00";
 				document.getElementById("n-hosts").innerHTML = "<strong>" + client.responseText + "</strong>";
@@ -95,15 +96,13 @@ function refreshSideInfo() {
 	}
 	
 	// Checking if we need to refresh de file system list
-	var nFiles = parseInt(document.getElementById("total-files").innerText);
-	var nFolders = parseInt(document.getElementById("total-users").innerText);
-	alert(nFiles);
-	alert(nFolders);
+	var nFiles = parseInt(document.getElementById("total-files").innerHTML);
+	var nFolders = parseInt(document.getElementById("total-folders").innerHTML);
 	if(currFiles != nFiles || currFolders != nFolders){
 		currFiles = nFiles;
 		currFolders = nFolders;
 		if (page == 1)
-			requestAndPutHTML("?list-users", "users-list-body");
+			requestAndPutHTML("?Rfolder=" + currPath, "file-system-body");
 	}
 }
 
@@ -133,7 +132,7 @@ function optionListFiles(){
 	page = 1;
 	requestAndPutHTML("listFiles.html", "content");
 	document.getElementById("separator").style.display = 'block';
-  document.getElementById("folder-info").style.display = 'block';
+	document.getElementById("folder-info").style.display = 'block';
 	// get a VALID current path from server
 	{
 		var server;
@@ -170,7 +169,6 @@ function searchOnTable(input, tableId){
 		for (var j = 0; j < cells.length; j++){
 			if(j == 1 || j == 3){
 				var txt = cells[j].innerText.toLowerCase();
-				alert(txt);
 				if(txt.indexOf(key) != -1 || key == "")
 					find = 1;
 			}
