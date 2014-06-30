@@ -35,6 +35,7 @@ void System::send_createFile(const string& fullPath, const ByteQueue& info) {
       conn.send(info);
     }
     
+    FileSystem::initTmpFileSystem();
     list<FileSystem::Command*> cmds = FileSystem::calculateDuplications(peers);
     list<FileSystem::Command*> balCmds = FileSystem::calculateBalance(peers);
     for (auto& cmd : balCmds)
@@ -50,6 +51,7 @@ void System::send_createFile(const string& fullPath, const ByteQueue& info) {
     }
     
     send_files(cmds);
+    FileSystem::processCommands(cmds);
     
     for (auto& cmd : cmds)
       delete cmd;
@@ -83,6 +85,7 @@ void System::send_deleteFile(const string& fullPath) {
       conn.send(fullPath);
     }
     
+    FileSystem::initTmpFileSystem();
     list<FileSystem::Command*> cmds = FileSystem::calculateBalance(peers);
     ByteQueue data = FileSystem::Command::serialize(cmds);
     for (auto& kv : users) {
@@ -95,6 +98,7 @@ void System::send_deleteFile(const string& fullPath) {
     }
     
     send_files(cmds);
+    FileSystem::processCommands(cmds);
     
     for (auto& cmd : cmds)
       delete cmd;

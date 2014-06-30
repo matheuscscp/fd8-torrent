@@ -107,6 +107,7 @@ class FileSystem {
     };
   private:
     static Folder rootFolder;
+    static Folder tmpRootFolder;
     static uint32_t nextID;
     static uint32_t localIP;
     static std::set<uint32_t> storedFiles;
@@ -137,6 +138,7 @@ class FileSystem {
     static std::list<Command*> calculateDuplications(const std::set<uint32_t>& peers);
     static std::list<Command*> calculateBalance(const std::set<uint32_t>& peers);
     static void processCommands(const std::list<Command*>& cmds);
+    static void initTmpFileSystem();
 };
 
 #endif /* FILESYSTEM_HPP_ */

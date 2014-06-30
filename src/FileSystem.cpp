@@ -20,6 +20,7 @@ using namespace helpers;
 using namespace fd8protocol;
 
 FileSystem::Folder FileSystem::rootFolder;
+FileSystem::Folder FileSystem::tmpRootFolder;
 uint32_t FileSystem::nextID;
 uint32_t FileSystem::localIP;
 set<uint32_t> FileSystem::storedFiles;
@@ -500,12 +501,12 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>
   map<uint32_t, set<uint32_t>> peersFiles;
   for (auto& peer : peers)
     peersFiles[peer];
-  rootFolder.getPeersFiles(peersFiles);
+  tmpRootFolder.getPeersFiles(peersFiles);
   
   // get the two peers of each file
   map<uint32_t, pair<uint32_t, uint32_t>> filesPeers;
   set<uint32_t> toDup;
-  rootFolder.getFilesPeers(filesPeers);
+  tmpRootFolder.getFilesPeers(filesPeers);
   for (auto& kv : filesPeers) {
     if (!kv.second.second)
       toDup.insert(kv.first);
@@ -538,7 +539,7 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>
       pair<uint32_t, uint32_t>& theFile = filesPeers[fileID];
       theFile.second = minimalPeer->first;            // updating filesPeers
       cmds.push_back(new DuplicationCommand(fileID, theFile.first, theFile.second));
-      rootFolder.findFile(fileID)->peer2 = theFile.second; // updating the file system of this host
+      tmpRootFolder.findFile(fileID)->peer2 = theFile.second; // updating the file system of this host
     }
   }
   
@@ -555,7 +556,7 @@ list<FileSystem::Command*> FileSystem::calculateBalance(const set<uint32_t>& pee
   map<uint32_t, set<uint32_t>> peersFiles;
   for (auto& peer : peers)
     peersFiles[peer];
-  rootFolder.getPeersFiles(peersFiles);
+  tmpRootFolder.getPeersFiles(peersFiles);
   
   uint32_t averageFiles = ceil(float(getTotalFiles()*2)/peers.size());
   
@@ -576,7 +577,7 @@ list<FileSystem::Command*> FileSystem::calculateBalance(const set<uint32_t>& pee
         if (minimalPeer->second.find(fileID) == minimalPeer->second.end()){ // file to move found
           maximalPeer->second.erase(fileID);
           minimalPeer->second.insert(fileID);
-          File* file = rootFolder.findFile(fileID);
+          File* file = tmpRootFolder.findFile(fileID);
           if(file->peer1 == maximalPeer->first)
             file->peer1 = minimalPeer->first;
           else
@@ -629,4 +630,8 @@ void FileSystem::processCommands(const list<Command*>& cmds) {
         break;
     }
   }
+}
+
+void FileSystem::initTmpFileSystem() {
+  tmpRootFolder = rootFolder;
 }

@@ -25,6 +25,7 @@ void System::recoverFromFailure() {
       designatedPeer = kv.first;
   }
   if (designatedPeer == localAddress.ip) {
+    FileSystem::initTmpFileSystem();
     list<FileSystem::Command*> cmds = FileSystem::calculateDuplications(peers);
     list<FileSystem::Command*> balCmds = FileSystem::calculateBalance(peers);
     for (auto& cmd : balCmds)
@@ -39,6 +40,7 @@ void System::recoverFromFailure() {
       conn.send(data);
     }
     send_files(cmds);
+    FileSystem::processCommands(cmds);
     for (auto& cmd : cmds)
       delete cmd;
   }

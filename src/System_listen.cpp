@@ -50,6 +50,7 @@ void System::listen() {
     for (auto& kv : users)
       peers.insert(kv.first);
     list<FileSystem::Command*> cmds;
+    FileSystem::initTmpFileSystem();
     if (users.size() == 2)
       cmds = FileSystem::calculateDuplications(peers);
     else
@@ -64,6 +65,7 @@ void System::listen() {
       conn.send(data);
     }
     send_files(cmds);
+    FileSystem::processCommands(cmds);
     for (auto& cmd : cmds)
       delete cmd;
   }
