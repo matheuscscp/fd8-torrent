@@ -26,17 +26,25 @@ void System::requestSystemState() {
       break;
     }
   }
-  if (!ip) // no one found, then return
+  
+  User& user = users[localAddress.ip];
+  
+  if (!ip) { // no one found, then return
+    user.sessionID = 1;
+    nextSessionID = 2;
     return;
+  }
   
   TCPConnection conn(Address(ip, Address("", TCPUDP_MAIN).port));
   conn.send(char(MTYPE_SYNC));
+  user.sessionID = conn.recv<uint32_t>();
   ByteQueue data(conn.recv<uint32_t>());
   conn.recv(data);
   FileSystem::deserialize(data);
 }
 
 void System::respondSystemState(TCPConnection* peer) {
+  peer->send(nextSessionID);
   ByteQueue data = FileSystem::serialize();
   peer->send(uint32_t(data.size()));
   peer->send(data);

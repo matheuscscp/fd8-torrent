@@ -28,5 +28,4 @@ void System::changeToLogin() {
 
 void System::stateLogin() {
   listen();
-  detectFailure();
 }

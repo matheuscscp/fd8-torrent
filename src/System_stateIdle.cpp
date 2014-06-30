@@ -29,6 +29,5 @@ void System::changeToIdle() {
 void System::stateIdle() {
   listen();
   speak();
-  detectFailure();
   executeProtocol();
 }

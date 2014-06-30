@@ -26,6 +26,7 @@ class System {
     
     class User {
       public:
+        uint32_t sessionID;
         std::string name;
         helpers::Timer timer;
         User();
@@ -38,6 +39,7 @@ class System {
       STATE_IDLE
     };
     
+    uint32_t nextSessionID;
     State state, newState;
     std::map<uint32_t, User> users;
     network::Address localAddress;
@@ -70,7 +72,7 @@ class System {
     void speak();
     void executeProtocol();
     void listen();
-    void detectFailure();
+    void recoverFromFailure();
     
     void loginHttpServer();
     void loginHttpServer_loginAttempt(const std::string& data);

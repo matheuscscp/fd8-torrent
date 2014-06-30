@@ -1,7 +1,7 @@
 /*
- * System_detectFailure.cpp
+ * System_recoverFromFailure.cpp
  *
- *  Created on: Jun 15, 2014
+ *  Created on: Jun 29, 2014
  *      Author: Pimenta
  */
 
@@ -9,31 +9,18 @@
 #include "System.hpp"
 
 // local
-#include "Defines.hpp"
 #include "FD8Protocol.hpp"
 
 using namespace std;
+using namespace helpers;
 using namespace network;
 using namespace fd8protocol;
-using namespace helpers;
 
-void System::detectFailure() {
+void System::recoverFromFailure() {
   set<uint32_t> peers;
-  for (auto it = users.begin(); it != users.end();) {
-    if (it->second.timer.time() >= MS_DETECTFAILURE) {
-      users.erase(it++);
-    }
-    else {
-      peers.insert(it->first);
-      ++it;
-    }
-  }
-  
-  if (state == STATE_LOGIN)
-    return;
-  
   uint32_t designatedPeer = 0;
   for (auto& kv : users) {
+    peers.insert(kv.first);
     if (kv.first > designatedPeer)
       designatedPeer = kv.first;
   }

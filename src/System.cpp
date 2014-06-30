@@ -20,11 +20,11 @@ Thread* System::thread = nullptr;
 bool System::started = false;
 bool System::initialized = false;
 
-System::User::User() {
+System::User::User() : sessionID(0) {
   
 }
 
-System::User::User(const string& name) : name(name) {
+System::User::User(const string& name) : sessionID(0), name(name) {
   
 }
 
@@ -71,6 +71,7 @@ bool System::running() {
 }
 
 System::System() :
+nextSessionID(1),
 state(STATE_NONE),
 newState(STATE_LOGIN),
 localAddress(Address::local()),
