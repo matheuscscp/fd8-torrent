@@ -303,7 +303,7 @@ button.submit:active{
 .img-td{ width: 2%; }
 .table{	width: 100%; border-collapse: collapse; }
 
-#file-system thead th{
+#file-system thead th, #users-list thead th{
 	background: #000;
 	color: #fff;
 	text-align: left;

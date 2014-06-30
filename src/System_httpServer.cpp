@@ -327,7 +327,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
   } else if( request == "list-users" ){
     string tableContent;
     for(auto& kv : users) {
-      tableContent += "<tr><td>";
+      tableContent += "<tr><td><img src='img/userimg.png'/></td><td>";
       tableContent += kv.second.name;
       tableContent += "</td>";
       tableContent += "<td>";

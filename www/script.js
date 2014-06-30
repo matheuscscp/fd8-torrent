@@ -3,6 +3,9 @@ var currPath = '/';
 var page = 1;
 var folderToEdit = '';
 var folderFormAction;
+var currFolders = 0;
+var currFiles = 0;
+var currUsers = 0;
 
 // Funcao para inicializar a variavel de requisicao para o servidor
 function configureBrowserRequest(xmlhttp){
@@ -32,21 +35,6 @@ function logout() {
 	client.send();
 }
 
-// Funcao que pergunta ao servidor o IP do host e retorna o mesmo
-function getHostIP(){
-	var client;
-	client = configureBrowserRequest(client);	
-	
-	client.onreadystatechange = function() {
-		if(client.readyState == 4 && client.status == 200){
-			document.getElementById("host-ip").innerHTML = client.responseText;
-		}
-	}
-	
-	client.open("POST", "?host-ip", true);
-	client.send();
-}
-
 // Funcao que pergunta ao servidor o numero de hosts e retorna o mesmo
 function getNumberOfHosts(){ 
 	var client;
@@ -56,6 +44,11 @@ function getNumberOfHosts(){
 	
 	client.onreadystatechange = function() {
 		if(client.readyState == 4 && client.status == 200){
+			if(parseInt(client.responseText) != currUsers){
+				currUsers = parseInt(client.responseText);
+				if(page == 2)
+					requestAndPutHTML("?list-users", "users-list-body");
+			}			
 			if(parseInt(client.responseText) <= 2) {
 				document.getElementById("n-hosts").style.color = "#f00";
 				document.getElementById("n-hosts").innerHTML = "<strong>" + client.responseText + "</strong>";
@@ -87,19 +80,31 @@ function getServerStatus(){
 }
 
 // Funcao para atualizar as informacoes na barra lateral do sistema
-function refreshSideInfo(){
-	getHostIP();
+function refreshSideInfo() {
 	getNumberOfHosts();
 	getServerStatus();
-	if(page == 2)
-		requestAndPutHTML("?list-users", "users-list");
+	requestAndPutHTML("?host-ip", "host-ip");
 	requestAndPutHTML("?total-files", "total-files");
 	requestAndPutHTML("?total-folders", "total-folders");
 	requestAndPutHTML("?total-size", "total-size");
 	requestAndPutHTML("?username", "username");
-	requestAndPutHTML("?folder-tfolders=" + currPath, "folder-tfolders");
-	requestAndPutHTML("?folder-tfiles=" + currPath, "folder-tfiles");
-	requestAndPutHTML("?folder-tsize=" + currPath, "folder-tsize");
+	if(page == 1){
+		requestAndPutHTML("?folder-tfolders=" + currPath, "folder-tfolders");
+		requestAndPutHTML("?folder-tfiles=" + currPath, "folder-tfiles");
+		requestAndPutHTML("?folder-tsize=" + currPath, "folder-tsize");
+	}
+	
+	// Checking if we need to refresh de file system list
+	var nFiles = parseInt(document.getElementById("total-files").innerText);
+	var nFolders = parseInt(document.getElementById("total-users").innerText);
+	alert(nFiles);
+	alert(nFolders);
+	if(currFiles != nFiles || currFolders != nFolders){
+		currFiles = nFiles;
+		currFolders = nFolders;
+		if (page == 1)
+			requestAndPutHTML("?list-users", "users-list-body");
+	}
 }
 
 function requestAndPutHTML(command, areaId){
@@ -121,7 +126,7 @@ function optionListUser(){
 	document.getElementById("separator").style.display = 'none';
 	document.getElementById("folder-info").style.display = 'none';
 	requestAndPutHTML("listUsers.html", "content");
-	requestAndPutHTML("?list-users", "users-list");
+	requestAndPutHTML("?list-users", "users-list-body");
 }
 
 function optionListFiles(){
