@@ -19,9 +19,8 @@
 #define SIZE_FILEBUFFER_MAXLEN  0x4000
 
 // times
-#define MS_INITTIMER            3000
 #define MS_SLEEP                20
-#define MS_DETECTFAILURE        12000
+#define MS_DETECTFAILURE        6000
 #define MS_SPEAK                1000
 #define MS_LOGINSYNC            2000
 

@@ -42,7 +42,7 @@ void System::loginHttpServer() {
     client->recv(tmp);
   }
   
-  if (requestLine.find("?") != string::npos) {
+  if (requestLine.find("?login") != string::npos) {
     loginHttpServer_loginAttempt(requestLine);
   }
   else {
@@ -111,7 +111,7 @@ void System::loginHttpServer_loginAttempt(const string& data) {
     return;
   }
   
-  string input = data.substr(data.find("?") + 1, data.size());
+  string input = data.substr(data.find("=") + 1, data.size());
   
   if (!input.size()) {
     client->send(string("0"), true);
