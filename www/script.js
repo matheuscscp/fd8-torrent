@@ -154,15 +154,26 @@ function previousFolder(){
 	retrieveFolder(currPath);
 }
 
-function searchOnTable(inputId, tableId){
+function searchOnTable(input, tableId){
 	var table = document.getElementById(tableId);
-	var tableHead = table.rows[0];
-	var key = new Array();
-	var tdTxt = new Array();
+	var rows = table.rows;
+	var key = input.value.toLowerCase();
 	
-	for (var i = 0; i < tableHead.cells.length; i++){}
-	for (var j = 0; j < table.rows.length; i++){
-	
+	for (var i = 1; i < rows.length; i++){
+		var cells = rows[i].getElementsByTagName("td");
+		var find = 0;
+		for (var j = 0; j < cells.length; j++){
+			if(j == 1 || j == 3){
+				var txt = cells[j].innerText.toLowerCase();
+				alert(txt);
+				if(txt.indexOf(key) != -1 || key == "")
+					find = 1;
+			}
+		}
+		if(!find)
+			rows[i].style.display = "none";
+		else
+			rows[i].style.display = "table-row";
 	}
 }
 

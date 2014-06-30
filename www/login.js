@@ -27,7 +27,7 @@
 		}
 	}
 	
-	server.open("POST", "?" + username, true);
+	server.open("POST", "?login=" + username, true);
 	server.send();
 	
 }
