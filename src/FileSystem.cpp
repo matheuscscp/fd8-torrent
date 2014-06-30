@@ -531,7 +531,7 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>
     
     if (fileToDup == toDup.end()) // if the peer already have all the toDup files
       peersFiles.erase(minimalPeer);
-    else { // 
+    else { // file to duplicate found for this minimal peer
       uint32_t fileID = *fileToDup;
       toDup.erase(fileToDup);                         // updating toDup (removing fileToDup from toDup set)
       minimalPeer->second.insert(fileID);             // updating peersFiles
@@ -557,32 +557,34 @@ list<FileSystem::Command*> FileSystem::calculateBalance(const set<uint32_t>& pee
     peersFiles[peer];
   rootFolder.getPeersFiles(peersFiles);
   
-  list<pair<uint32_t, set<uint32_t>>> orderedPeers;
   uint32_t averageFiles = ceil(float(getTotalFiles()*2)/peers.size());
   
   map<uint32_t, BalancingCommand*> tmpCmds;
   
   while (true) { // one iteration of this loop move a single file
-    for (auto& kv : peersFiles) { // sorting peers
-      auto it = orderedPeers.begin();
-      for (; it != orderedPeers.end() && it->second.size() < kv.second.size(); it++);
-      orderedPeers.insert(it, kv);
+    auto minimalPeer = peersFiles.begin(), maximalPeer = peersFiles.begin();
+    auto peerIt = peersFiles.begin();
+    for (peerIt++; peerIt != peersFiles.end(); peerIt++) {
+      if (peerIt->second.size() < minimalPeer->second.size())
+        minimalPeer = peerIt;
+      else if (peerIt->second.size() > maximalPeer->second.size())
+        maximalPeer = peerIt;
     }
     
-    if (orderedPeers.back().second.size() > averageFiles) { // not balanced
-      for(auto& fileID : orderedPeers.back().second){ // choose a file to move
-        if(orderedPeers.front().second.find(fileID) == orderedPeers.front().second.end()){ // file found
-          orderedPeers.back().second.erase(fileID);
-          orderedPeers.front().second.insert(fileID);
+    if (maximalPeer->second.size() > averageFiles) { // not balanced
+      for (auto& fileID : maximalPeer->second) { // choose a file to move
+        if (minimalPeer->second.find(fileID) == minimalPeer->second.end()){ // file to move found
+          maximalPeer->second.erase(fileID);
+          minimalPeer->second.insert(fileID);
           File* file = rootFolder.findFile(fileID);
-          if(file->peer1 == orderedPeers.back().first)
-            file->peer1 = orderedPeers.front().first;
+          if(file->peer1 == maximalPeer->first)
+            file->peer1 = minimalPeer->first;
           else
-            file->peer2 = orderedPeers.front().first;
+            file->peer2 = minimalPeer->first;
           BalancingCommand* balCmd;
           auto balCmdIt = tmpCmds.find(fileID);
           if (balCmdIt == tmpCmds.end()) {
-            balCmd = new BalancingCommand(fileID, orderedPeers.back().first, file->peer1, file->peer2);
+            balCmd = new BalancingCommand(fileID, maximalPeer->first, file->peer1, file->peer2);
             tmpCmds[fileID] = balCmd;
           }
           else {
