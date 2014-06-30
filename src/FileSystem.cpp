@@ -512,12 +512,11 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>
   }
   
   while (toDup.size()) {
-    // find the peer with least files in fileCount
-    auto minimalPeer = peersFiles.end();
-    for (auto peerIt = peersFiles.begin(); peerIt != peersFiles.end(); peerIt++) {
-      if (minimalPeer == peersFiles.end())
-        minimalPeer = peerIt;
-      else if (peerIt->second.size() < minimalPeer->second.size())
+    // find the peer with least files in peersFiles
+    auto minimalPeer = peersFiles.begin();
+    auto peerIt = peersFiles.begin();
+    for (peerIt++; peerIt != peersFiles.end(); peerIt++) {
+      if (peerIt->second.size() < minimalPeer->second.size())
         minimalPeer = peerIt;
     }
     
