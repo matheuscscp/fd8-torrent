@@ -143,9 +143,9 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
     }
     else if(cmd->type() == MTYPE_CMD_BALANCING && ((FileSystem::BalancingCommand*)cmd)->srcPeer == localAddress.ip) {
       FileSystem::BalancingCommand& balCmd = *((FileSystem::BalancingCommand*)cmd);
-      Thread([this, balCmd]() {
-        string zuera;
-        FileSystem::File* file = FileSystem::retrieveFolder("/", zuera)->findFile(balCmd.fileID);
+      string zuera;
+      FileSystem::File file = *FileSystem::retrieveFolder("/", zuera)->findFile(balCmd.fileID);
+      Thread([this, balCmd, file]() {
         char buf[SIZE_FILEBUFFER_MAXLEN];
         
         // getting file name
@@ -159,7 +159,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
         fclose(fp);
         
         // sending to peer 1
-        if (balCmd.peer1 != file->peer1 && balCmd.peer1 != file->peer2) {
+        if (balCmd.peer1 != file.peer1 && balCmd.peer1 != file.peer2) {
           TCPConnection conn(Address(balCmd.peer1, Address("", TCPUDP_MAIN).port));
           conn.send(char(fd8protocol::MTYPE_FILE));
           conn.send(uint32_t(balCmd.fileID));
@@ -174,7 +174,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
         }
         
         // sending to peer 2
-        if (balCmd.peer2 != file->peer1 && balCmd.peer2 != file->peer2) {
+        if (balCmd.peer2 != file.peer1 && balCmd.peer2 != file.peer2) {
           TCPConnection conn(Address(balCmd.peer2, Address("", TCPUDP_MAIN).port));
           conn.send(char(fd8protocol::MTYPE_FILE));
           conn.send(uint32_t(balCmd.fileID));
