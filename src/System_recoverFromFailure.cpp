@@ -26,6 +26,9 @@ void System::recoverFromFailure() {
   }
   if (designatedPeer == localAddress.ip) {
     list<FileSystem::Command*> cmds = FileSystem::calculateDuplications(peers);
+    list<FileSystem::Command*> balCmds = FileSystem::calculateBalance(peers);
+    for (auto& cmd : balCmds)
+      cmds.push_back(cmd);
     ByteQueue data = FileSystem::Command::serialize(cmds);
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)
@@ -35,7 +38,7 @@ void System::recoverFromFailure() {
       conn.send(uint32_t(data.size()));
       conn.send(data);
     }
-    send_fileDuplications(cmds);
+    send_files(cmds);
     for (auto& cmd : cmds)
       delete cmd;
   }

@@ -91,6 +91,20 @@ class FileSystem {
       public:
         char type();
     };
+    
+    class BalancingCommand : public Command {
+      public:
+        uint32_t fileID;
+        uint32_t srcPeer;
+        uint32_t peer1;
+        uint32_t peer2;
+        BalancingCommand(helpers::ByteQueue& data);
+        BalancingCommand(uint32_t fileID, uint32_t srcPeer, uint32_t peer1, uint32_t peer2);
+      private:
+        void serialize_(helpers::ByteQueue& data);
+      public:
+        char type();
+    };
   private:
     static Folder rootFolder;
     static uint32_t nextID;
@@ -120,7 +134,8 @@ class FileSystem {
     static uint32_t getTotalFiles();
     static uint64_t getTotalSize();
     
-    static std::list<Command*> calculateDuplications(std::set<uint32_t>& peers);
+    static std::list<Command*> calculateDuplications(const std::set<uint32_t>& peers);
+    static std::list<Command*> calculateBalance(const std::set<uint32_t>& peers);
     static void processCommands(const std::list<Command*>& cmds);
 };
 

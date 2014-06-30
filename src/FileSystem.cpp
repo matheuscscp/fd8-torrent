@@ -10,6 +10,7 @@
 
 // standard
 #include <cstdlib>
+#include <cmath>
 
 // local
 #include "FD8Protocol.hpp"
@@ -251,6 +252,10 @@ list<FileSystem::Command*> FileSystem::Command::deserialize(ByteQueue& data) {
         cmds.push_back(new DuplicationCommand(data));
         break;
         
+      case MTYPE_CMD_BALANCING:
+        cmds.push_back(new BalancingCommand(data));
+        break;
+        
       default:
         break;
     }
@@ -283,6 +288,24 @@ void FileSystem::DuplicationCommand::serialize_(ByteQueue& data) {
 
 char FileSystem::DuplicationCommand::type() {
   return MTYPE_CMD_DUPLICATION;
+}
+
+FileSystem::BalancingCommand::BalancingCommand(ByteQueue& data) :
+fileID(data.pop<uint32_t>()), srcPeer(data.pop<uint32_t>()), peer1(data.pop<uint32_t>()), peer2(data.pop<uint32_t>()) {
+  
+}
+
+FileSystem::BalancingCommand::BalancingCommand(uint32_t fileID, uint32_t srcPeer, uint32_t peer1, uint32_t peer2) :
+fileID(fileID), srcPeer(srcPeer), peer1(peer1), peer2(peer2) {
+  
+}
+
+void FileSystem::BalancingCommand::serialize_(ByteQueue& data) {
+  data.push(fileID).push(srcPeer).push(peer1).push(peer2);
+}
+
+char FileSystem::BalancingCommand::type() {
+  return MTYPE_CMD_BALANCING;
 }
 
 void FileSystem::init(uint32_t localIP) {
@@ -467,7 +490,7 @@ uint64_t FileSystem::getTotalSize() {
   return rootFolder.getTotalSize();
 }
 
-list<FileSystem::Command*> FileSystem::calculateDuplications(set<uint32_t>& peers) {
+list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>& peers) {
   list<Command*> cmds;
   
   if (peers.size() == 1)
@@ -523,6 +546,65 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(set<uint32_t>& peer
   return cmds;
 }
 
+list<FileSystem::Command*> FileSystem::calculateBalance(const set<uint32_t>& peers) {
+  list<Command*> cmds;
+  
+  if (peers.size() <= 2)
+    return cmds;
+  
+  // get files of each peer
+  map<uint32_t, set<uint32_t>> peersFiles;
+  for (auto& peer : peers)
+    peersFiles[peer];
+  rootFolder.getPeersFiles(peersFiles);
+  
+  list<pair<uint32_t, set<uint32_t>>> orderedPeers;
+  uint32_t averageFiles = ceil(float(getTotalFiles()*2)/peers.size());
+  
+  map<uint32_t, BalancingCommand*> tmpCmds;
+  
+  while (true) { // one iteration of this loop move a single file
+    for (auto& kv : peersFiles) { // sorting peers
+      auto it = orderedPeers.begin();
+      for (; it != orderedPeers.end() && it->second.size() < kv.second.size(); it++);
+      orderedPeers.insert(it, kv);
+    }
+    
+    if (orderedPeers.back().second.size() > averageFiles) { // not balanced
+      for(auto& fileID : orderedPeers.back().second){ // choose a file to move
+        if(orderedPeers.front().second.find(fileID) == orderedPeers.front().second.end()){ // file found
+          orderedPeers.back().second.erase(fileID);
+          orderedPeers.front().second.insert(fileID);
+          File* file = rootFolder.findFile(fileID);
+          if(file->peer1 == orderedPeers.back().first)
+            file->peer1 = orderedPeers.front().first;
+          else
+            file->peer2 = orderedPeers.front().first;
+          BalancingCommand* balCmd;
+          auto balCmdIt = tmpCmds.find(fileID);
+          if (balCmdIt == tmpCmds.end()) {
+            balCmd = new BalancingCommand(fileID, orderedPeers.back().first, file->peer1, file->peer2);
+            tmpCmds[fileID] = balCmd;
+          }
+          else {
+            balCmd = balCmdIt->second;
+            balCmd->peer1 = file->peer1;
+            balCmd->peer2 = file->peer2;
+          }
+          break;
+        }
+      }
+    } else { // balanced
+      break;
+    }
+  }
+  
+  for (auto& kv : tmpCmds)
+    cmds.push_back(kv.second);
+  
+  return cmds;
+}
+
 void FileSystem::processCommands(const list<Command*>& cmds) {
   for (auto& cmd : cmds) {
     switch (cmd->type()) {
@@ -531,6 +613,14 @@ void FileSystem::processCommands(const list<Command*>& cmds) {
         File* file = rootFolder.findFile(dupCmd.fileID);
         file->peer1 = dupCmd.srcPeer;
         file->peer2 = dupCmd.dstPeer;
+        break;
+      }
+      
+      case MTYPE_CMD_BALANCING: {
+        BalancingCommand& balCmd = *((BalancingCommand*)cmd);
+        File* file = rootFolder.findFile(balCmd.fileID);
+        file->peer1 = balCmd.peer1;
+        file->peer2 = balCmd.peer2;
         break;
       }
       

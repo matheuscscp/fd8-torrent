@@ -8,9 +8,13 @@
 // this
 #include "System.hpp"
 
+// local
+#include "FD8Protocol.hpp"
+
 using namespace std;
 using namespace network;
 using namespace helpers;
+using namespace fd8protocol;
 
 void System::listen() {
   Address addr;
@@ -41,6 +45,27 @@ void System::listen() {
     user.name = data.pop<string>();
     user.timer.start();
     nextSessionID = user.sessionID + 1;
+    
+    set<uint32_t> peers;
+    for (auto& kv : users)
+      peers.insert(kv.first);
+    list<FileSystem::Command*> cmds;
+    if (users.size() == 2)
+      cmds = FileSystem::calculateDuplications(peers);
+    else
+      cmds = FileSystem::calculateBalance(peers);
+    ByteQueue data = FileSystem::Command::serialize(cmds);
+    for (auto& kv : users) {
+      if (kv.first == localAddress.ip)
+        continue;
+      TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
+      conn.send(char(MTYPE_COMMANDS));
+      conn.send(uint32_t(data.size()));
+      conn.send(data);
+    }
+    send_files(cmds);
+    for (auto& cmd : cmds)
+      delete cmd;
   }
   
   // detecting failures
