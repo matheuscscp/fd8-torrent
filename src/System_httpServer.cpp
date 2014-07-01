@@ -173,8 +173,6 @@ void System::httpServer_dataRequest(const string& cRequest) {
   } else if( request == "total-size" ){
     client->send(toString(FileSystem::getTotalSize()));
   } else if( request == "n-hosts" ){
-    printf("%d\n\n", users.size());
-    fflush(stdout);
     client->send(toString(users.size()));
   } else if( request == "server-state" ){
     client->send("1");
