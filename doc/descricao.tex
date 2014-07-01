@@ -1,0 +1,273 @@
+
+\documentclass{article}
+
+\usepackage{authblk}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{graphicx}
+\usepackage[]{algorithm2e}
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+
+\title{Projeto final: FD8 Torrent}
+
+\author{Matheus Pimenta -- 09/0125789 \\ Felipe Rodopoulos -- 10/0100601}
+
+\affil{Universidade de Brasília \\ Instituto de Ciências Exatas \\ Departamento de Ciência da Computação \\ Disciplina: Teleinformática e Redes 2}
+
+%\date{}
+
+\begin{document}
+\maketitle
+
+Para a finalização da disciplina Teleinformática e Redes 2, foi pedido um projeto final cuja aplicação é o compartilhamento de arquivos em uma rede local. Este documento descreve a implementação.
+
+\section{Principais desafios}
+
+\indent
+
+Esta seção descreve os principais desafios do sistema e como eles foram solucionados.
+
+\subsection{Estrutura de dados para representação do sistema de arquivos}
+
+\indent
+
+O primeiro desafio enfrentado foi elaborar uma boa representação do sistema de arquivos, que facilitasse implementações simples e eficientes das quatro operações básicas: criação, recuperação, atualização e remoção de pastas e arquivos.
+
+A solução pensada inicialmente utilizava:
+\begin{itemize}
+	\item um \textit{map} de \textit{strings} para objetos do tipo \textit{Folder}, onde a \textit{string} chave deveria ser o caminho completo da pasta
+	\item o tipo \textit{Folder} possuía um \textit{map} de \textit{strings} para objetos do tipo \textit{File}, onde a \textit{string} chave deveria ser apenas o nome do arquivo
+	\item o tipo \textit{File} possuía campos para informar o tamanho do arquivo, os pares responsáveis e o usuário que enviou o arquivo
+\end{itemize}
+
+Esta solução foi considerada ruim, pois ao modificar o nome de uma pasta, era necessário passar pelo mapa atualizando chaves de muitas outras pastas. Além disso, o armazenamento físico de um arquivo em um par iria precisar que as pastas fossem criadas fisicamente.
+
+Pensando em uma solução com a estrutura de uma árvore, chegamos na seguinte estrutura de dados:
+\begin{itemize}
+	\item o tipo \textit{Folder} possui um \textit{map} de \textit{strings} para objetos do tipo \textit{Folder}, onde a \textit{string} chave é apenas a concatenção de ``/'' com o nome da pasta
+	\item o tipo \textit{Folder} possui também um \textit{map} de \textit{strings} para objetos do tipo \textit{File}, onde a \textit{string} chave é a concatenação de ``/'' com o nome do arquivo
+	\item o tipo \textit{File} possui campos para informar o tamanho do arquivo, os pares responsáveis, o usuário que enviou o arquivo e um número identificador único
+	\item um objeto do tipo \textit{Folder} denominado \textit{rootFolder} foi criado no sistema de arquivos
+\end{itemize}
+
+Com esta solução, a modificação do nome de uma pasta se resume a trocar a entrada da pasta no mapa de sua pasta mãe. Além disso, com um número identificador único para cada arquivo, o armazenamento físico pode ser feito em um grande pasta que contém apenas os arquivos físicos.
+
+\subsection{Criação de um algoritmo de duplicação de arquivos}
+
+\indent
+
+Para duplicar arquivos entre os pares, foi desenvolvido o algoritmo Pimenta--Rodopoulos, que seleciona os arquivos que precisam ser duplicados e os distribui procurando os pares com menos arquivos. Procurou-se pares com menos arquivos para facilitar o trabalho do algoritmo de balanceamento.
+
+\begin{algorithm}[H]
+ \KwData{rootFolder}
+ \KwResult{um conjunto de comandos de duplicação}
+ cmds $\leftarrow$ [] \\
+ peersFiles $\leftarrow$ o mapa de IPs para conjuntos de arquivos obtido de rootFolder \\
+ filesPeers $\leftarrow$ o mapa de IDs para pares de IPs obtido de rootFolder \\
+ toDup $\leftarrow$ o conjunto dos arquivos de filesPeers com apenas apenas um IP válido \\
+ \For{$file \in filesPeers$}{
+  \eIf{$peersFiles.contains(file.value.peer1)$}{
+   file.value.peer2 $\leftarrow$ 0 \\
+  }{
+   file.value.peer1 $\leftarrow$ file.value.peer2 \\
+   file.value.peer2 $\leftarrow$ 0 \\
+  }
+ }
+ \While{$toDup.size() > 0$}{
+  peer $\leftarrow$ o par com menos arquivos em peersFiles \\
+  f $\leftarrow$ null \\
+  \For{$file \in toDup$}{
+   \If{$peer.value.contains(file)$}{
+    f $\leftarrow$ filesPeers[file] \\
+    pare \\
+   }
+  }
+  \eIf{$f = null$}{
+   peersFiles.erase(peer.key) \\
+  }{
+   toDup.erase(f.key) \\
+   peer.value.insert(f.key) \\
+   f.value.peer2 $\leftarrow$ peer.key \\
+   cmds.insert(DuplicationCommand(f.key, f.value.peer1, f.value.peer2)) \\
+  }
+ }
+ \caption{Algoritmo Pimenta--Rodopoulos}
+\end{algorithm}
+
+\subsection{Criação de um algoritmo de balanceamento}
+\label{rodopoulos-pimenta}
+
+\indent
+
+Para balancear a quantidade de arquivos entre os pares, de modo que cada par possua no máximo $\ceil{\frac{\#arquivos}{\#pares}}$ arquivos físicos, foi desenvolvido o algoritmo Rodopoulos--Pimenta.
+
+\begin{algorithm}[H]
+ \KwData{rootFolder e averageFiles}
+ \KwResult{um mapa de IDs para comandos de balanceamento}
+ cmds $\leftarrow$ [] \\
+ peersFiles $\leftarrow$ o mapa de IPs para conjuntos de arquivos obtido de rootFolder \\
+ \For{$file \in filesPeers$}{
+  \eIf{$peersFiles.contains(file.value.peer1)$}{
+   file.value.peer2 $\leftarrow$ 0 \\
+  }{
+   file.value.peer1 $\leftarrow$ file.value.peer2 \\
+   file.value.peer2 $\leftarrow$ 0 \\
+  }
+ }
+ \While{$true$}{
+  minimalPeer $\leftarrow$ o par com menos arquivos em peersFiles \\
+  maximalPeer $\leftarrow$ o par com mais arquivos em peersFiles \\
+  \If{$maximalPeer.value.size() \leq averageFiles$}{
+   pare \\
+  }
+  \For{$file \in maximalPeer.value$}{
+   \If{$minimalPeer.value.contains(file.key)$}{
+    continue \\
+   }
+   maximalPeer.value.erase(file.key) \\
+   minimalPeer.value.insert(file.key) \\
+   f $\leftarrow$ referência do objeto com ID file.key contido em rootFolder \\
+   \eIf{$f.peer1 = maximalPeer.key$}{
+    f.peer1 $\leftarrow$ minimalPeer.key \\
+   }{
+    f.peer2 $\leftarrow$ minimalPeer.key \\
+   }
+   \eIf{$cmds.contains(file.key)$}{
+    balCmd $\leftarrow$ cmds[file.key] \\
+    balCmd.peer1 $\leftarrow$ f.peer1 \\
+    balCmd.peer2 $\leftarrow$ f.peer2 \\
+   }{
+    cmds[file.key] $\leftarrow$ BalancingCommand(file.key, maximalPeer.key, f.peer1, f.peer2) \\
+   }
+   pare \\
+  }
+ }
+ \caption{Algoritmo Rodopoulos--Pimenta}
+\end{algorithm}
+
+\section{Requisitos e implementações}
+
+\indent
+
+Esta seção descreve a implementação de cada requisito do projeto final.
+
+\subsection{Cadastro de usuários}
+
+\indent
+
+Requisito -- O sistema deve permitir o cadastro de usuários com ID único.
+
+Implementação -- Para implementar um cadastro de usuários, decidimos que o mais adequando seria criar sessões de acesso ao sistema através de um nome de usuário único, ou seja, ao tentar acessar o sistema, o usuário deve entrar com um nome que não exista na tabela de usuários.
+
+Para implementar a sessão de acesso com nome de usuário único, foi criado um número identificar único de sessão que só é válido até que o usuário saia do sistema. O endereço IP e o número identificador de sessão são utilizados para detectar falhas de pares.
+
+\subsection{Ações de usuários}
+
+\indent
+
+Requisito -- Usuários cadastrados podem:
+
+\begin{itemize}
+	\item Acessar o estado do sistema
+	\begin{itemize}
+		\item Número de arquivos no sistema
+		\item Capacidade total armazenada no sistema
+		\item Distribuição dos arquivos entre os pares
+		\item Número de pares ativos (alertar se houver apenas dois)
+	\end{itemize}
+	\item Visualizar a árvore de diretórios do sistema de arquivos
+	\item Criar diretórios
+	\item Enviar arquivos
+	\item Renomear diretórios/arquivos
+	\item Remover diretórios/arquivos
+\end{itemize}
+
+Implementação -- Para visualizar o número de arquivos, a capacidade total armazenada e o número de pares ativos no sistema, foi feita uma divisão lateral na interface do sistema que atualiza as informações de estado constantemente utilizando AJAX. Além das informações pedidas, são informados também o nome e o IP do usuário.
+
+Para visualizar a árvore de diretórios do sistema de arquivos, foi criada um variável no navegador de páginas que armazena o caminho completo da pasta que está sendo visualizada atualmente. Esta variável é exibida na interface do sistema, juntamente com a quantidade de subpastas, arquivos e capacidade da pasta atual. Na área principal da interface, as subpastas e arquivos são listados. Para navegar entre as pastas, basta clicar no nome de uma pasta para entrar nela, ou clicar no botão ``Nível acima'' para ir até a pasta mãe da pasta atual. A listagem é atualizada automaticamente caso hajam mudanças no sistema de arquivos.
+
+Para criar diretórios e enviar arquivos, foram criados dois botões ao lado do botão ``Nível acima'', que disparam requisições AJAX ao servidor \textit{web}. O servidor \textit{web} verifica o tipo de requisição, tentar realizar a operação chamando o módulo responsável pelo sistema de arquivos e retorna códigos de erro ou sucesso para o navegador.
+
+Para renomear diretórios ou arquivos, cada item da listagem da pasta atual possui um pequeno botão com a imagem de um lápis que, ao ser clicado, abre uma caixa de entrada para o novo nome. Um botão de confirmação ao lado da caixa dispara a requisição AJAX para o servidor \textit{web}.
+
+Para remover diretórios ou arquivos, cada item da listagem da pasta atual possui também um pequeno botão com a imagem de um $X$ vermelho que dispara a requisição AJAX.
+
+Para visualizar a distribuição dos arquivos entre os pares, decidimos criar dois botões na linha de um arquivo da listagem. Cada botão contém a URL com o IP de um dos pares que está armazenando o arquivo naquele momento.
+
+\subsection{Interface do usuário}
+
+\indent
+
+Requisito -- A interface utilizada pelos usuários deve ser um \textit{browser} (navegador) compatível com HTML 5.0.
+
+Implementação -- A interface do sistema foi implementada em HTML5 e CSS3. O sistema foi testado nos navegadores Google Chrome, Mozilla Firefox e Internet Explorer.
+
+\subsection{Utilização da aplicação}
+
+\indent
+
+Requisito -- Para utilizar o sistema o usuário deverá apontar seu \textit{browser} para o endereço
+
+http://localhost:8080/
+
+Implementação -- A porta do servidor \textit{web} foi parametrizada na etapa de compilação do sistema. A compilação final foi feita com a porta 8080, como pedido, de modo que o usuário pode apontar seu navegador para o endereço http://localhost:8080/ e utilizar o sistema.
+
+Para iniciar o sistema, a aplicação abre um janela gráfica. Um botão central do tipo \textit{toggle} foi colocado na janela para iniciar e finalizar o sistema. Ao iniciar o sistema, um botão aparece na parte superior da janela, que dispara a abertura do navegador padrão do sistema operacional no endereço http://localhost:8080/.
+
+\subsection{Descobrimento de pares}
+
+\indent
+
+Requisito -- Um par deve se capaz de descobrir os demais pares que estiverem executando na rede.
+
+Implementação -- Para solucionar este problema, pensou-se inicialmente em abrir um \textit{socket} UDP para enviar segmentos \textit{broadcast} e \textit{multicast} de descobrimento. Os pares que recebessem estes segmentos deveriam responder confirmando a existência. A partir daí, cada par deveria enviar periodicamente segmentos direcionados para cada um dos outros pares e todos devem responder.
+
+Pensando mais tarde em outra solução, vimos que a solução acima iria provocar um tráfego maior de segmentos UDP na rede e sua implementação seria um pouco mais complexa.
+
+A solução de fato implementada foi enviar periodicamente segmentos sinalizadores de existência em \textit{broadcast} e \textit{multicast}. Os sinalizadores são suficientes tanto para descobrimento de novos pares quanto para detecção de falhas.
+
+A decisão de enviar segmentos tanto em \textit{broadcast} quando em \textit{multicast} foi tomada por duas razões opostas. Por um lado, a tendência do \textit{broadcast} é deixar de existir, em virtude do \textit{multicast}. Uma das mudanças do IPV4 para o IPV6 é a remoção de \textit{broadcast}. Por outro lado, \textit{multicast} não é permitido por padrão em alguns ambientes. É preciso configurar para que seja permitido. Portanto, atualmente, os dois segmentos são complementares.
+
+\subsection{Tolerância a falha de um par}
+
+\indent
+
+Requisito -- O sistema deve ser tolerante a falha de uma máquina, ou seja, os pares ativos devem trocar informações de forma que todos se mantenham sincronizados em relação (i) ao sistema de arquivos, (ii) ao cadastro de usuários e (iii) ao estado do sistema. Para tal, cada arquivo deve ser armazenado em duplicidade na rede, ou seja, a quantidade total de dados armazenados no sistema deve ser igual ao dobro da soma dos tamanhos dos arquivos existentes.
+
+Implementação -- Para implementar este requisito, utilizou-se um temporizador que detecta a falha de um par caso um segmento UDP sinalizador não chegue em um determinado intervalo de tempo.
+
+Ao detectar uma falha, cada par remanescente verifica se o seu endereço IP é o menor. Apenas o par de menor endereço IP irá calcular as duplicações e o balanceamento necessário.
+
+Ao calcular os comandos de duplicação e balanceamento, o par de menor endereço IP envia estes comandos aos outros pares, que, por sua vez, atualizam suas próprias tabelas e enviam os arquivos necessários.
+
+\subsection{Balanceamento de arquivos}
+
+\indent
+
+Requisito -- O sistema deve promover o balanceamento de arquivos, distribuindo os arquivos entre os pares conectados de forma que cada par possua uma quantidade similar de arquivos, sendo no máximo $\ceil{\frac{\#arquivos}{\#pares}}$.
+
+Implementação -- Para implementar o balanceamento de arquivos, foi desenvolvido o algoritmo Rodopoulos--Pimenta (seção \ref{rodopoulos-pimenta}), que gera um conjunto de comandos de balanceamento. Os comandos são processados por cada par, para que as tabelas possam ser atualizadas e os arquivos possam ser enviados e removidos.
+
+\section{Protocolo de comunicação}
+
+\indent
+
+O protocolo de comunicação desenvolvido estabelece nove tipos de mensagens. Assim que um par aceita uma conexão TCP, ele deve receber um \textit{byte}, que indica o tipo de mensagem. De acordo com cada mensagem, outros \textit{bytes} devem ser recebidos e ações devem ser tomadas.
+
+\begin{itemize}
+	\item SYNC -- Ao receber esta mensagem, o par deve serializar toda a informação atual do sistema de arquivos e enviar pela conexão TCP.
+	\item CREATE FOLDER -- Ao receber esta mensagem, o par deve receber uma \textit{string} terminada em nulo que contém um caminho de pasta e criar a pasta no seu sistema de arquivos.
+	\item UPDATE FOLDER -- Ao receber esta mensagem, o par deve receber uma \textit{string} terminada em nulo que contém um caminho de pasta, outra \textit{string} terminada em nulo que contém o novo nome da pasta e realizar a atualização no seu sistema de arquivos.
+	\item DELETE FOLDER -- Ao receber esta mensagem, o par deve receber uma \textit{string} terminada em nulo que contém um caminho de pasta e remover a pasta do seu sistema de arquivos.
+	\item CREATE FILE -- Ao receber esta mensagem, o par deve receber uma \textit{string} terminada em nulo que contém um caminho de arquivo, receber quatro \textit{bytes} que indicam o tamanho de uma fila de \textit{bytes}, receber a fila de \textit{bytes}, que contém as informações do arquivo criado, e criar o arquivo no seu sistema de arquivos.
+	\item UPDATE FILE -- Ao receber esta mensagem, o par deve receber uma \textit{string} terminada em nulo que contém um caminho de arquivo, outra \textit{string} terminada em nulo que contém o novo nome do arquivo e realizar a atualização no seu sistema de arquivos.
+	\item DELETE FILE -- Ao receber esta mensagem, o par deve receber uma \textit{string} terminada em nulo que contém um caminho de arquivo e remover o arquivo do seu sistema de arquivos.
+	\item COMMANDS -- Ao receber esta mensagem, o par deve receber quatro \textit{bytes} que indicam o tamanho de uma fila de \textit{bytes}, receber a fila de \textit{bytes}, que contém a serialização de uma lista de comandos, e deserializar a fila de \textit{bytes} chamando o módulo responsável pelo sistema de arquivos. Ao remontar os comandos, o par deve processá-los, enviando arquivos para duplicação/balanceamento, removendo arquivos que não pertecem mais a ele e atualizando seu sistema de arquivos.
+	\item FILE -- Ao receber esta mensagem, o par deve receber quatro \textit{bytes} que contêm o número identificador único do arquivo, quatro \textit{bytes} com o tamanho do arquivo e receber o arquivo.
+\end{itemize}
+
+Além das mensagens trocadas por TCP, o protocolo também estabelece que a carga útil dos sinalizadores UDP deve ser quatro \textit{bytes}, que contêm o número identificador único de sessão de acesso, seguidos de uma \textit{string} terminada em nulo que contenha o nome de usuário de um par.
+
+\end{document}
