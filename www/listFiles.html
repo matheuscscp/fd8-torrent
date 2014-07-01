@@ -6,8 +6,12 @@
 	<input class="as-table" type="text" placeholder="" id="folderform-input">
 	<button id="folderform-button" class="as-table button-filesystem" onclick="formFolderAction()"></button>
 	<div class="search-bar as-table">
-		<img src="img/lupa.png" />
-		<input type="text" onkeyup="searchOnTable(this,'file-system')" class="finder" placeholder="Buscar pasta ou arquivo..." autofocus>
+		<table>
+			<tr>
+				<td><img src="img/lupa.png" /></td>
+				<td><input type="text" onkeyup="searchOnTable(this,'file-system')" class="finder" placeholder="Buscar pasta ou arquivo..." autofocus></td>
+			</tr>
+		</table>
 	</div>
 </div>
 
