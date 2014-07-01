@@ -158,7 +158,7 @@ function previousFolder(){
 	retrieveFolder(currPath);
 }
 
-function searchOnTable(input, tableId){
+function searchOnTable(input, tableId, cellIndexes){
 	var table = document.getElementById(tableId);
 	var rows = table.rows;
 	var key = input.value.toLowerCase();
@@ -167,7 +167,14 @@ function searchOnTable(input, tableId){
 		var cells = rows[i].getElementsByTagName("td");
 		var find = 0;
 		for (var j = 0; j < cells.length; j++){
-			if(j == 1 || j == 3){
+			var check = 0;
+			for (var k = 0; k < cellIndexes.length; k++) {
+				if (j == cellIndexes[k]) {
+					check = 1;
+					break;
+				}
+			}
+			if(check){
 				var txt = cells[j].innerText.toLowerCase();
 				if(txt.indexOf(key) != -1 || key == "")
 					find = 1;
