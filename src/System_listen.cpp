@@ -30,7 +30,8 @@ void System::listen() {
         userIt->second.timer.start();
       else { // failure detected
         users.erase(userIt);
-        recoverFromFailure();
+        if (state == STATE_IDLE)
+          recoverFromFailure();
         User& user = users[addr.ip];
         user.sessionID = sessionID;
         user.name = data.pop<string>();
@@ -45,28 +46,30 @@ void System::listen() {
       user.timer.start();
       nextSessionID = user.sessionID + 1;
       
-      set<uint32_t> peers;
-      for (auto& kv : users)
-        peers.insert(kv.first);
-      list<FileSystem::Command*> cmds;
-      FileSystem::initTmpFileSystem();
-      if (users.size() == 2)
-        cmds = FileSystem::calculateDuplications(peers);
-      else
-        cmds = FileSystem::calculateBalance(peers);
-      ByteQueue data = FileSystem::Command::serialize(cmds);
-      for (auto& kv : users) {
-        if (kv.first == localAddress.ip)
-          continue;
-        TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
-        conn.send(char(MTYPE_COMMANDS));
-        conn.send(uint32_t(data.size()));
-        conn.send(data);
+      if (state == STATE_IDLE) {
+        set<uint32_t> peers;
+        for (auto& kv : users)
+          peers.insert(kv.first);
+        list<FileSystem::Command*> cmds;
+        FileSystem::initTmpFileSystem();
+        if (users.size() == 2)
+          cmds = FileSystem::calculateDuplications(peers);
+        else
+          cmds = FileSystem::calculateBalance(peers);
+        ByteQueue data = FileSystem::Command::serialize(cmds);
+        for (auto& kv : users) {
+          if (kv.first == localAddress.ip)
+            continue;
+          TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
+          conn.send(char(MTYPE_COMMANDS));
+          conn.send(uint32_t(data.size()));
+          conn.send(data);
+        }
+        send_files(cmds);
+        FileSystem::processCommands(cmds);
+        for (auto& cmd : cmds)
+          delete cmd;
       }
-      send_files(cmds);
-      FileSystem::processCommands(cmds);
-      for (auto& cmd : cmds)
-        delete cmd;
     }
   }
   
