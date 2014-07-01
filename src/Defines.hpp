@@ -20,7 +20,7 @@
 
 // times
 #define MS_SLEEP                20
-#define MS_DETECTFAILURE        6000
+#define MS_DETECTFAILURE        10000
 #define MS_SPEAK                1000
 #define MS_LOGINSYNC            2000
 
