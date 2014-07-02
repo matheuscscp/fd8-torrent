@@ -118,6 +118,16 @@ uint16_t Address::htons(uint16_t port) {
   return SDLNet_Read16(&port);
 }
 
+bool Address::isPrivateNetwork() {
+  if ((ip & 0x0000FFFF) == 0x0000A8C0) // 16-bit block
+    return true;
+  if ((ip & 0x0000F0FF) == 0x000010AC) // 20-bit block
+    return true;
+  if ((ip & 0x000000FF) == 0x0000000A) // 24-bit block
+    return true;
+  return false;
+}
+
 bool Address::isPrivateNetwork(uint32_t ip) {
   if ((ip & 0x0000FFFF) == 0x0000A8C0) // 16-bit block
     return true;

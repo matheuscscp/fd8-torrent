@@ -38,6 +38,7 @@ class Address {
     static uint16_t ntohs(uint16_t port);
     static uint16_t htons(uint16_t port);
     
+    bool isPrivateNetwork();
     static bool isPrivateNetwork(uint32_t ip);
 };
 

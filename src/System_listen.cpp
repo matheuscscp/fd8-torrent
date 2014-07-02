@@ -21,7 +21,7 @@ void System::listen() {
   Address addr;
   ByteQueue data;
   data = mainUDPSocket.recv(addr);
-  if (data.size() && addr.ip != localAddress.ip && Address::isPrivateNetwork(addr.ip)) {
+  if (data.size() && addr.ip != localAddress.ip && addr.isPrivateNetwork()) {
     // update timeout
     uint32_t sessionID = data.pop<uint32_t>();
     auto userIt = users.find(addr.ip);
