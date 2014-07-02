@@ -16,6 +16,18 @@ using namespace helpers;
 using namespace network;
 using namespace fd8protocol;
 
+void System::detectFailure() {
+  for (auto it = users.begin(); it != users.end();) {
+    if (it->second.timer.time() >= MS_DETECTFAILURE) {
+      users.erase(it++);
+      if (state == STATE_IDLE)
+        recoverFromFailure();
+    }
+    else
+      ++it;
+  }
+}
+
 void System::recoverFromFailure() {
   set<uint32_t> peers;
   uint32_t designatedPeer = 0;

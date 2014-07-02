@@ -73,15 +73,4 @@ void System::listen() {
       }
     }
   }
-  
-  // detecting failures
-  for (auto it = users.begin(); it != users.end();) {
-    if (it->second.timer.time() >= MS_DETECTFAILURE) {
-      users.erase(it++);
-      if (state == STATE_IDLE)
-        recoverFromFailure();
-    }
-    else
-      ++it;
-  }
 }

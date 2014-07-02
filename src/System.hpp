@@ -69,9 +69,12 @@ class System {
     void changeToIdle();
     void stateIdle();
     
-    void speak();
     void executeProtocol();
+    
+    void speak();
     void listen();
+    
+    void detectFailure();
     void recoverFromFailure();
     
     void loginHttpServer();
