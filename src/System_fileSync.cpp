@@ -33,7 +33,6 @@ void System::send_createFile(const string& fullPath, const ByteQueue& info) {
       conn.send(fullPath);
       conn.send(uint32_t(info.size()));
       conn.send(info);
-      conn.recv<char>();
     }
     
     FileSystem::initTmpFileSystem();
@@ -50,7 +49,6 @@ void System::send_createFile(const string& fullPath, const ByteQueue& info) {
       conn.send(char(MTYPE_COMMANDS));
       conn.send(uint32_t(data.size()));
       conn.send(data);
-      conn.recv<char>();
     }
     
     send_files(cmds);
@@ -70,7 +68,6 @@ void System::send_updateFile(const string& fullPath, const string& newName) {
       conn.send(char(MTYPE_UPDATE_FILE));
       conn.send(fullPath);
       conn.send(newName);
-      conn.recv<char>();
     }
   }).start();
 }
@@ -87,7 +84,6 @@ void System::send_deleteFile(const string& fullPath) {
       TCPConnection conn(Address(kv.first, Address("", TCPUDP_MAIN).port));
       conn.send(char(MTYPE_DELETE_FILE));
       conn.send(fullPath);
-      conn.recv<char>();
     }
     
     FileSystem::initTmpFileSystem();
@@ -100,7 +96,6 @@ void System::send_deleteFile(const string& fullPath) {
       conn.send(char(MTYPE_COMMANDS));
       conn.send(uint32_t(data.size()));
       conn.send(data);
-      conn.recv<char>();
     }
     
     send_files(cmds);
@@ -149,7 +144,6 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
           conn.send(buf, readBytes)
         );
         fclose(fp);
-        conn.recv<char>();
       }).start();
     }
     else if (cmd->type() == MTYPE_CMD_BALANCING) {
@@ -183,7 +177,6 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
               conn.send(buf, readBytes)
             );
             fclose(fp);
-            conn.recv<char>();
           }
           
           // sending to peer 2
@@ -199,7 +192,6 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
               conn.send(buf, readBytes)
             );
             fclose(fp);
-            conn.recv<char>();
           }
           
           remove(tmp);

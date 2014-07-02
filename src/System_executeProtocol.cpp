@@ -33,20 +33,17 @@ void System::executeProtocol() {
       
     case MTYPE_CREATE_FOLDER:
       recv_createFolder(peer->recv<string>());
-      peer->send(char(MTYPE_ACK));
       break;
       
     case MTYPE_UPDATE_FOLDER:
       {
         string fullPath = peer->recv<string>();
         recv_updateFolder(fullPath, peer->recv<string>());
-        peer->send(char(MTYPE_ACK));
       }
       break;
       
     case MTYPE_DELETE_FOLDER:
       recv_deleteFolder(peer->recv<string>());
-      peer->send(char(MTYPE_ACK));
       break;
       
     case MTYPE_CREATE_FILE:
@@ -55,7 +52,6 @@ void System::executeProtocol() {
         ByteQueue info(peer->recv<uint32_t>());
         peer->recv(info);
         recv_createFile(fullPath, info);
-        peer->send(char(MTYPE_ACK));
       }
       break;
       
@@ -63,20 +59,17 @@ void System::executeProtocol() {
       {
         string fullPath = peer->recv<string>();
         recv_updateFile(fullPath, peer->recv<string>());
-        peer->send(char(MTYPE_ACK));
       }
       break;
       
     case MTYPE_DELETE_FILE:
       recv_deleteFile(peer->recv<string>());
-      peer->send(char(MTYPE_ACK));
       break;
       
     case MTYPE_COMMANDS:
       {
         ByteQueue data(peer->recv<uint32_t>());
         peer->recv(data);
-        peer->send(char(MTYPE_ACK));
         list<FileSystem::Command*> cmds = FileSystem::Command::deserialize(data);
         send_files(cmds);
         FileSystem::processCommands(cmds);
@@ -111,7 +104,6 @@ void System::executeProtocol() {
           
           fclose(fp);
           
-          tmpConn->send(char(MTYPE_ACK));
           delete tmpConn;
         }).start();
       }
