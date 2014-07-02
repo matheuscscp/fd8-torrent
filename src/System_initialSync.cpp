@@ -39,6 +39,7 @@ void System::requestSystemState() {
   TCPConnection conn(Address(ip, Address("", TCPUDP_MAIN).port));
   conn.send(char(MTYPE_SYNC));
   user.sessionID = conn.recv<uint32_t>();
+  nextSessionID = user.sessionID + 1;
   ByteQueue data(conn.recv<uint32_t>());
   conn.recv(data);
   FileSystem::deserialize(data);
