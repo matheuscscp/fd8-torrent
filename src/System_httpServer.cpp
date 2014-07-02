@@ -293,7 +293,7 @@ void System::httpServer_dataRequest(const string& cRequest) {
         return;
       TCPConnection* tmpConn = client;
       client = nullptr;
-      Thread([fp, tmpConn, this]() {
+      Thread([this, fp, tmpConn]() {
         downloadsRemaining++;
         char buf[SIZE_FILEBUFFER_MAXLEN];
         for (
