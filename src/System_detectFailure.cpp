@@ -17,15 +17,18 @@ using namespace network;
 using namespace fd8protocol;
 
 void System::detectFailure() {
+  bool failureDetected = false;
   for (auto it = users.begin(); it != users.end();) {
     if (it->second.timer.time() >= MS_DETECTFAILURE) {
       users.erase(it++);
-      if (state == STATE_IDLE)
-        recoverFromFailure();
+      failureDetected = true;
     }
     else
       ++it;
   }
+  
+  if (failureDetected && state == STATE_IDLE)
+    recoverFromFailure();
 }
 
 void System::recoverFromFailure() {
