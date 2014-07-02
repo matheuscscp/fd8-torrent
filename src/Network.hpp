@@ -37,6 +37,8 @@ class Address {
     static uint32_t htonl(uint32_t ip);
     static uint16_t ntohs(uint16_t port);
     static uint16_t htons(uint16_t port);
+    
+    static bool isPrivateNetwork(uint32_t ip);
 };
 
 class UDPSocket {
