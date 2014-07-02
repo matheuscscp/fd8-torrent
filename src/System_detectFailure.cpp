@@ -42,6 +42,7 @@ void System::recoverFromFailure() {
     list<FileSystem::Command*> balCmds = FileSystem::calculateBalancing(peers);
     for (auto& cmd : balCmds)
       cmds.push_back(cmd);
+    FileSystem::eliminateIntersections(cmds);
     ByteQueue data = FileSystem::Command::serialize(cmds);
     for (auto& kv : users) {
       if (kv.first == localAddress.ip)

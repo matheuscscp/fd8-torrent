@@ -605,22 +605,49 @@ list<FileSystem::Command*> FileSystem::calculateBalancing(const set<uint32_t>& p
   return cmds;
 }
 
+void FileSystem::eliminateIntersections(list<Command*>& cmds) {
+  // getting files to move
+  map<uint32_t, BalancingCommand*> filesToMove;
+  auto cmd = cmds.begin();
+  for (; cmd != cmds.end() && (*cmd)->type() == MTYPE_CMD_DUPLICATION; cmd++);
+  for (; cmd != cmds.end(); cmds.erase(cmd++)) {
+    BalancingCommand* balCmd = (BalancingCommand*)*cmd;
+    filesToMove[balCmd->fileID] = balCmd;
+  }
+  
+  // removing duplication commands that match a file to move
+  for (cmd = cmds.begin(); cmd != cmds.end();) {
+    DuplicationCommand& dupCmd = *((DuplicationCommand*)*cmd);
+    auto balCmd = filesToMove.find(dupCmd.fileID);
+    if (balCmd != filesToMove.end()) {
+      balCmd->second->srcPeer = dupCmd.srcPeer;
+      cmds.erase(cmd++);
+    }
+    else
+      ++cmd;
+  }
+  
+  // moving balacing commands back to the list
+  for (auto& kv : filesToMove)
+    cmds.push_back(kv.second);
+}
+
 void FileSystem::processCommands(const list<Command*>& cmds) {
   for (auto& cmd : cmds) {
     switch (cmd->type()) {
       case MTYPE_CMD_DUPLICATION: {
         DuplicationCommand& dupCmd = *((DuplicationCommand*)cmd);
-        File* file = rootFolder.findFile(dupCmd.fileID);
-        file->peer1 = dupCmd.srcPeer;
-        file->peer2 = dupCmd.dstPeer;
+        File& file = *rootFolder.findFile(dupCmd.fileID);
+        file.peer1 = dupCmd.srcPeer;
+        file.peer2 = dupCmd.dstPeer;
         break;
       }
       
       case MTYPE_CMD_BALANCING: {
         BalancingCommand& balCmd = *((BalancingCommand*)cmd);
-        File* file = rootFolder.findFile(balCmd.fileID);
-        file->peer1 = balCmd.peer1;
-        file->peer2 = balCmd.peer2;
+        File& file = *rootFolder.findFile(balCmd.fileID);
+        file.peer1 = balCmd.peer1;
+        file.peer2 = balCmd.peer2;
         break;
       }
       
