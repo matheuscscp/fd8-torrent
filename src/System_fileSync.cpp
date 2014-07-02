@@ -146,7 +146,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
       }).start();
     }
     else if (cmd->type() == MTYPE_CMD_BALANCING) {
-      FileSystem::BalancingCommand& balCmd = *((FileSystem::BalancingCommand*)cmd);
+      FileSystem::BalancingCommand balCmd = *((FileSystem::BalancingCommand*)cmd);
       string zuera;
       FileSystem::File file = *FileSystem::retrieveFolder("/", zuera)->findFile(balCmd.fileID);
       if (balCmd.srcPeer == localAddress.ip) {
