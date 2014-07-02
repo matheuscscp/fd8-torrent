@@ -37,6 +37,18 @@ void System::stateIdle() {
   if (idleBalancingTimer.time() > MS_DETECTFAILURE) {
     idleBalancingTimer.reset();
     
+    // ask for synchronization
+    {
+      User& user = users[localAddress.ip];
+      uint32_t mySessionID = user.sessionID;
+      uint32_t tmpNextSessionID = nextSessionID;
+      requestSystemState();
+      if (nextSessionID != 2) {
+        user.sessionID = mySessionID;
+        nextSessionID = tmpNextSessionID;
+      }
+    }
+    
     set<uint32_t> peers;
     for (auto& kv : users)
       peers.insert(kv.first);

@@ -552,7 +552,7 @@ list<FileSystem::Command*> FileSystem::calculateBalancing(const set<uint32_t>& p
     peersFiles[peer];
   tmpRootFolder.getPeersFiles(peersFiles);
   
-  uint32_t averageFiles = uint32_t(ceilf(float(getTotalFiles()*2)/peers.size()));
+  uint32_t averageFiles = uint32_t(ceilf(float(tmpRootFolder.getTotalFiles()*2)/peers.size()));
   
   while (true) { // one iteration of this loop moves a single file
     // find the peers with least and more files in peersFiles
