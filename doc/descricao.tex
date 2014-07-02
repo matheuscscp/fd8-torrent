@@ -254,7 +254,7 @@ Implementação -- Para implementar o balanceamento de arquivos, foi desenvolvid
 
 \indent
 
-O protocolo de comunicação desenvolvido estabelece dez tipos de mensagem. Assim que um par aceita uma conexão TCP, ele deve receber um \textit{byte}, que indica o tipo de mensagem. De acordo com cada mensagem, outros \textit{bytes} devem ser recebidos e ações devem ser tomadas.
+O protocolo de comunicação desenvolvido estabelece nove tipos de mensagem. Assim que um par aceita uma conexão TCP, ele deve receber um \textit{byte}, que indica o tipo de mensagem. De acordo com cada mensagem, outros \textit{bytes} devem ser recebidos e ações devem ser tomadas.
 
 \begin{itemize}
 	\item SYNC -- Ao receber esta mensagem, o par deve responder quatro \textit{bytes} com um número identificador único de sessão de acesso, serializar toda a informação atual do sistema de arquivos e enviar pela conexão TCP. Todos os pares que já estão na rede conhecem o número identificador da próxima sessão de acesso. Portanto, qualquer par que recebe uma mensagem de sincronização pode fornecer ao novo par um número identificador válido. Assim que o par que requisitou sincronização recebe seu número identificador, ele começa a enviar sinalizadores com este número. Os pares que recebem estes sinalizadores podem então colocar o novo par em suas tabelas e atualizar o número identificador da próxima sessão de acesso.
@@ -266,7 +266,6 @@ O protocolo de comunicação desenvolvido estabelece dez tipos de mensagem. Assi
 	\item DELETE FILE -- Ao receber esta mensagem, o par deve receber uma \textit{string} terminada em nulo que contém um caminho de arquivo e remover o arquivo do seu sistema de arquivos.
 	\item COMMANDS -- Ao receber esta mensagem, o par deve receber quatro \textit{bytes} que indicam o tamanho de uma fila de \textit{bytes}, receber a fila de \textit{bytes}, que contém a serialização de uma lista de comandos, e deserializar a fila de \textit{bytes} chamando o módulo responsável pelo sistema de arquivos. Ao remontar os comandos, o par deve processá-los, enviando arquivos para duplicação/balanceamento, removendo arquivos que não pertecem mais a ele e atualizando seu sistema de arquivos.
 	\item FILE -- Ao receber esta mensagem, o par deve receber quatro \textit{bytes} que contêm o número identificador único do arquivo, quatro \textit{bytes} com o tamanho do arquivo e receber o arquivo.
-	\item ACK -- Esta mensagem é enviada pelo par que recebe alguma das oito mensagens acima, para sinalizar que as ações necessárias já foram executadas. Como a mensagem SYNC é um pedido de sincronização, não é necessário enviar um ACK no final.
 \end{itemize}
 
 Além das mensagens trocadas por TCP, o protocolo também estabelece que a carga útil dos sinalizadores UDP deve ser quatro \textit{bytes}, que contêm o número identificador único de sessão de acesso, seguidos de uma \textit{string} terminada em nulo que contenha o nome de usuário de um par.
