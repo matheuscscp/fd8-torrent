@@ -64,6 +64,7 @@ void System::listen() {
           conn.send(char(MTYPE_COMMANDS));
           conn.send(uint32_t(data.size()));
           conn.send(data);
+          conn.recv<char>();
         }
         send_files(cmds);
         FileSystem::processCommands(cmds);

@@ -49,6 +49,7 @@ void System::send_createFile(const string& fullPath, const ByteQueue& info) {
       conn.send(char(MTYPE_COMMANDS));
       conn.send(uint32_t(data.size()));
       conn.send(data);
+      conn.recv<char>();
     }
     
     send_files(cmds);
@@ -98,6 +99,7 @@ void System::send_deleteFile(const string& fullPath) {
       conn.send(char(MTYPE_COMMANDS));
       conn.send(uint32_t(data.size()));
       conn.send(data);
+      conn.recv<char>();
     }
     
     send_files(cmds);

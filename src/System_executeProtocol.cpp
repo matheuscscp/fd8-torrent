@@ -76,6 +76,7 @@ void System::executeProtocol() {
       {
         ByteQueue data(peer->recv<uint32_t>());
         peer->recv(data);
+        peer->send(char(MTYPE_ACK));
         list<FileSystem::Command*> cmds = FileSystem::Command::deserialize(data);
         send_files(cmds);
         FileSystem::processCommands(cmds);
