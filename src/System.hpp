@@ -50,6 +50,7 @@ class System {
     network::TCPServer httpTCPServer;
     helpers::Timer loginSyncTimer;
     concurrency::Thread httpThread;
+    concurrency::Thread initialBalancingThread;
     uint32_t downloadsRemaining;
   public:
     static bool start();
