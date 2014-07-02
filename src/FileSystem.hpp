@@ -136,7 +136,7 @@ class FileSystem {
     static uint64_t getTotalSize();
     
     static std::list<Command*> calculateDuplications(const std::set<uint32_t>& peers);
-    static std::list<Command*> calculateBalance(const std::set<uint32_t>& peers);
+    static std::list<Command*> calculateBalancing(const std::set<uint32_t>& peers);
     static void processCommands(const std::list<Command*>& cmds);
     static void initTmpFileSystem();
 };

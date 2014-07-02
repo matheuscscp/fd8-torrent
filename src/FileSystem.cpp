@@ -539,7 +539,7 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>
   return cmds;
 }
 
-list<FileSystem::Command*> FileSystem::calculateBalance(const set<uint32_t>& peers) {
+list<FileSystem::Command*> FileSystem::calculateBalancing(const set<uint32_t>& peers) {
   list<Command*> cmds;
   map<uint32_t, BalancingCommand*> tmpCmds;
   

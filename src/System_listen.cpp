@@ -55,7 +55,7 @@ void System::listen() {
         if (users.size() == 2)
           cmds = FileSystem::calculateDuplications(peers);
         else
-          cmds = FileSystem::calculateBalance(peers);
+          cmds = FileSystem::calculateBalancing(peers);
         ByteQueue data = FileSystem::Command::serialize(cmds);
         for (auto& kv : users) {
           if (kv.first == localAddress.ip)

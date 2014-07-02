@@ -27,7 +27,7 @@ void System::recoverFromFailure() {
   if (designatedPeer == localAddress.ip) {
     FileSystem::initTmpFileSystem();
     list<FileSystem::Command*> cmds = FileSystem::calculateDuplications(peers);
-    list<FileSystem::Command*> balCmds = FileSystem::calculateBalance(peers);
+    list<FileSystem::Command*> balCmds = FileSystem::calculateBalancing(peers);
     for (auto& cmd : balCmds)
       cmds.push_back(cmd);
     ByteQueue data = FileSystem::Command::serialize(cmds);
