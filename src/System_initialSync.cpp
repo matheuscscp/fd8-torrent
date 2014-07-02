@@ -18,7 +18,7 @@ using namespace fd8protocol;
 using namespace helpers;
 
 void System::requestSystemState() {
-  // first, find someone to send the system state to this peer
+  // find someone to send the system state to this peer
   uint32_t ip = 0;
   for (auto& kv : users) {
     if (kv.first != localAddress.ip) {
@@ -35,6 +35,7 @@ void System::requestSystemState() {
     return;
   }
   
+  // ask for synchronization
   TCPConnection conn(Address(ip, Address("", TCPUDP_MAIN).port));
   conn.send(char(MTYPE_SYNC));
   user.sessionID = conn.recv<uint32_t>();
