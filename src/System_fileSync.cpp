@@ -148,6 +148,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
           conn.send(buf, readBytes)
         );
         fclose(fp);
+        conn.recv<char>();
       }).start();
     }
     else if (cmd->type() == MTYPE_CMD_BALANCING) {
@@ -181,6 +182,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
               conn.send(buf, readBytes)
             );
             fclose(fp);
+            conn.recv<char>();
           }
           
           // sending to peer 2
@@ -196,6 +198,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
               conn.send(buf, readBytes)
             );
             fclose(fp);
+            conn.recv<char>();
           }
           
           remove(tmp);

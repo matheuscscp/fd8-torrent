@@ -111,6 +111,7 @@ void System::executeProtocol() {
           
           fclose(fp);
           
+          tmpConn->send(char(MTYPE_ACK));
           delete tmpConn;
         }).start();
       }
