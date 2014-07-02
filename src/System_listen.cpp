@@ -21,12 +21,16 @@ void System::listen() {
   Address addr;
   ByteQueue data;
   data = mainUDPSocket.recv(addr);
-  
-  // listening only to non-empty messages, with valid IP address from other peer
-  if (!data.size() || addr.ip == localAddress.ip || !addr.isPrivateNetwork())
+  if (!data.size()) // no beacon was received
     return;
   
   uint32_t sessionID = data.pop<uint32_t>();
+  string userName = data.pop<string>();
+  
+  // ignoring beacons sent from this peer and non-private network addresses
+  if (userName == users[localAddress.ip].name || !addr.isPrivateNetwork())
+    return;
+  
   auto userIt = users.find(addr.ip);
   if (userIt != users.end()) { // IP already in the user table
     if (userIt->second.sessionID == sessionID) // refresh beacon
@@ -37,7 +41,7 @@ void System::listen() {
         recoverFromFailure();
       User& user = users[addr.ip];
       user.sessionID = sessionID;
-      user.name = data.pop<string>();
+      user.name = userName;
       user.timer.start();
       nextSessionID = user.sessionID + 1;
     }
@@ -45,7 +49,7 @@ void System::listen() {
   else { // IP just logged in
     User& user = users[addr.ip];
     user.sessionID = sessionID;
-    user.name = data.pop<string>();
+    user.name = userName;
     user.timer.start();
     nextSessionID = user.sessionID + 1;
   }
