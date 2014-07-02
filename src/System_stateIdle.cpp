@@ -22,22 +22,21 @@ using namespace helpers;
 void System::changeToIdle() {
   FileSystem::init(localAddress.ip);
   requestSystemState();
+  idleBalancingTimer.start();
   httpThread = Thread([this]() {
     while (state == newState) {
       httpServer();
       Thread::sleep(MS_SLEEP);
     }
   });
-  initialBalancingThread = Thread([this]() {
-    // wait a detect failure time to start balancing
-    Timer timer;
-    timer.start();
-    while (state == newState && timer.time() < MS_DETECTFAILURE)
-      Thread::sleep(MS_SLEEP);
-    if (state != newState)
-      return;
+  httpThread.start();
+}
+
+void System::stateIdle() {
+  // first balancing of this peer
+  if (idleBalancingTimer.time() > MS_DETECTFAILURE) {
+    idleBalancingTimer.reset();
     
-    // start balancing
     set<uint32_t> peers;
     for (auto& kv : users)
       peers.insert(kv.first);
@@ -61,12 +60,8 @@ void System::changeToIdle() {
     FileSystem::processCommands(cmds);
     for (auto& cmd : cmds)
       delete cmd;
-  });
-  httpThread.start();
-  initialBalancingThread.start();
-}
-
-void System::stateIdle() {
+  }
+  
   executeProtocol();
   speak();
   listen();

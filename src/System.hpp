@@ -49,8 +49,8 @@ class System {
     network::TCPServer mainTCPServer;
     network::TCPServer httpTCPServer;
     helpers::Timer loginSyncTimer;
+    helpers::Timer idleBalancingTimer;
     concurrency::Thread httpThread;
-    concurrency::Thread initialBalancingThread;
     uint32_t downloadsRemaining;
   public:
     static bool start();

@@ -81,7 +81,6 @@ mainUDPSocket(multicastAddress, SIZE_MULTICAST_MAXLEN),
 mainTCPServer(TCPUDP_MAIN),
 httpTCPServer(TCP_HTTPSERVER),
 httpThread([]() {}),
-initialBalancingThread([]() {}),
 downloadsRemaining(0)
 {
   
@@ -90,7 +89,6 @@ downloadsRemaining(0)
 System::~System() {
   state = STATE_NONE;
   httpThread.join();
-  initialBalancingThread.join();
   while (downloadsRemaining)
     Thread::sleep(MS_SLEEP);
 }
@@ -110,7 +108,6 @@ void System::run() {
 
 void System::change() {
   httpThread.join();
-  initialBalancingThread.join();
   state = newState;
   switch (newState) {
     case STATE_LOGIN: changeToLogin();  break;
