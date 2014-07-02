@@ -18,7 +18,7 @@ using namespace fd8protocol;
 using namespace helpers;
 
 void System::requestSystemState() {
-  // first, find someone to send the system state
+  // first, find someone to send the system state to this peer
   uint32_t ip = 0;
   for (auto& kv : users) {
     if (kv.first != localAddress.ip) {
