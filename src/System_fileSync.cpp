@@ -122,13 +122,17 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
     if(cmd->type() == MTYPE_CMD_DUPLICATION && ((FileSystem::DuplicationCommand*)cmd)->srcPeer == localAddress.ip) {
       FileSystem::DuplicationCommand dupCmd = *((FileSystem::DuplicationCommand*)cmd);
       Thread([this, dupCmd]() {
-        char tmp[25];
         char buf[SIZE_FILEBUFFER_MAXLEN];
-        TCPConnection conn(Address(dupCmd.dstPeer, Address("", TCPUDP_MAIN).port));
+        
+        // getting file name
+        char tmp[25];
         sprintf(tmp, "www/files/%08x", dupCmd.fileID);
+        
         FILE* fp = fopen(tmp, "rb");
         fseek(fp, 0, SEEK_END);
-        conn.send(char(fd8protocol::MTYPE_FILE));
+        
+        TCPConnection conn(Address(dupCmd.dstPeer, Address("", TCPUDP_MAIN).port));
+        conn.send(char(MTYPE_FILE));
         conn.send(uint32_t(dupCmd.fileID));
         conn.send(uint32_t(ftell(fp)));
         fclose(fp);
@@ -162,7 +166,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
           // sending to peer 1
           if (balCmd.peer1 != file.peer1 && balCmd.peer1 != file.peer2) {
             TCPConnection conn(Address(balCmd.peer1, Address("", TCPUDP_MAIN).port));
-            conn.send(char(fd8protocol::MTYPE_FILE));
+            conn.send(char(MTYPE_FILE));
             conn.send(uint32_t(balCmd.fileID));
             conn.send(fileSize);
             fp = fopen(tmp, "rb");
@@ -177,7 +181,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
           // sending to peer 2
           if (balCmd.peer2 != file.peer1 && balCmd.peer2 != file.peer2) {
             TCPConnection conn(Address(balCmd.peer2, Address("", TCPUDP_MAIN).port));
-            conn.send(char(fd8protocol::MTYPE_FILE));
+            conn.send(char(MTYPE_FILE));
             conn.send(uint32_t(balCmd.fileID));
             conn.send(fileSize);
             fp = fopen(tmp, "rb");

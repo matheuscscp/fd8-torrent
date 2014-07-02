@@ -18,6 +18,7 @@ using namespace std;
 using namespace network;
 using namespace helpers;
 using namespace concurrency;
+using namespace fd8protocol;
 
 void System::executeProtocol() {
   TCPConnection* peer = mainTCPServer.accept();
@@ -26,26 +27,26 @@ void System::executeProtocol() {
   
   char request = peer->recv<char>();
   switch (request) {
-    case fd8protocol::MTYPE_SYNC:
+    case MTYPE_SYNC:
       respondSystemState(peer);
       break;
       
-    case fd8protocol::MTYPE_CREATE_FOLDER:
+    case MTYPE_CREATE_FOLDER:
       recv_createFolder(peer->recv<string>());
       break;
       
-    case fd8protocol::MTYPE_UPDATE_FOLDER:
+    case MTYPE_UPDATE_FOLDER:
       {
         string fullPath = peer->recv<string>();
         recv_updateFolder(fullPath, peer->recv<string>());
       }
       break;
       
-    case fd8protocol::MTYPE_DELETE_FOLDER:
+    case MTYPE_DELETE_FOLDER:
       recv_deleteFolder(peer->recv<string>());
       break;
       
-    case fd8protocol::MTYPE_CREATE_FILE:
+    case MTYPE_CREATE_FILE:
       {
         string fullPath = peer->recv<string>();
         ByteQueue info(peer->recv<uint32_t>());
@@ -54,18 +55,18 @@ void System::executeProtocol() {
       }
       break;
       
-    case fd8protocol::MTYPE_UPDATE_FILE:
+    case MTYPE_UPDATE_FILE:
       {
         string fullPath = peer->recv<string>();
         recv_updateFile(fullPath, peer->recv<string>());
       }
       break;
       
-    case fd8protocol::MTYPE_DELETE_FILE:
+    case MTYPE_DELETE_FILE:
       recv_deleteFile(peer->recv<string>());
       break;
       
-    case fd8protocol::MTYPE_COMMANDS:
+    case MTYPE_COMMANDS:
       {
         ByteQueue data(peer->recv<uint32_t>());
         peer->recv(data);
@@ -77,7 +78,7 @@ void System::executeProtocol() {
       }
       break;
       
-    case fd8protocol::MTYPE_FILE:
+    case MTYPE_FILE:
       {
         TCPConnection* tmpConn = peer;
         peer = nullptr;
