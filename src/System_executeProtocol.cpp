@@ -83,11 +83,15 @@ void System::executeProtocol() {
         TCPConnection* tmpConn = peer;
         peer = nullptr;
         Thread([tmpConn]() {
-          char tmp[25];
           uint32_t fileID = tmpConn->recv<uint32_t>();
           uint32_t fileSize = tmpConn->recv<uint32_t>();
+          
+          // opening file
+          char tmp[25];
           sprintf(tmp, "www/files/%08x", fileID);
           FILE* fp = fopen(tmp, "wb");
+          
+          // receiving file
           size_t bytesRecvd = 0;
           ByteQueue buf;
           while (bytesRecvd < fileSize) {
@@ -97,7 +101,9 @@ void System::executeProtocol() {
             bytesRecvd += buf.size();
             fwrite(buf.ptr(), buf.size(), 1, fp);
           }
+          
           fclose(fp);
+          
           delete tmpConn;
         }).start();
       }
