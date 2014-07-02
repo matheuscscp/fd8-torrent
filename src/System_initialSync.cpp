@@ -30,6 +30,7 @@ void System::requestSystemState() {
   User& user = users[localAddress.ip];
   
   if (!ip) { // no one found, then return
+    nextSessionID = 1;
     user.sessionID = nextSessionID++;
     return;
   }
