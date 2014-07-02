@@ -528,11 +528,11 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>
       minimalPeer->second.insert(fileID);
       
       // update temporary file system
-      File* file = tmpRootFolder.findFile(fileID);
-      file->peer2 = minimalPeer->first;
+      File& file = *tmpRootFolder.findFile(fileID);
+      file.peer2 = minimalPeer->first;
       
       // push command
-      cmds.push_back(new DuplicationCommand(fileID, file->peer1, file->peer2));
+      cmds.push_back(new DuplicationCommand(fileID, file.peer1, file.peer2));
     }
   }
   
@@ -580,19 +580,19 @@ list<FileSystem::Command*> FileSystem::calculateBalance(const set<uint32_t>& pee
       minimalPeer->second.insert(fileID);
       
       // update temporary file system
-      File* file = tmpRootFolder.findFile(fileID);
-      if (file->peer1 == maximalPeer->first)
-        file->peer1 = minimalPeer->first;
+      File& file = *tmpRootFolder.findFile(fileID);
+      if (file.peer1 == maximalPeer->first)
+        file.peer1 = minimalPeer->first;
       else
-        file->peer2 = minimalPeer->first;
+        file.peer2 = minimalPeer->first;
       
       auto balCmd = tmpCmds.find(fileID);
       if (balCmd == tmpCmds.end()) { // push command
-        tmpCmds[fileID] = new BalancingCommand(fileID, maximalPeer->first, file->peer1, file->peer2);
+        tmpCmds[fileID] = new BalancingCommand(fileID, maximalPeer->first, file.peer1, file.peer2);
       }
       else { // update command
-        balCmd->second->peer1 = file->peer1;
-        balCmd->second->peer2 = file->peer2;
+        balCmd->second->peer1 = file.peer1;
+        balCmd->second->peer2 = file.peer2;
       }
       
       break;
