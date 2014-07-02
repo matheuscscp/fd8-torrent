@@ -594,6 +594,7 @@ list<FileSystem::Command*> FileSystem::calculateBalance(const set<uint32_t>& pee
         balCmd->second->peer1 = file->peer1;
         balCmd->second->peer2 = file->peer2;
       }
+      
       break;
     }
   }
