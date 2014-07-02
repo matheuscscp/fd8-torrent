@@ -93,13 +93,12 @@ void FileSystem::Folder::getPeersFiles(map<uint32_t, set<uint32_t>>& peersFiles)
   }
 }
 
-void FileSystem::Folder::getFilesPeers(map<uint32_t, pair<uint32_t, uint32_t>>& filesPeers) {
+void FileSystem::Folder::getSingleFiles(set<uint32_t>& singleFiles) {
   for (auto& kv : subfolders)
-    kv.second.getFilesPeers(filesPeers);
+    kv.second.getSingleFiles(singleFiles);
   for (auto& kv : files) {
-    pair<uint32_t, uint32_t>& file = filesPeers[kv.second.id];
-    file.first = kv.second.peer1;
-    file.second = kv.second.peer2;
+    if (!kv.second.peer2)
+      singleFiles.insert(kv.second.id);
   }
 }
 
@@ -503,16 +502,11 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>
     peersFiles[peer];
   tmpRootFolder.getPeersFiles(peersFiles);
   
-  // get the two peers of each file
-  map<uint32_t, pair<uint32_t, uint32_t>> filesPeers;
-  set<uint32_t> toDup;
-  tmpRootFolder.getFilesPeers(filesPeers);
-  for (auto& kv : filesPeers) {
-    if (!kv.second.second)
-      toDup.insert(kv.first);
-  }
+  // get files to be duplicated
+  set<uint32_t> singleFiles;
+  tmpRootFolder.getSingleFiles(singleFiles);
   
-  while (toDup.size()) {
+  while (singleFiles.size()) {
     // find the peer with least files in peersFiles
     auto minimalPeer = peersFiles.begin();
     auto peerIt = peersFiles.begin();
@@ -522,24 +516,17 @@ list<FileSystem::Command*> FileSystem::calculateDuplications(const set<uint32_t>
     }
     
     // searching file to duplicate in the minimal peer
-    auto fileToDup = toDup.end();
-    for (auto fileIt = toDup.begin(); fileIt != toDup.end(); fileIt++) {
-      if (minimalPeer->second.find(*fileIt) == minimalPeer->second.end()) {
-        fileToDup = fileIt;
-        break;
-      }
-    }
-    
-    if (fileToDup == toDup.end()) // if the peer already have all the toDup files
+    auto fileToDup = singleFiles.begin();
+    for (; fileToDup != singleFiles.end() && minimalPeer->second.find(*fileToDup) != minimalPeer->second.end(); fileToDup++);
+    if (fileToDup == singleFiles.end()) // if the peer already have all the toDup files
       peersFiles.erase(minimalPeer);
     else { // file to duplicate found for this minimal peer
       uint32_t fileID = *fileToDup;
-      toDup.erase(fileToDup);                         // updating toDup (removing fileToDup from toDup set)
-      minimalPeer->second.insert(fileID);             // updating peersFiles
-      pair<uint32_t, uint32_t>& theFile = filesPeers[fileID];
-      theFile.second = minimalPeer->first;            // updating filesPeers
-      cmds.push_back(new DuplicationCommand(fileID, theFile.first, theFile.second));
-      tmpRootFolder.findFile(fileID)->peer2 = theFile.second; // updating the file system of this host
+      singleFiles.erase(fileToDup);
+      minimalPeer->second.insert(fileID);
+      File* file = tmpRootFolder.findFile(fileID);
+      file->peer2 = minimalPeer->first;
+      cmds.push_back(new DuplicationCommand(fileID, file->peer1, file->peer2));
     }
   }
   

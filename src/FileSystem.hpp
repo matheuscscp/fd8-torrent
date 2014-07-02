@@ -48,7 +48,7 @@ class FileSystem {
         uint64_t getTotalSize();
         
         void getPeersFiles(std::map<uint32_t, std::set<uint32_t>>& peersFiles);
-        void getFilesPeers(std::map<uint32_t, std::pair<uint32_t, uint32_t>>& filesPeers);
+        void getSingleFiles(std::set<uint32_t>& singleFiles);
         
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
         File* findFile(const std::string& subPath, Folder** parent = nullptr);
