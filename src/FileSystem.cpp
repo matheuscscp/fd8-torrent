@@ -102,6 +102,19 @@ void FileSystem::Folder::getSingleFiles(set<uint32_t>& singleFiles) {
   }
 }
 
+void FileSystem::Folder::removeOfflinePeers(const set<uint32_t>& peers) {
+  for (auto& kv : subfolders)
+    kv.second.removeOfflinePeers(peers);
+  for (auto& kv : files) {
+    if (peers.find(kv.second.peer1) == peers.end()) {
+      kv.second.peer1 = kv.second.peer2;
+      kv.second.peer2 = 0;
+    }
+    else if (peers.find(kv.second.peer2) == peers.end())
+      kv.second.peer2 = 0;
+  }
+}
+
 FileSystem::Folder* FileSystem::Folder::findFolder(const string& subPath, Folder** parent) {
   if (!parsePath(subPath)) { // if the path is invalid
     if (parent) // if the parent folder was requested

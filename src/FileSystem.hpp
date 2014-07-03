@@ -49,6 +49,7 @@ class FileSystem {
         
         void getPeersFiles(std::map<uint32_t, std::set<uint32_t>>& peersFiles);
         void getSingleFiles(std::set<uint32_t>& singleFiles);
+        void removeOfflinePeers(const std::set<uint32_t>& peers);
         
         Folder* findFolder(const std::string& subPath, Folder** parent = nullptr);
         File* findFile(const std::string& subPath, Folder** parent = nullptr);

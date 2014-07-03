@@ -41,6 +41,13 @@ void System::recoverFromFailure() {
       designatedPeer = kv.first;
   }
   
+  // remains only this peer
+  if (peers.size() == 1) {
+    string zuera;
+    FileSystem::retrieveFolder("/", zuera)->removeOfflinePeers(peers);
+    return;
+  }
+  
   // if the designated peer is not this one
   if (designatedPeer != localAddress.ip)
     return;
