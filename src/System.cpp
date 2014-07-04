@@ -91,7 +91,7 @@ System::~System() {
   state = STATE_NONE;
   httpThread.join();
   while (downloadsRemaining)
-    Thread::sleep(MS_SLEEP);
+    Thread::sleep(MS_WAIT);
 }
 
 void System::reopenSockets() {
