@@ -120,7 +120,7 @@ void System::recv_deleteFile(const string& fullPath) {
 
 void System::send_files(const list<FileSystem::Command*>& cmds) {
   for (auto& cmd : cmds) {
-    if(cmd->type() == MTYPE_CMD_DUPLICATION && ((FileSystem::DuplicationCommand*)cmd)->srcPeer == localAddress.ip) {
+    if(cmd->type() == FileSystem::Command::DUPLICATION && ((FileSystem::DuplicationCommand*)cmd)->srcPeer == localAddress.ip) {
       FileSystem::DuplicationCommand dupCmd = *((FileSystem::DuplicationCommand*)cmd);
       Thread([this, dupCmd]() {
         char buf[SIZE_FILEBUFFER_MAXLEN];
@@ -146,7 +146,7 @@ void System::send_files(const list<FileSystem::Command*>& cmds) {
         fclose(fp);
       }).start();
     }
-    else if (cmd->type() == MTYPE_CMD_BALANCING) {
+    else if (cmd->type() == FileSystem::Command::BALANCING) {
       FileSystem::BalancingCommand balCmd = *((FileSystem::BalancingCommand*)cmd);
       string zuera;
       FileSystem::File file = *FileSystem::retrieveFolder("/", zuera)->findFile(balCmd.fileID);

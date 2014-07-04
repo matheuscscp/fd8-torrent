@@ -68,6 +68,11 @@ class FileSystem {
     
     class Command {
       public:
+        enum {
+          DUPLICATION = 0,
+          BALANCING
+        };
+        
         static helpers::ByteQueue serialize(const std::list<Command*>& cmds);
         static std::list<Command*> deserialize(helpers::ByteQueue& data);
         

@@ -261,11 +261,11 @@ list<FileSystem::Command*> FileSystem::Command::deserialize(ByteQueue& data) {
   while (data.size()) {
     char mtype = data.pop<char>();
     switch (mtype) {
-      case MTYPE_CMD_DUPLICATION:
+      case DUPLICATION:
         cmds.push_back(new DuplicationCommand(data));
         break;
         
-      case MTYPE_CMD_BALANCING:
+      case BALANCING:
         cmds.push_back(new BalancingCommand(data));
         break;
         
@@ -300,7 +300,7 @@ void FileSystem::DuplicationCommand::serialize_(ByteQueue& data) {
 }
 
 char FileSystem::DuplicationCommand::type() {
-  return MTYPE_CMD_DUPLICATION;
+  return DUPLICATION;
 }
 
 FileSystem::BalancingCommand::BalancingCommand(ByteQueue& data) :
@@ -318,7 +318,7 @@ void FileSystem::BalancingCommand::serialize_(ByteQueue& data) {
 }
 
 char FileSystem::BalancingCommand::type() {
-  return MTYPE_CMD_BALANCING;
+  return BALANCING;
 }
 
 void FileSystem::init(uint32_t localIP) {
@@ -622,7 +622,7 @@ void FileSystem::eliminateIntersections(list<Command*>& cmds) {
   // getting files to move
   map<uint32_t, BalancingCommand*> filesToMove;
   auto cmd = cmds.begin();
-  for (; cmd != cmds.end() && (*cmd)->type() == MTYPE_CMD_DUPLICATION; cmd++);
+  for (; cmd != cmds.end() && (*cmd)->type() == Command::DUPLICATION; cmd++);
   for (; cmd != cmds.end(); cmds.erase(cmd++)) {
     BalancingCommand* balCmd = (BalancingCommand*)*cmd;
     filesToMove[balCmd->fileID] = balCmd;
@@ -648,7 +648,7 @@ void FileSystem::eliminateIntersections(list<Command*>& cmds) {
 void FileSystem::processCommands(const list<Command*>& cmds) {
   for (auto& cmd : cmds) {
     switch (cmd->type()) {
-      case MTYPE_CMD_DUPLICATION: {
+      case Command::DUPLICATION: {
         DuplicationCommand& dupCmd = *((DuplicationCommand*)cmd);
         File& file = *rootFolder.findFile(dupCmd.fileID);
         file.peer1 = dupCmd.srcPeer;
@@ -656,7 +656,7 @@ void FileSystem::processCommands(const list<Command*>& cmds) {
         break;
       }
       
-      case MTYPE_CMD_BALANCING: {
+      case Command::BALANCING: {
         BalancingCommand& balCmd = *((BalancingCommand*)cmd);
         File& file = *rootFolder.findFile(balCmd.fileID);
         file.peer1 = balCmd.peer1;
