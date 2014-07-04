@@ -9,9 +9,6 @@
 #define NETWORK_HPP_
 
 // standard
-#include <vector>
-#include <string>
-#include <cstdint>
 #include <cstdio>
 
 // local

@@ -111,7 +111,7 @@ bool Thread::running() {
   return thread && !terminated;
 }
 
-void Thread::sleep(uint32_t ms, const bool* keepCondition) {
+void Thread::sleep(uint32_t ms, bool* keepCondition) {
   // for naps, or if there is no wakeup condition
   if (ms <= 50 || keepCondition == nullptr) {
     SDL_Delay(ms);

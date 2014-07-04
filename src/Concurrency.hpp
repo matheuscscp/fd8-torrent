@@ -32,7 +32,7 @@ class Thread {
     void join();
     bool running();
     
-    static void sleep(uint32_t ms, const bool* keepCondition = nullptr);
+    static void sleep(uint32_t ms, bool* keepCondition = nullptr);
   private:
     static int exec(void* threadInfo);
 };

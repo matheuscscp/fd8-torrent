@@ -8,13 +8,8 @@
 #ifndef SYSTEM_HPP_
 #define SYSTEM_HPP_
 
-// standard
-#include <map>
-#include <string>
-
 // local
 #include "Concurrency.hpp"
-#include "Helpers.hpp"
 #include "Network.hpp"
 #include "FileSystem.hpp"
 
@@ -79,10 +74,11 @@ class System {
     void recoverFromFailure();
     
     void loginHttpServer();
-    void loginHttpServer_loginAttempt(const std::string& data);
+    void loginHttpServer_loginAttempt(network::TCPConnection* client, const std::string& request);
     
     void httpServer();
-    void httpServer_dataRequest(const std::string& cRequest);
+    void httpServer_dataRequest(network::TCPConnection* client, const std::string& request);
+    void httpServer_recvFile(network::TCPConnection* client);
     
     // initial synchronization
     void requestSystemState();

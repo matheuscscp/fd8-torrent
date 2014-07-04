@@ -9,12 +9,7 @@
 #define FILESYSTEM_HPP_
 
 // standard
-#include <cstdint>
-#include <string>
 #include <map>
-#include <set>
-#include <cstdio>
-#include <list>
 #include <set>
 
 // local

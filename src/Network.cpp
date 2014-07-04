@@ -8,9 +8,6 @@
 // this
 #include "Network.hpp"
 
-// standard
-#include <cstdio>
-
 // lib
 #include <SDL_net.h>
 #ifdef _WIN32
