@@ -76,7 +76,6 @@ System::System() :
 nextSessionID(1),
 state(STATE_NONE),
 newState(STATE_LOGIN),
-localAddress(Address::local()),
 broadcastAddress("255.255.255.255", TCPUDP_MAIN),
 multicastAddress(IP_MULTICAST, TCPUDP_MAIN),
 mainUDPSocket(multicastAddress, SIZE_UDPSOCKET_MAXLEN),
@@ -93,6 +92,12 @@ System::~System() {
   httpThread.join();
   while (downloadsRemaining)
     Thread::sleep(MS_SLEEP);
+}
+
+void System::reopenSockets() {
+  mainUDPSocket = UDPSocket(multicastAddress, SIZE_UDPSOCKET_MAXLEN);
+  mainTCPServer = TCPServer(TCPUDP_MAIN);
+  httpTCPServer = TCPServer(TCP_HTTPSERVER);
 }
 
 void System::run() {
@@ -120,6 +125,8 @@ void System::change() {
 
 void System::changeToLogin() {
   users.erase(localAddress.ip);
+  localAddress = Address::local();
+  reopenSockets();
   loginSyncTimer.start();
   httpThread = Thread([this]() {
     while (state == newState) {
@@ -136,6 +143,8 @@ void System::stateLogin() {
 }
 
 void System::changeToIdle() {
+  localAddress = Address::local();
+  reopenSockets();
   FileSystem::init(localAddress.ip);
   requestSystemState();
   idleBalancingTimer.start();
@@ -146,6 +155,7 @@ void System::changeToIdle() {
     }
   });
   httpThread.start();
+  downloadsRemaining = 0;
 }
 
 void System::stateIdle() {
