@@ -56,8 +56,6 @@ class System {
     System();
     ~System();
     
-    void reopenSockets();
-    
     void run();
     void change();
     

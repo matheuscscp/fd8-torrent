@@ -94,12 +94,6 @@ System::~System() {
     Thread::sleep(MS_WAIT);
 }
 
-void System::reopenSockets() {
-  mainUDPSocket = UDPSocket(multicastAddress, SIZE_UDPSOCKET_MAXLEN);
-  mainTCPServer = TCPServer(TCPUDP_MAIN);
-  httpTCPServer = TCPServer(TCP_HTTPSERVER);
-}
-
 void System::run() {
   while (started) {
     switch (state) {
@@ -126,7 +120,6 @@ void System::change() {
 void System::changeToLogin() {
   users.erase(localAddress.ip);
   localAddress = Address::local();
-  reopenSockets();
   loginSyncTimer.start();
   httpThread = Thread([this]() {
     while (state == newState) {
@@ -143,8 +136,6 @@ void System::stateLogin() {
 }
 
 void System::changeToIdle() {
-  localAddress = Address::local();
-  reopenSockets();
   FileSystem::init(localAddress.ip);
   requestSystemState();
   idleBalancingTimer.start();
